@@ -1,0 +1,2440 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRC WINTER RALLY CUP 2024/2025 // TELEMETRY</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Source+Code+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Custom Base Styles */
+        :root {
+            --bg-color: #0A0A0A;
+            --panel-color: #111111;
+            --accent-color: #8B0000; /* Bordowy */
+            --text-main: #FFFFFF;
+            --text-muted: #888888;
+            --border-color: #222222;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Roboto', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .font-mono {
+            font-family: 'Source Code Pro', monospace;
+            letter-spacing: 0.02em;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-color);
+        }
+
+        /* Utility Classes */
+        .scanline {
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px;
+            pointer-events: none;
+        }
+        
+        .technical-border {
+            border: 1px solid var(--border-color);
+        }
+
+        .accent-text {
+            color: var(--accent-color);
+        }
+
+        .btn-primary {
+            background-color: transparent;
+            border: 1px solid var(--text-main);
+            color: var(--text-main);
+            font-family: 'Source Code Pro', monospace;
+            text-transform: uppercase;
+            padding: 0.6rem 1.75rem;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            border-radius: 0.5rem;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--text-main);
+            color: var(--bg-color);
+        }
+
+        .btn-accent {
+            background-color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            color: var(--bg-color);
+            font-weight: 600;
+            font-family: 'Source Code Pro', monospace;
+            text-transform: uppercase;
+            padding: 0.6rem 1.75rem;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            border-radius: 0.5rem;
+        }
+        
+        .btn-accent:hover {
+            opacity: 0.9;
+        }
+
+        .input-dark {
+            background-color: var(--panel-color);
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 0.8rem;
+            font-family: 'Source Code Pro', monospace;
+            outline: none;
+            width: 100%;
+            transition: border-color 0.2s;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .input-dark:focus {
+            border-color: var(--accent-color);
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Leader rotation animation */
+        @keyframes slideInRight {
+            from { transform: translateX(20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideInLeft {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .slide-right {
+            animation: slideInRight 0.5s ease-out forwards;
+        }
+        
+        .slide-left {
+            animation: slideInLeft 0.5s ease-out forwards;
+        }
+
+        /* Leader dot indicators */
+        .leader-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #444;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .leader-dot.active {
+            background-color: var(--accent-color);
+            width: 20px;
+            border-radius: 4px;
+        }
+
+        /* Badge colors for car classes */
+        .badge-r5 {
+            background-color: #1e40af;
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        /* Equalization points badge */
+        .badge-equalization {
+            background-color: #7c3aed;
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        /* Modal styles */
+        .fixed {
+            position: fixed;
+        }
+
+        .inset-0 {
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        .bg-black\/70 {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .z-50 {
+            z-index: 50;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col relative">
+
+    <!-- Header / Navigation -->
+    <header class="sticky top-0 z-50 bg-[#0A0A0A]/95 backdrop-blur-md border-b border-[#222]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-3 h-3 bg-[#8B0000] rounded-sm"></div>
+                    <div class="flex items-center gap-2">
+                        <!-- WRC Logo -->
+                        <div>
+                            <img src="wrc.png" width="80px">
+                        </div>
+                    </div>
+                </div>
+                <nav class="hidden md:flex space-x-8">
+                    <button onclick="router('home')" id="nav-home" class="text-sm font-mono uppercase tracking-widest hover:text-[#8B0000] transition-colors text-gray-300">Start</button>
+                    <button onclick="router('championship')" id="nav-champ" class="text-sm font-mono uppercase tracking-widest hover:text-[#8B0000] transition-colors text-gray-300">Mistrzostwa</button>
+                    <button onclick="router('results')" id="nav-results" class="text-sm font-mono uppercase tracking-widest hover:text-[#8B0000] transition-colors text-gray-300">Wyniki</button>
+                    <button onclick="router('teams')" id="nav-teams" class="text-sm font-mono uppercase tracking-widest hover:text-[#8B0000] transition-colors text-gray-300">Teamy</button>
+                    <button onclick="router('schedule')" id="nav-schedule" class="text-sm font-mono uppercase tracking-widest hover:text-[#8B0000] transition-colors text-gray-300">Harmonogram</button>
+                    <button onclick="router('rules')" id="nav-rules" class="text-sm font-mono uppercase tracking-widest hover:text-[#8B0000] transition-colors text-gray-300">Zasady</button>
+                    <button onclick="router('login')" id="nav-login" class="text-sm font-mono uppercase tracking-widest hover:text-[#8B0000] transition-colors text-gray-300">Panel Admina</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main id="app" class="flex-grow w-full relative">
+        
+        <!-- VIEW: HOME -->
+        <section id="view-home" class="fade-in w-full px-4 pt-8">
+            <div class="max-w-7xl mx-auto">
+                <div class="technical-border rounded-xl bg-[#0E0E0E] relative overflow-hidden h-[280px] w-full flex flex-col items-center justify-center group mb-6">
+                    <!-- Background Image -->
+                    <div class="absolute inset-0 z-0">
+                        <img src="zdj.jpg" class="w-full h-full object-cover grayscale brightness-[0.4] group-hover:scale-105 transition-transform duration-700">
+                        <div class="absolute inset-0 scanline opacity-30"></div>
+                        <div class="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/60 via-transparent to-[#0A0A0A]/60"></div>
+                    </div>
+                    
+                    <!-- Content -->
+                    <div class="relative z-10 text-center p-8 max-w-3xl mx-auto">
+                        <h1 class="text-3xl md:text-5xl font-mono font-bold tracking-tighter mb-4 text-white leading-tight drop-shadow-lg">
+                            WRC WINTER RALLY CUP<br>2024/2025
+                        </h1>
+                        
+                        <div class="h-[1px] w-24 bg-[#8B0000] mx-auto my-6"></div>
+                        
+                        <button onclick="router('championship')" class="btn-primary hover:bg-white hover:text-black border-white backdrop-blur-sm rounded-lg">
+                            SPRAWDŹ TABELĘ
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Dynamic Leaders Section -->
+                <div id="rotating-leaders" class="technical-border rounded-xl bg-[#0E0E0E] relative overflow-hidden h-[180px] w-full">
+                    <!-- Background Image -->
+                    <div class="absolute inset-0 z-0">
+                        <div class="absolute inset-0 scanline opacity-30"></div>
+                        <div class="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/80 via-transparent to-[#0A0A0A]/80"></div>
+                    </div>
+                    
+                    <!-- Driver Leader -->
+                    <div id="leader-driver" class="absolute inset-0 flex flex-col items-center justify-center p-6 transition-all duration-500 opacity-100">
+                        <div class="text-center">
+                            <p class="text-xs font-mono text-gray-400 mb-2 uppercase tracking-widest">Aktualny Lider</p>
+                            <h3 class="text-2xl font-mono font-bold text-white tracking-widest mb-1" id="driver-leader-name">Ładowanie...</h3>
+                            <p class="text-sm text-gray-300 font-mono tracking-wide">KIEROWCÓW</p>
+                            <div class="mt-3 flex items-center justify-center">
+                                <span class="text-3xl font-mono font-bold text-[#8B0000] mr-2" id="driver-leader-points">0</span>
+                                <span class="text-xs text-gray-400 font-mono">PKT</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Constructor Leader -->
+                    <div id="leader-constructor" class="absolute inset-0 flex flex-col items-center justify-center p-6 transition-all duration-500 opacity-0">
+                        <div class="text-center">
+                            <p class="text-xs font-mono text-gray-400 mb-2 uppercase tracking-widest">Aktualny Lider</p>
+                            <h3 class="text-2xl font-mono font-bold text-white tracking-widest mb-1" id="constructor-leader-name">Ładowanie...</h3>
+                            <p class="text-sm text-gray-300 font-mono tracking-wide">KONSTRUKTORÓW</p>
+                            <div class="mt-3 flex items-center justify-center">
+                                <span class="text-3xl font-mono font-bold text-[#8B0000] mr-2" id="constructor-leader-points">0</span>
+                                <span class="text-xs text-gray-400 font-mono">PKT</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Navigation Dots -->
+                    <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                        <button onclick="showLeader('driver')" class="leader-dot active" data-target="driver"></button>
+                        <button onclick="showLeader('constructor')" class="leader-dot" data-target="constructor"></button>
+                    </div>
+                    
+                    <!-- Auto Rotation Indicator -->
+                    <div class="absolute top-4 right-4">
+                        <div class="w-2 h-2 rounded-full bg-[#8B0000] animate-pulse"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: CHAMPIONSHIP -->
+        <section id="view-championship" class="hidden fade-in max-w-7xl mx-auto px-4 py-12">
+            <div class="flex items-end justify-between mb-8 border-b border-[#222] pb-4">
+                <div>
+                    <h2 class="text-3xl font-mono font-bold">KLASYFIKACJA GENERALNA</h2>
+                    <p class="text-sm text-gray-400 font-mono mt-1">WRC WINTER RALLY CUP 2024/2025</p>
+                </div>
+                <div class="space-x-1 bg-[#111] p-1 border border-[#222] rounded-lg">
+                    <button onclick="switchTab('drivers')" id="btn-drivers" class="text-sm font-mono px-4 py-2 bg-white text-black transition-all rounded-md">KIEROWCY</button>
+                    <button onclick="switchTab('constructors')" id="btn-constructors" class="text-sm font-mono px-4 py-2 text-gray-400 hover:text-white transition-all rounded-md">KONSTRUKTORZY</button>
+                </div>
+            </div>
+
+            <!-- Drivers Table -->
+            <div id="tab-drivers" class="w-full overflow-x-auto rounded-xl technical-border">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="font-mono text-sm text-gray-400 border-b border-[#222] bg-[#0F0F0F]" id="drivers-table-header">
+                            <!-- Dynamic headers will be inserted here -->
+                        </tr>
+                    </thead>
+                    <tbody class="font-mono text-base divide-y divide-[#1a1a1a]" id="drivers-ranking-body">
+                        <!-- JS GENERATED -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Constructors Table -->
+            <div id="tab-constructors" class="w-full overflow-x-auto hidden rounded-xl technical-border">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="font-mono text-sm text-gray-400 border-b border-[#222] bg-[#0F0F0F]">
+                            <th class="py-4 px-4 font-normal">POZ</th>
+                            <th class="py-4 px-4 font-normal">KONSTRUKTOR</th>
+                            <th class="py-4 px-4 font-normal">KIEROWCY</th>
+                            <th class="py-4 px-4 font-normal text-right">PUNKTY</th>
+                        </tr>
+                    </thead>
+                    <tbody class="font-mono text-base divide-y divide-[#1a1a1a]" id="constructors-ranking-body">
+                        <!-- JS GENERATED -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- VIEW: RESULTS -->
+        <section id="view-results" class="hidden fade-in max-w-7xl mx-auto px-4 py-12">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-8 gap-6 border-b border-[#222] pb-6">
+                <div>
+                    <h2 class="text-3xl font-mono font-bold">WYNIKI SZCZEGÓŁOWE</h2>
+                    <p class="text-sm text-gray-400 font-mono mt-1">ANALIZA CZASÓW ODCINKÓW SPECJALNYCH</p>
+                </div>
+                
+                <!-- Controls -->
+                <div class="flex flex-wrap gap-4 w-full lg:w-auto">
+                    <!-- Round Selector with Arrows -->
+                    <div class="flex items-center bg-[#111] border border-[#222] rounded-lg overflow-hidden">
+                        <button onclick="changeRound(-1)" class="px-3 py-2 text-gray-400 hover:text-white hover:bg-[#222] border-r border-[#222]">&lt;</button>
+                        <select id="res-round-select" class="bg-transparent text-white text-sm font-mono py-2 px-4 outline-none appearance-none min-w-[150px] text-center cursor-pointer">
+                            <!-- JS GENERATED -->
+                        </select>
+                        <button onclick="changeRound(1)" class="px-3 py-2 text-gray-400 hover:text-white hover:bg-[#222] border-l border-[#222]">&gt;</button>
+                    </div>
+
+                    <!-- Stage Selector with Arrows -->
+                    <div class="flex items-center bg-[#111] border border-[#222] rounded-lg overflow-hidden">
+                        <button onclick="changeStage(-1)" class="px-3 py-2 text-gray-400 hover:text-white hover:bg-[#222] border-r border-[#222]">&lt;</button>
+                        <select id="res-stage-select" class="bg-transparent text-white text-sm font-mono py-2 px-4 outline-none appearance-none min-w-[150px] text-center cursor-pointer">
+                            <!-- JS GENERATED -->
+                        </select>
+                        <button onclick="changeStage(1)" class="px-3 py-2 text-gray-400 hover:text-white hover:bg-[#222] border-l border-[#222]">&gt;</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full overflow-x-auto bg-[#0F0F0F] technical-border rounded-xl">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="font-mono text-sm text-gray-400 border-b border-[#222] bg-[#151515]">
+                            <th class="py-3 pl-4 w-16">#</th>
+                            <th class="py-3">KIEROWCA</th>
+                            <th class="py-3 text-right">CZAS OS</th>
+                            <th class="py-3 text-right">RÓŻNICA</th>
+                            <th class="py-3 text-right pr-4">PKT BONUSOWE</th>
+                        </tr>
+                    </thead>
+                    <tbody class="font-mono text-base divide-y divide-[#1a1a1a]" id="stage-results-body">
+                         <!-- JS GENERATED -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- VIEW: TEAMS -->
+        <section id="view-teams" class="hidden fade-in max-w-7xl mx-auto px-4 py-12">
+            <div class="mb-8">
+                <h2 class="text-3xl font-mono font-bold">TEAMY I KONSTRUKTORZY</h2>
+                <p class="text-sm text-gray-400 font-mono mt-1">PRZYDZIAŁ KIEROWCÓW I SAMOCHODÓW</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Ford Team -->
+                <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-4 h-4 bg-blue-600 rounded-sm"></div>
+                        <h3 class="font-mono text-xl font-bold">FORD</h3>
+                        <span class="badge-r5 ml-auto">R5</span>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="p-3 bg-[#111] rounded-lg border-l-4 border-blue-600">
+                            <p class="font-mono text-sm text-white">Kierowca 1: <span class="text-[#8B0000]" id="ford-driver1">Rendi</span></p>
+                            <p class="font-mono text-xs text-gray-400 mt-1">Ford Fiesta R5</p>
+                        </div>
+                        <div class="p-3 bg-[#111] rounded-lg border-l-4 border-blue-600">
+                            <p class="font-mono text-sm text-white">Kierowca 2: <span class="text-[#8B0000]" id="ford-driver2">Hanał</span></p>
+                            <p class="font-mono text-xs text-gray-400 mt-1">Ford Fiesta R5</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Volkswagen Team -->
+                <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-4 h-4 bg-white rounded-sm"></div>
+                        <h3 class="font-mono text-xl font-bold">VOLKSWAGEN</h3>
+                        <span class="badge-r5 ml-auto">R5</span>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="p-3 bg-[#111] rounded-lg border-l-4 border-white">
+                            <p class="font-mono text-sm text-white">Kierowca 1: <span class="text-[#8B0000]" id="volkswagen-driver1">Dombart</span></p>
+                            <p class="font-mono text-xs text-gray-400 mt-1">Volkswagen Polo GTI R5</p>
+                        </div>
+                        <div class="p-3 bg-[#111] rounded-lg border-l-4 border-white">
+                            <p class="font-mono text-sm text-white">Kierowca 2: <span class="text-[#8B0000]" id="volkswagen-driver2">Lamała</span></p>
+                            <p class="font-mono text-xs text-gray-400 mt-1">Volkswagen Polo GTI R5</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Škoda Team -->
+                <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-4 h-4 bg-green-600 rounded-sm"></div>
+                        <h3 class="font-mono text-xl font-bold">ŠKODA</h3>
+                        <span class="badge-r5 ml-auto">R5</span>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="p-3 bg-[#111] rounded-lg border-l-4 border-green-600">
+                            <p class="font-mono text-sm text-white">Kierowca 1: <span class="text-[#8B0000]" id="skoda-driver1">White</span></p>
+                            <p class="font-mono text-xs text-gray-400 mt-1">Škoda Fabia R5</p>
+                        </div>
+                        <div class="p-3 bg-[#111] rounded-lg border-l-4 border-green-600">
+                            <p class="font-mono text-sm text-white">Kierowca 2: <span class="text-gray-400" id="skoda-driver2">Do przydziału</span></p>
+                            <p class="font-mono text-xs text-gray-400 mt-1">Škoda Fabia R5</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Peugeot Team -->
+                <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-4 h-4 bg-red-600 rounded-sm"></div>
+                        <h3 class="font-mono text-xl font-bold">PEUGEOT</h3>
+                        <span class="badge-r5 ml-auto">R5</span>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="p-3 bg-[#111] rounded-lg border-l-4 border-red-600">
+                            <p class="font-mono text-sm text-white">Kierowca 1: <span class="text-[#8B0000]" id="peugeot-driver1">Barto</span></p>
+                            <p class="font-mono text-xs text-gray-400 mt-1">Peugeot 208 T16 R5</p>
+                        </div>
+                        <div class="p-3 bg-[#111] rounded-lg border-l-4 border-red-600">
+                            <p class="font-mono text-sm text-white">Kierowca 2: <span class="text-gray-400" id="peugeot-driver2">Do przydziału</span></p>
+                            <p class="font-mono text-xs text-gray-400 mt-1">Peugeot 208 T16 R5</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mitsubishi Team -->
+                <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-4 h-4 bg-yellow-600 rounded-sm"></div>
+                        <h3 class="font-mono text-xl font-bold">MITSUBISHI</h3>
+                        <span class="badge-r5 ml-auto">R5</span>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="p-3 bg-[#111] rounded-lg border-l-4 border-yellow-600">
+                            <p class="font-mono text-sm text-white">Kierowca 1: <span class="text-gray-400" id="mitsubishi-driver1">Do przydziału</span></p>
+                            <p class="font-mono text-xs text-gray-400 mt-1">Mitsubishi Space Star R5</p>
+                        </div>
+                        <div class="p-3 bg-[#111] rounded-lg border-l-4 border-yellow-600">
+                            <p class="font-mono text-sm text-white">Kierowca 2: <span class="text-gray-400" id="mitsubishi-driver2">Do przydziału</span></p>
+                            <p class="font-mono text-xs text-gray-400 mt-1">Mitsubishi Space Star R5</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Citroën Team -->
+                <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-4 h-4 bg-purple-600 rounded-sm"></div>
+                        <h3 class="font-mono text-xl font-bold">CITROËN</h3>
+                        <span class="badge-r5 ml-auto">R5</span>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="p-3 bg-[#111] rounded-lg border-l-4 border-purple-600">
+                            <p class="font-mono text-sm text-white">Kierowca 1: <span class="text-gray-400" id="citroen-driver1">Do przydziału</span></p>
+                            <p class="font-mono text-xs text-gray-400 mt-1">Citroën C3 R5</p>
+                        </div>
+                        <div class="p-3 bg-[#111] rounded-lg border-l-4 border-purple-600">
+                            <p class="font-mono text-sm text-white">Kierowca 2: <span class="text-gray-400" id="citroen-driver2">Do przydziału</span></p>
+                            <p class="font-mono text-xs text-gray-400 mt-1">Citroën C3 R5</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: SCHEDULE -->
+        <section id="view-schedule" class="hidden fade-in max-w-7xl mx-auto px-4 py-12">
+            <div class="mb-8">
+                <h2 class="text-3xl font-mono font-bold">HARMONOGRAM TURNIEJU</h2>
+                <p class="text-sm text-gray-400 font-mono mt-1">29-30 GRUDNIA & 1-2 STYCZNIA</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Day 1 -->
+                <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-3 h-3 bg-[#8B0000] rounded-sm"></div>
+                        <h3 class="font-mono text-xl font-bold">DZIEŃ 1</h3>
+                        <span class="text-xs font-mono text-gray-400 ml-auto">29.12</span>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-[#111] rounded-lg">
+                            <p class="font-mono text-sm text-white">Monte Carlo</p>
+                            <p class="font-mono text-xs text-gray-400 mt-1">Śnieg / Asfalt</p>
+                            <p class="font-mono text-xs text-[#8B0000] mt-2">3 Odcinki Specjalne</p>
+                        </div>
+                        <div class="p-4 bg-[#111] rounded-lg">
+                            <p class="font-mono text-sm text-white">Szkocja</p>
+                            <p class="font-mono text-xs text-gray-400 mt-1">Żwir średni</p>
+                            <p class="font-mono text-xs text-[#8B0000] mt-2">3 Odcinki Specjalne</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Day 2 -->
+                <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-3 h-3 bg-[#8B0000] rounded-sm"></div>
+                        <h3 class="font-mono text-xl font-bold">DZIEŃ 2</h3>
+                        <span class="text-xs font-mono text-gray-400 ml-auto">30.12</span>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-[#111] rounded-lg">
+                            <p class="font-mono text-sm text-white">Argentyna</p>
+                            <p class="font-mono text-xs text-gray-400 mt-1">Żwir ciężki</p>
+                            <p class="font-mono text-xs text-[#8B0000] mt-2">3 Odcinki Specjalne</p>
+                        </div>
+                        <div class="p-4 bg-[#111] rounded-lg">
+                            <p class="font-mono text-sm text-white">Szwecja</p>
+                            <p class="font-mono text-xs text-gray-400 mt-1">Śnieg</p>
+                            <p class="font-mono text-xs text-[#8B0000] mt-2">3 Odcinki Specjalne</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Day 3 -->
+                <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-3 h-3 bg-[#8B0000] rounded-sm"></div>
+                        <h3 class="font-mono text-xl font-bold">DZIEŃ 3</h3>
+                        <span class="text-xs font-mono text-gray-400 ml-auto">01.01</span>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-[#111] rounded-lg">
+                            <p class="font-mono text-sm text-white">Walia</p>
+                            <p class="font-mono text-xs text-gray-400 mt-1">Żwir średni</p>
+                            <p class="font-mono text-xs text-[#8B0000] mt-2">3 Odcinki Specjalne</p>
+                        </div>
+                        <div class="p-4 bg-[#111] rounded-lg">
+                            <p class="font-mono text-sm text-white">Nowa Zelandia</p>
+                            <p class="font-mono text-xs text-gray-400 mt-1">Wszystkie rodzaje żwiru</p>
+                            <p class="font-mono text-xs text-[#8B0000] mt-2">3 Odcinki Specjalne</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Day 4 -->
+                <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-3 h-3 bg-[#8B0000] rounded-sm"></div>
+                        <h3 class="font-mono text-xl font-bold">DZIEŃ 4</h3>
+                        <span class="text-xs font-mono text-gray-400 ml-auto">02.01</span>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-[#111] rounded-lg">
+                            <p class="font-mono text-sm text-white">Niemcy</p>
+                            <p class="font-mono text-xs text-gray-400 mt-1">Asfalt</p>
+                            <p class="font-mono text-xs text-[#8B0000] mt-2">3 Odcinki Specjalne</p>
+                        </div>
+                        <div class="p-4 bg-[#111] rounded-lg">
+                            <p class="font-mono text-sm text-white">Polska</p>
+                            <p class="font-mono text-xs text-gray-400 mt-1">Żwir średni</p>
+                            <p class="font-mono text-xs text-[#8B0000] mt-2">3 Odcinki Specjalne</p>
+                        </div>
+                        <div class="p-4 bg-[#111] rounded-lg border-l-4 border-yellow-500">
+                            <p class="font-mono text-sm text-white">Power Stage: USA</p>
+                            <p class="font-mono text-xs text-gray-400 mt-1">Różne nawierzchnie</p>
+                            <p class="font-mono text-xs text-yellow-500 mt-2">Dodatkowe punkty</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: RULES -->
+        <section id="view-rules" class="hidden fade-in max-w-7xl mx-auto px-4 py-12">
+            <div class="mb-8">
+                <h2 class="text-3xl font-mono font-bold">ZASADY TURNIEJU</h2>
+                <p class="text-sm text-gray-400 font-mono mt-1">WRC WINTER RALLY CUP 2024/2025</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Left Column -->
+                <div class="space-y-6">
+                    <!-- General Rules -->
+                    <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
+                        <h3 class="font-mono text-xl font-bold mb-4">📅 TERMINY I HARMONOGRAM</h3>
+                        <ul class="space-y-3 font-mono text-sm text-gray-300">
+                            <li class="flex items-start">
+                                <span class="text-[#8B0000] mr-2">•</span>
+                                Turniej odbywa się w dniach: 29–30 grudnia oraz 1–2 stycznia
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-[#8B0000] mr-2">•</span>
+                                Każdego dnia rozgrywane są 2 kraje
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-[#8B0000] mr-2">•</span>
+                                Każdy kraj: <span class="text-[#8B0000]">3 odcinki specjalne</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-[#8B0000] mr-2">•</span>
+                                Ostatniego dnia dodatkowy Power Stage: USA
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Scoring System -->
+                    <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
+                        <h3 class="font-mono text-xl font-bold mb-4">🏁 PUNKTACJA</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left font-mono text-sm">
+                                <thead class="text-gray-400 border-b border-[#222]">
+                                    <tr>
+                                        <th class="py-2">Miejsce</th>
+                                        <th class="py-2 text-right">Punkty</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-gray-300">
+                                    <tr><td class="py-2">1.</td><td class="py-2 text-right text-[#8B0000] font-bold">15</td></tr>
+                                    <tr><td class="py-2">2.</td><td class="py-2 text-right">12</td></tr>
+                                    <tr><td class="py-2">3.</td><td class="py-2 text-right">10</td></tr>
+                                    <tr><td class="py-2">4.</td><td class="py-2 text-right">8</td></tr>
+                                    <tr><td class="py-2">5.</td><td class="py-2 text-right">6</td></tr>
+                                    <tr><td class="py-2">6.</td><td class="py-2 text-right">4</td></tr>
+                                    <tr><td class="py-2">7.</td><td class="py-2 text-right">2</td></tr>
+                                    <tr><td class="py-2">8.</td><td class="py-2 text-right">1</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-[#111] rounded-lg border-l-4 border-yellow-600">
+                            <h4 class="font-mono text-sm font-bold text-white mb-2">🔧 Punkty za stan pojazdu:</h4>
+                            <ul class="font-mono text-xs text-gray-300 space-y-1">
+                                <li>• Brak uszkodzeń: <span class="text-green-500">+2 punkty</span></li>
+                                <li>• Lekkie uszkodzenia: <span class="text-yellow-500">+1 punkt</span></li>
+                            </ul>
+                        </div>
+                        
+                        <!-- New: Equalization Points -->
+                        <div class="mt-4 p-3 bg-[#111] rounded-lg border-l-4 border-purple-600">
+                            <h4 class="font-mono text-sm font-bold text-white mb-2">🔄 Punkty Wyrównawcze (+4 PKT):</h4>
+                            <ul class="font-mono text-xs text-gray-300 space-y-1">
+                                <li>• <strong>Przy 6 graczach:</strong> Jeśli w 2 pierwszych etapach miejsce poniżej 5. i w 3. etapie miejsce 3. lub wyższe</li>
+                                <li>• <strong>Przy 8 graczach:</strong> Jeśli w 2 pierwszych etapach miejsce poniżej 6. i w 3. etapie miejsce 4. lub wyższe</li>
+                                <li>• Punkty dodawane po podliczeniu punktów za etapy</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="space-y-6">
+                    <!-- Team Rules -->
+                    <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
+                        <h3 class="font-mono text-xl font-bold mb-4">👥 TEAMY I KONSTRUKTORZY</h3>
+                        <ul class="space-y-3 font-mono text-sm text-gray-300">
+                            <li class="flex items-start">
+                                <span class="text-[#8B0000] mr-2">•</span>
+                                Każdy team składa się z 2 kierowców
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-[#8B0000] mr-2">•</span>
+                                Każdy team przypisany do jednego konstruktora
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-[#8B0000] mr-2">•</span>
+                                Dostępni konstruktorzy: Ford, Volkswagen, Škoda, Peugeot, Mitsubishi, Citroën
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-[#8B0000] mr-2">•</span>
+                                Punkty teamowe = suma punktów obu kierowców
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-[#8B0000] mr-2">•</span>
+                                Przyznawane tytuły: Mistrz Kierowców i Mistrz Konstruktorów
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Safety Rules -->
+                    <div class="technical-border rounded-xl bg-[#0E0E0E] p-6 border-l-4 border-red-600">
+                        <h3 class="font-mono text-xl font-bold mb-4">⚠️ ZASADY BEZPIECZEŃSTWA I FAIR PLAY</h3>
+                        <ul class="space-y-3 font-mono text-sm text-gray-300">
+                            <li class="flex items-start">
+                                <span class="text-red-500 mr-2">❌</span>
+                                Zakaz wychodzenia z turnieju - opuszczenie = dyskwalifikacja
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-red-500 mr-2">❌</span>
+                                Zakaz restartowania OS-ów (nawet po wypadku)
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-red-500 mr-2">❌</span>
+                                Świadome rozbijanie się surowo zabronione
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-red-500 mr-2">•</span>
+                                Wszelkie naruszenia zgłaszać na ticketach serwerowych
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Car Rules -->
+                    <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
+                        <h3 class="font-mono text-xl font-bold mb-4">🚗 SAMOCHODY</h3>
+                        <ul class="space-y-3 font-mono text-sm text-gray-300">
+                            <li class="flex items-start">
+                                <span class="text-[#8B0000] mr-2">•</span>
+                                Dozwolona klasa: R5
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-[#8B0000] mr-2">•</span>
+                                Po wyborze konstruktora nie można zmieniać marki
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-[#8B0000] mr-2">•</span>
+                                Zmiana auta możliwa tylko w obrębie tej samej marki
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-[#8B0000] mr-2">•</span>
+                                Konstruktor z jednym samochodem = brak możliwości zmiany
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: LOGIN -->
+        <section id="view-login" class="hidden fade-in min-h-[70vh] flex flex-col items-center justify-center px-4">
+            <div class="w-full max-w-sm p-8 technical-border bg-[#0E0E0E] relative overflow-hidden rounded-xl">
+                <div class="absolute top-0 left-0 w-full h-1 bg-[#222]"></div>
+                <div class="absolute top-0 left-0 w-1/3 h-1 bg-[#8B0000]"></div>
+                
+                <div class="text-center mb-10">
+                    <h2 class="text-2xl font-mono font-bold mb-2">ACCESS CONTROL</h2>
+                    <p class="text-sm text-gray-400 font-mono">AUTHORIZED PERSONNEL ONLY</p>
+                </div>
+                <form onsubmit="handleLogin(event)" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-mono text-gray-400 mb-2">IDENTYFIKATOR</label>
+                        <input type="text" id="login-username" placeholder="Wprowadź identyfikator" class="input-dark bg-[#080808] border-[#333] focus:border-[#8B0000]">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-mono text-gray-400 mb-2">HASŁO DOSTĘPU</label>
+                        <input type="password" id="login-password" placeholder="Wprowadź hasło" class="input-dark bg-[#080808] border-[#333] focus:border-[#8B0000]">
+                    </div>
+                    <div id="login-error" class="hidden text-xs text-red-500 font-mono p-2 bg-red-900/20 border border-red-900/30 rounded-md">
+                        Nieprawidłowy login lub hasło
+                    </div>
+                    <button type="submit" class="btn-accent w-full mt-6 hover:brightness-110">ZALOGUJ</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- VIEW: ADMIN DASHBOARD -->
+        <section id="view-admin" class="hidden fade-in max-w-7xl mx-auto px-4 py-8">
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Sidebar -->
+                <aside class="lg:w-64 flex-shrink-0">
+                    <div class="technical-border bg-[#0E0E0E] p-4 sticky top-24 rounded-xl">
+                        <div class="mb-8 pb-4 border-b border-[#222]">
+                            <h3 class="font-mono font-bold text-lg">PANEL STEROWANIA</h3>
+                            <p class="text-sm text-[#8B0000] font-mono mt-1">STATUS: ONLINE</p>
+                        </div>
+                        <nav class="space-y-1">
+                            <button onclick="switchAdminModule('drivers')" id="admin-nav-drivers" class="w-full text-left px-4 py-3 font-mono text-sm uppercase tracking-wide transition-all border-l-2 rounded-r-md hover:bg-[#1a1a1a]">KIEROWCY</button>
+                            <button onclick="switchAdminModule('stages')" id="admin-nav-stages" class="w-full text-left px-4 py-3 font-mono text-sm uppercase tracking-wide transition-all border-l-2 rounded-r-md hover:bg-[#1a1a1a]">ETAPY I WYNIKI</button>
+                            <button onclick="switchAdminModule('scoring')" id="admin-nav-scoring" class="w-full text-left px-4 py-3 font-mono text-sm uppercase tracking-wide transition-all border-l-2 rounded-r-md hover:bg-[#1a1a1a]">PUNKTACJA</button>
+                            <div class="h-4"></div>
+                            <button onclick="logout()" class="w-full text-left px-4 py-3 font-mono text-sm uppercase tracking-wide text-red-500 border border-red-900/30 hover:bg-red-900/10 rounded-md">WYLOGUJ</button>
+                        </nav>
+                    </div>
+                </aside>
+
+                <!-- Content Area -->
+                <div class="flex-grow">
+                    
+                    <!-- MODULE: DRIVERS -->
+                    <div id="module-drivers" class="space-y-6">
+                        <div class="flex justify-between items-center mb-6 border-b border-[#222] pb-4">
+                            <h2 class="font-mono text-xl font-bold">BAZA KIEROWCÓW</h2>
+                            <button onclick="toggleDriverForm()" class="btn-primary text-sm">+ DODAJ NOWEGO</button>
+                        </div>
+
+                        <!-- Add Driver Form -->
+                        <div id="driver-form" class="hidden technical-border p-6 bg-[#111] mb-6 border-l-4 border-l-[#8B0000] rounded-xl">
+                            <h4 class="font-mono text-sm font-bold text-gray-400 mb-4 uppercase">Nowy Kierowca</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                                <input type="text" placeholder="Imię i Nazwisko" id="new-driver-name" class="input-dark">
+                                <select id="new-driver-team" class="input-dark">
+                                    <option value="">Wybierz zespół...</option>
+                                    <option value="Ford">Ford</option>
+                                    <option value="Volkswagen">Volkswagen</option>
+                                    <option value="Škoda">Škoda</option>
+                                    <option value="Peugeot">Peugeot</option>
+                                    <option value="Mitsubishi">Mitsubishi</option>
+                                    <option value="Citroën">Citroën</option>
+                                </select>
+                                <select id="new-driver-car" class="input-dark">
+                                    <option value="">Wybierz samochód...</option>
+                                    <option value="Ford Fiesta R5">Ford Fiesta R5</option>
+                                    <option value="Volkswagen Polo GTI R5">Volkswagen Polo GTI R5</option>
+                                    <option value="Škoda Fabia R5">Škoda Fabia R5</option>
+                                    <option value="Peugeot 208 T16 R5">Peugeot 208 T16 R5</option>
+                                    <option value="Mitsubishi Space Star R5">Mitsubishi Space Star R5</option>
+                                    <option value="Citroën C3 R5">Citroën C3 R5</option>
+                                </select>
+                            </div>
+                            <div class="flex justify-end gap-3">
+                                <button onclick="toggleDriverForm()" class="text-sm font-mono text-gray-400 px-4 py-2 hover:text-white">ANULUJ</button>
+                                <button onclick="addDriver()" class="btn-accent text-sm">ZAPISZ DANE</button>
+                            </div>
+                        </div>
+
+                        <!-- Drivers List -->
+                        <div class="technical-border bg-[#0F0F0F] overflow-x-auto rounded-xl">
+                            <table class="w-full text-left">
+                                <thead class="bg-[#151515] font-mono text-sm text-gray-400">
+                                    <tr>
+                                        <th class="p-4">ID</th>
+                                        <th class="p-4">NAZWISKO</th>
+                                        <th class="p-4">ZESPÓŁ</th>
+                                        <th class="p-4">SAMOCHÓD</th>
+                                        <th class="p-4 text-right">AKCJE</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-drivers-list" class="font-mono text-base divide-y divide-[#222]">
+                                    <!-- JS Generated -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- MODULE: STAGES -->
+                    <div id="module-stages" class="hidden space-y-8">
+                        
+                        <!-- Top: Management (Add Rally/Stage) -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="technical-border p-5 bg-[#111] rounded-xl">
+                                <h4 class="font-mono text-sm font-bold text-gray-400 mb-3 uppercase border-b border-[#222] pb-2">NOWY RAJD</h4>
+                                <div class="flex gap-2">
+                                    <input id="new-rally-name" type="text" placeholder="Np. Monte Carlo" class="input-dark text-sm">
+                                    <button onclick="addRally()" class="btn-primary px-3">+</button>
+                                </div>
+                            </div>
+                            <div class="technical-border p-5 bg-[#111] rounded-xl">
+                                <h4 class="font-mono text-sm font-bold text-gray-400 mb-3 uppercase border-b border-[#222] pb-2">NOWY OS (DO WYBRANEGO RAJDU)</h4>
+                                <div class="flex gap-2">
+                                    <input id="new-stage-name" type="text" placeholder="Np. Turini" class="input-dark text-sm">
+                                    <button onclick="addStage()" class="btn-primary px-3">+</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Main: Result Entry -->
+                        <div class="technical-border bg-[#0E0E0E] rounded-xl overflow-hidden">
+                            <div class="p-4 border-b border-[#222] bg-[#111]">
+                                <h2 class="font-mono text-lg font-bold">EDYCJA I WPROWADZANIE WYNIKÓW</h2>
+                            </div>
+                            
+                            <div class="p-6">
+                                <!-- Select Context -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                    <div>
+                                        <label class="block text-sm font-mono text-gray-400 mb-2">WYBIERZ RAJD</label>
+                                        <select id="admin-stage-round" class="input-dark cursor-pointer"></select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-mono text-gray-400 mb-2">WYBIERZ ODCINEK</label>
+                                        <select id="admin-stage-select" class="input-dark cursor-pointer"></select>
+                                    </div>
+                                </div>
+
+                                <!-- Input Data -->
+                                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end border-t border-[#222] pt-6">
+                                    <div class="md:col-span-4">
+                                        <label class="block text-sm font-mono text-gray-400 mb-2">KIEROWCA</label>
+                                        <select id="stage-driver-select" class="input-dark cursor-pointer">
+                                            <option value="">Wybierz kierowcę...</option>
+                                        </select>
+                                    </div>
+                                    <div class="md:col-span-3">
+                                        <label class="block text-sm font-mono text-gray-400 mb-2">CZAS (MM:SS.ms)</label>
+                                        <input id="admin-stage-time" type="text" placeholder="03:42.122" class="input-dark text-[#8B0000] font-bold tracking-wider">
+                                    </div>
+                                    
+                                    <!-- Condition Radios -->
+                                    <div class="md:col-span-5 flex flex-col justify-end h-full pb-1">
+                                        <label class="block text-sm font-mono text-gray-400 mb-2">PUNKTY BONUSOWE</label>
+                                        <div class="flex gap-2">
+                                            <label class="cursor-pointer flex-1">
+                                                <input type="radio" name="run_condition" value="0" id="radio-0" class="hidden peer">
+                                                <div class="border border-[#333] bg-[#111] text-gray-400 text-xs font-mono py-2 text-center peer-checked:bg-red-900/30 peer-checked:border-red-500 peer-checked:text-red-500 hover:bg-[#1a1a1a] rounded-md transition-colors">
+                                                    USZKODZENIA<br>(0 PKT)
+                                                </div>
+                                            </label>
+                                            <label class="cursor-pointer flex-1">
+                                                <input type="radio" name="run_condition" value="1" id="radio-1" class="hidden peer">
+                                                <div class="border border-[#333] bg-[#111] text-gray-400 text-xs font-mono py-2 text-center peer-checked:bg-yellow-900/30 peer-checked:border-yellow-500 peer-checked:text-yellow-500 hover:bg-[#1a1a1a] rounded-md transition-colors">
+                                                    LEKKIE USZK.<br>(+1 PKT)
+                                                </div>
+                                            </label>
+                                            <label class="cursor-pointer flex-1">
+                                                <input type="radio" name="run_condition" value="2" id="radio-2" class="hidden peer" checked>
+                                                <div class="border border-[#333] bg-[#111] text-gray-400 text-xs font-mono py-2 text-center peer-checked:bg-green-900/30 peer-checked:border-green-500 peer-checked:text-green-500 hover:bg-[#1a1a1a] rounded-md transition-colors">
+                                                    CZYSTY<br>(+2 PKT)
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-4 mt-6">
+                                    <button onclick="submitAdminResult()" class="btn-accent flex-grow h-12 rounded-lg">ZAPISZ / AKTUALIZUJ WYNIK</button>
+                                    <span id="admin-status-msg" class="text-sm font-mono text-green-500 hidden fade-in">ZAPISANO POPRAWNIE</span>
+                                    <span id="admin-error-msg" class="text-sm font-mono text-red-500 hidden fade-in"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Current Results Table -->
+                        <div class="technical-border bg-[#0F0F0F] rounded-xl overflow-hidden">
+                            <div class="p-3 border-b border-[#222] bg-[#151515] flex justify-between items-center">
+                                <h4 class="font-mono text-sm font-bold text-gray-400 uppercase">Aktualne wyniki dla wybranego odcinka</h4>
+                                <span class="text-xs font-mono text-[#8B0000]" id="admin-table-info"></span>
+                            </div>
+                            <table class="w-full text-left">
+                                <thead class="font-mono text-xs text-gray-400 border-b border-[#222]">
+                                    <tr>
+                                        <th class="p-3">KIEROWCA</th>
+                                        <th class="p-3 text-right">CZAS</th>
+                                        <th class="p-3 text-right">BONUS</th>
+                                        <th class="p-3 text-right">AKCJE</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-stage-results-body" class="font-mono text-base divide-y divide-[#222]">
+                                    <!-- JS Generated -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                     <!-- MODULE: SCORING -->
+                     <div id="module-scoring" class="hidden space-y-6">
+                        <h2 class="font-mono text-xl font-bold mb-4">KALKULACJA PUNKTÓW</h2>
+                        <div class="p-4 bg-[#111] border-l-4 border-yellow-600 text-gray-300 font-mono text-sm mb-4 leading-relaxed rounded-r-lg">
+                            <strong class="text-white">SYSTEM PUNKTACJI:</strong><br>
+                            1. Miejsca w rajdzie: 15-12-10-8-6-4-2-1<br>
+                            2. Punkty za stan pojazdu: Czysty (+2), Lekkie uszk. (+1)<br>
+                            3. Punkty wyrównawcze: +4 po 3 etapach w określonych warunkach
+                        </div>
+                        <div class="technical-border bg-[#0F0F0F] p-6 rounded-xl">
+                            <div class="flex justify-between items-end mb-4">
+                                <h4 class="font-mono text-base text-gray-400">PODGLĄD PUNKTACJI (TOP 5)</h4>
+                                <span class="text-sm font-mono text-gray-500">LIVE PREVIEW</span>
+                            </div>
+                             <table class="w-full text-left font-mono text-base mb-6 border border-[#222]">
+                                <thead class="bg-[#151515] text-sm text-gray-400">
+                                    <tr>
+                                        <th class="p-2">POZ</th>
+                                        <th class="p-2">KIEROWCA</th>
+                                        <th class="p-2 text-right">TOTAL</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-scoring-preview">
+                                    <!-- JS Generated -->
+                                </tbody>
+                            </table>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                <button onclick="recalculateAllPoints()" class="btn-primary border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-black rounded-lg">PRZELICZ PUNKTY</button>
+                                <button onclick="exportData()" class="btn-primary border-green-500 text-green-500 hover:bg-green-500 hover:text-black rounded-lg">EKSPORTUJ DANE</button>
+                            </div>
+                            <div class="mt-2">
+                                <button onclick="importData()" class="btn-primary w-full border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-black rounded-lg">IMPORTUJ DANE</button>
+                            </div>
+                            <div class="mt-4">
+                                <button onclick="resetToDefaults()" class="btn-primary w-full border-red-500 text-red-500 hover:bg-red-500 hover:text-black rounded-lg">RESETUJ DO DANYCH DOMYŚLNYCH</button>
+                            </div>
+                        </div>
+                     </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="mt-12 border-t border-[#222] py-8 bg-[#050505] relative z-10">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="font-mono text-xs text-gray-500 uppercase tracking-widest">WRC WINTER RALLY CUP 2024/2025 // OFFICIAL TOURNAMENT SYSTEM</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- DATA STORE ---
+        const state = {
+            view: 'home',
+            isLoggedIn: false,
+            currentLeader: 'driver',
+            leaderRotationInterval: null
+        };
+
+        // Stałe dane początkowe
+        const DEFAULT_DATA = {
+            rounds: [
+                { id: 1, name: "Monte Carlo", stages: ["OS1: Col de Turini", "OS2: La Bollène", "OS3: Pra d'Alart"] },
+                { id: 2, name: "Szkocja", stages: ["OS1: Glencoe", "OS2: Kielder", "OS3: Glendevon"] },
+                { id: 3, name: "Argentyna", stages: ["OS1: El Condor", "OS2: Mina Clavero", "OS3: Giulio Cesare"] },
+                { id: 4, name: "Szwecja", stages: ["OS1: Vargåsen", "OS2: Colin's Crest", "OS3: Torsby"] },
+                { id: 5, name: "Walia", stages: ["OS1: Sweet Lamb", "OS2: Dyfnant", "OS3: Gartheiniog"] },
+                { id: 6, name: "Nowa Zelandia", stages: ["OS1: Te Awanga", "OS2: Ocean Beach", "OS3: Waimarama"] },
+                { id: 7, name: "Niemcy", stages: ["OS1: Panzerplatte", "OS2: Arena", "OS3: Mittelmosel"] },
+                { id: 8, name: "Polska", stages: ["OS1: Mikołajki", "OS2: Baranowo", "OS3: Wieliczki"] },
+                { id: 9, name: "USA (Power Stage)", stages: ["OS1: Power Stage"] }
+            ],
+            drivers: [
+                { id: 1, name: "Rendi", team: "Ford", car: "Ford Fiesta R5", points: [0, 0, 0, 0, 0, 0, 0, 0, 0], equalizationPoints: 0 },
+                { id: 2, name: "Dombart", team: "Volkswagen", car: "Volkswagen Polo GTI R5", points: [0, 0, 0, 0, 0, 0, 0, 0, 0], equalizationPoints: 0 },
+                { id: 3, name: "White", team: "Škoda", car: "Škoda Fabia R5", points: [0, 0, 0, 0, 0, 0, 0, 0, 0], equalizationPoints: 0 },
+                { id: 4, name: "Barto", team: "Peugeot", car: "Peugeot 208 T16 R5", points: [0, 0, 0, 0, 0, 0, 0, 0, 0], equalizationPoints: 0 },
+                { id: 5, name: "Lamała", team: "Volkswagen", car: "Volkswagen Polo GTI R5", points: [0, 0, 0, 0, 0, 0, 0, 0, 0], equalizationPoints: 0 },
+                { id: 6, name: "Hanał", team: "Ford", car: "Ford Fiesta R5", points: [0, 0, 0, 0, 0, 0, 0, 0, 0], equalizationPoints: 0 },
+                { id: 7, name: "Gryzna", team: "Ford", car: "Ford Fiesta R5", points: [0, 0, 0, 0, 0, 0, 0, 0, 0], equalizationPoints: 0 },
+                { id: 8, name: "Sala", team: "Peugeot", car: "Peugeot 208 T16 R5", points: [0, 0, 0, 0, 0, 0, 0, 0, 0], equalizationPoints: 0 }
+            ],
+            results: [
+                // Przykładowe wyniki dla Monte Carlo - OS1
+                { r: 0, s: 0, d: 1, time: "03:42.122", ms: 222122, cp: 2 },
+                { r: 0, s: 0, d: 2, time: "03:44.523", ms: 224523, cp: 2 },
+                { r: 0, s: 0, d: 3, time: "03:47.234", ms: 227234, cp: 1 },
+                { r: 0, s: 0, d: 4, time: "03:48.001", ms: 228001, cp: 0 },
+                { r: 0, s: 0, d: 5, time: "03:45.123", ms: 225123, cp: 1 },
+                { r: 0, s: 0, d: 6, time: "03:46.789", ms: 226789, cp: 2 },
+                
+                // Monte Carlo - OS2
+                { r: 0, s: 1, d: 1, time: "04:12.345", ms: 252345, cp: 2 },
+                { r: 0, s: 1, d: 2, time: "04:14.678", ms: 254678, cp: 1 },
+                { r: 0, s: 1, d: 3, time: "04:16.901", ms: 256901, cp: 2 },
+                { r: 0, s: 1, d: 4, time: "04:18.234", ms: 258234, cp: 1 },
+                { r: 0, s: 1, d: 5, time: "04:15.555", ms: 255555, cp: 2 },
+                { r: 0, s: 1, d: 6, time: "04:17.777", ms: 257777, cp: 1 },
+                
+                // Monte Carlo - OS3
+                { r: 0, s: 2, d: 1, time: "05:02.111", ms: 302111, cp: 2 },
+                { r: 0, s: 2, d: 2, time: "05:04.222", ms: 304222, cp: 2 },
+                { r: 0, s: 2, d: 3, time: "05:06.333", ms: 306333, cp: 1 },
+                { r: 0, s: 2, d: 4, time: "05:08.444", ms: 308444, cp: 0 },
+                { r: 0, s: 2, d: 5, time: "05:05.555", ms: 305555, cp: 1 },
+                { r: 0, s: 2, d: 6, time: "05:07.777", ms: 307777, cp: 2 },
+            ]
+        };
+
+        // --- LOCALSTORAGE FUNCTIONS ---
+        function saveToLocalStorage() {
+            const dataToSave = {
+                rounds: state.rounds,
+                drivers: state.drivers,
+                results: state.results,
+                version: "1.2"
+            };
+            localStorage.setItem('wrc_winter_cup_data', JSON.stringify(dataToSave));
+        }
+
+        function loadFromLocalStorage() {
+            const savedData = localStorage.getItem('wrc_winter_cup_data');
+            if (savedData) {
+                try {
+                    const parsed = JSON.parse(savedData);
+                    state.rounds = parsed.rounds || DEFAULT_DATA.rounds;
+                    state.drivers = parsed.drivers || DEFAULT_DATA.drivers;
+                    state.results = parsed.results || DEFAULT_DATA.results;
+                    
+                    // Upewnij się, że każdy kierowca ma equalizationPoints
+                    state.drivers.forEach(driver => {
+                        if (driver.equalizationPoints === undefined) {
+                            driver.equalizationPoints = 0;
+                        }
+                    });
+                    
+                    return true;
+                } catch (e) {
+                    console.error("Błąd podczas wczytywania danych:", e);
+                    loadDefaultData();
+                }
+            } else {
+                loadDefaultData();
+            }
+            return false;
+        }
+
+        function loadDefaultData() {
+            state.rounds = JSON.parse(JSON.stringify(DEFAULT_DATA.rounds));
+            state.drivers = JSON.parse(JSON.stringify(DEFAULT_DATA.drivers));
+            state.results = JSON.parse(JSON.stringify(DEFAULT_DATA.results));
+        }
+
+        function resetToDefaults() {
+            if (confirm("Czy na pewno chcesz zresetować wszystkie dane do ustawień domyślnych? Ta operacja jest nieodwracalna.")) {
+                loadDefaultData();
+                saveToLocalStorage();
+                refreshAllViews();
+                showAdminStatus("Dane zresetowane do domyślnych");
+            }
+        }
+
+        // --- HELPER FUNCTIONS ---
+        function parseTime(timeStr) {
+            const parts = timeStr.split(':');
+            if (parts.length < 2) throw new Error("Format");
+            const min = parseInt(parts[0]);
+            const secParts = parts[1].split('.');
+            const sec = parseInt(secParts[0]);
+            const ms = parseInt(secParts[1] || 0);
+            return (min * 60 * 1000) + (sec * 1000) + ms;
+        }
+
+        function formatTimeDiff(msDiff) {
+            const sec = Math.floor(msDiff / 1000);
+            const ms = msDiff % 1000;
+            return `+${String(sec).padStart(2, '0')}.${String(ms).padStart(3, '0')}`;
+        }
+
+        function calculateTotalTimeForDriverInRound(driverId, roundIndex) {
+            let totalMs = 0;
+            const roundResults = state.results.filter(res => res.r === roundIndex && res.d === driverId);
+            
+            roundResults.forEach(result => {
+                totalMs += result.ms;
+            });
+            
+            return totalMs;
+        }
+
+        function getRoundStandings(roundIndex) {
+            const driverTimes = [];
+            
+            // Sprawdź, którzy kierowcy mają wyniki w tej rundzie
+            const driversInRound = [...new Set(state.results
+                .filter(res => res.r === roundIndex)
+                .map(res => res.d))];
+            
+            driversInRound.forEach(driverId => {
+                const totalTime = calculateTotalTimeForDriverInRound(driverId, roundIndex);
+                driverTimes.push({
+                    driverId: driverId,
+                    totalMs: totalTime
+                });
+            });
+            
+            // Sortuj od najszybszego do najwolniejszego
+            driverTimes.sort((a, b) => a.totalMs - b.totalMs);
+            
+            return driverTimes;
+        }
+
+        function calculateRoundPoints(roundIndex) {
+            const standings = getRoundStandings(roundIndex);
+            const pointsSystem = [15, 12, 10, 8, 6, 4, 2, 1];
+            
+            standings.forEach((standing, position) => {
+                const driver = state.drivers.find(d => d.id === standing.driverId);
+                if (driver && position < pointsSystem.length) {
+                    driver.points[roundIndex] = pointsSystem[position];
+                } else if (driver && position >= pointsSystem.length) {
+                    driver.points[roundIndex] = 0;
+                }
+            });
+        }
+
+        // Funkcja do obliczania punktów wyrównawczych
+        function calculateEqualizationPoints() {
+            // Resetuj punkty wyrównawcze
+            state.drivers.forEach(driver => {
+                driver.equalizationPoints = 0;
+            });
+            
+            const totalDrivers = state.drivers.length;
+            
+            // Sprawdzamy tylko jeśli mamy przynajmniej 3 rundy
+            if (state.rounds.length < 3) return;
+            
+            // Obliczamy pozycje w pierwszych 2 rundach
+            const firstTwoRoundsStandings = [];
+            
+            state.drivers.forEach(driver => {
+                // Suma punktów z pierwszych 2 rund
+                const firstTwoRoundsPoints = (driver.points[0] || 0) + (driver.points[1] || 0);
+                firstTwoRoundsStandings.push({
+                    driverId: driver.id,
+                    points: firstTwoRoundsPoints
+                });
+            });
+            
+            // Sortujemy malejąco według punktów
+            firstTwoRoundsStandings.sort((a, b) => b.points - a.points);
+            
+            // Przypisujemy pozycje
+            const positions = {};
+            firstTwoRoundsStandings.forEach((standing, index) => {
+                positions[standing.driverId] = index + 1; // pozycja 1-based
+            });
+            
+            // Obliczamy pozycję w 3. rundzie
+            const thirdRoundStandings = getRoundStandings(2);
+            
+            // Przypisujemy pozycje w 3. rundzie
+            const thirdRoundPositions = {};
+            thirdRoundStandings.forEach((standing, index) => {
+                thirdRoundPositions[standing.driverId] = index + 1; // pozycja 1-based
+            });
+            
+            // Sprawdzamy warunki dla każdego kierowcy
+            state.drivers.forEach(driver => {
+                const positionInFirstTwo = positions[driver.id];
+                const positionInThird = thirdRoundPositions[driver.id];
+                
+                if (!positionInFirstTwo || !positionInThird) return;
+                
+                if (totalDrivers === 6) {
+                    // Warunek dla 6 graczy
+                    if (positionInFirstTwo > 5 && positionInThird <= 3) {
+                        driver.equalizationPoints = 4;
+                    }
+                } else if (totalDrivers === 8) {
+                    // Warunek dla 8 graczy
+                    if (positionInFirstTwo > 6 && positionInThird <= 4) {
+                        driver.equalizationPoints = 4;
+                    }
+                }
+            });
+        }
+
+        function calculateAllRoundPoints() {
+            // Resetuj wszystkie punkty
+            state.drivers.forEach(driver => {
+                driver.points = new Array(state.rounds.length).fill(0);
+            });
+            
+            // Dla każdej rundy oblicz punkty
+            for (let i = 0; i < state.rounds.length; i++) {
+                calculateRoundPoints(i);
+            }
+            
+            // Oblicz punkty wyrównawcze
+            calculateEqualizationPoints();
+            
+            // Zapisz do LocalStorage
+            saveToLocalStorage();
+        }
+
+        function calculateDriverStats() {
+            // Najpierw przelicz punkty za miejsca w rundach i wyrównawcze
+            calculateAllRoundPoints();
+            
+            return state.drivers.map(d => {
+                const basePoints = d.points.reduce((a,b)=>a+b, 0);
+                const bonusPoints = state.results.filter(r => r.d === d.id).reduce((a, b) => a + (b.cp || 0), 0);
+                const equalizationPoints = d.equalizationPoints || 0;
+                
+                return {
+                    ...d,
+                    bonus: bonusPoints,
+                    equalization: equalizationPoints,
+                    total: basePoints + bonusPoints + equalizationPoints
+                };
+            });
+        }
+
+        function calculateConstructorStats() {
+            const teams = {};
+            const teamDrivers = {};
+            
+            state.drivers.forEach(d => {
+                if(!teams[d.team]) {
+                    teams[d.team] = 0;
+                    teamDrivers[d.team] = [];
+                }
+                const driverStats = calculateDriverStats().find(ds => ds.id === d.id);
+                teams[d.team] += driverStats ? driverStats.total : 0;
+                teamDrivers[d.team].push(d.name);
+            });
+
+            return Object.entries(teams).sort((a,b) => b[1] - a[1]).map(([team, points]) => ({
+                team,
+                points,
+                drivers: teamDrivers[team]
+            }));
+        }
+
+        function calculateDriverLeader() {
+            const driverStats = calculateDriverStats();
+            driverStats.sort((a, b) => b.total - a.total);
+            return driverStats[0] || { name: "Brak danych", total: 0 };
+        }
+
+        function calculateConstructorLeader() {
+            const constructorStats = calculateConstructorStats();
+            return constructorStats[0] || { team: "Brak danych", points: 0 };
+        }
+
+        // --- FUNKCJE DO AKTUALIZACJI WSZYSTKICH WIDOKÓW ---
+        function refreshAllViews() {
+            // Aktualizuj liderów na stronie głównej
+            updateLeaders();
+            
+            // Aktualizuj tabele w widoku mistrzostw
+            renderDriversTable();
+            renderConstructorsTable();
+            
+            // Aktualizuj podgląd punktacji w panelu admina
+            if (state.view === 'admin') {
+                renderScoringPreview();
+            }
+            
+            // Aktualizuj listę kierowców w panelu admina jeśli jest aktywny
+            if (state.view === 'admin' && document.getElementById('admin-drivers-list')) {
+                renderAdminDrivers();
+            }
+            
+            // Aktualizuj widok wyników jeśli jest aktywny
+            if (state.view === 'results') {
+                renderStageResults();
+            }
+            
+            // Aktualizuj widok teamów
+            updateTeamAssignments();
+        }
+
+        function recalculateAllPoints() {
+            calculateAllRoundPoints();
+            refreshAllViews();
+            showAdminStatus("Punkty przeliczone pomyślnie");
+        }
+
+        // --- DYNAMIC LEADERS ON HOME PAGE ---
+        function updateLeaders() {
+            const driverLeader = calculateDriverLeader();
+            const constructorLeader = calculateConstructorLeader();
+            
+            document.getElementById('driver-leader-name').textContent = driverLeader.name;
+            document.getElementById('driver-leader-points').textContent = driverLeader.total;
+            
+            document.getElementById('constructor-leader-name').textContent = constructorLeader.team;
+            document.getElementById('constructor-leader-points').textContent = constructorLeader.points;
+        }
+
+        function showLeader(type) {
+            const driverEl = document.getElementById('leader-driver');
+            const constructorEl = document.getElementById('leader-constructor');
+            const driverDot = document.querySelector('[data-target="driver"]');
+            const constructorDot = document.querySelector('[data-target="constructor"]');
+            
+            if (type === 'driver') {
+                driverEl.classList.remove('opacity-0');
+                driverEl.classList.add('opacity-100', 'slide-right');
+                constructorEl.classList.remove('opacity-100', 'slide-left');
+                constructorEl.classList.add('opacity-0');
+                
+                driverDot.classList.add('active');
+                constructorDot.classList.remove('active');
+                state.currentLeader = 'driver';
+            } else {
+                constructorEl.classList.remove('opacity-0');
+                constructorEl.classList.add('opacity-100', 'slide-left');
+                driverEl.classList.remove('opacity-100', 'slide-right');
+                driverEl.classList.add('opacity-0');
+                
+                constructorDot.classList.add('active');
+                driverDot.classList.remove('active');
+                state.currentLeader = 'constructor';
+            }
+            
+            // Reset rotation interval
+            if (state.leaderRotationInterval) {
+                clearInterval(state.leaderRotationInterval);
+                startLeaderRotation();
+            }
+        }
+
+        function startLeaderRotation() {
+            if (state.leaderRotationInterval) {
+                clearInterval(state.leaderRotationInterval);
+            }
+            
+            state.leaderRotationInterval = setInterval(() => {
+                if (state.currentLeader === 'driver') {
+                    showLeader('constructor');
+                } else {
+                    showLeader('driver');
+                }
+            }, 5000); // Rotate every 5 seconds
+        }
+
+        // --- CORE FUNCTIONS ---
+
+        function router(viewName) {
+            document.querySelectorAll('section[id^="view-"]').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById(`view-${viewName}`);
+            if (target) {
+                target.classList.remove('hidden');
+            }
+            document.querySelectorAll('nav button').forEach(btn => {
+               if(btn.id !== 'nav-login') btn.classList.remove('text-[#8B0000]', 'text-white');
+               else if(btn.id !== 'nav-login') btn.classList.add('text-gray-300');
+            });
+            
+            if (viewName === 'admin' && !state.isLoggedIn) {
+                router('login');
+                return;
+            }
+            
+            if(viewName === 'home') {
+                document.getElementById('nav-home')?.classList.add('text-[#8B0000]');
+                updateLeaders();
+                if (!state.leaderRotationInterval) {
+                    startLeaderRotation();
+                }
+            }
+            if(viewName === 'championship') {
+                document.getElementById('nav-champ')?.classList.add('text-[#8B0000]');
+                renderDriversTable();
+                renderConstructorsTable();
+            }
+            if(viewName === 'results') {
+                document.getElementById('nav-results')?.classList.add('text-[#8B0000]');
+                initResultsView();
+            }
+            if(viewName === 'teams') {
+                document.getElementById('nav-teams')?.classList.add('text-[#8B0000]');
+                updateTeamAssignments();
+            }
+            if(viewName === 'schedule') {
+                document.getElementById('nav-schedule')?.classList.add('text-[#8B0000]');
+            }
+            if(viewName === 'rules') {
+                document.getElementById('nav-rules')?.classList.add('text-[#8B0000]');
+            }
+
+            state.view = viewName;
+            window.scrollTo(0,0);
+        }
+
+        function switchTab(tabName) {
+            if (tabName === 'drivers') {
+                document.getElementById('tab-drivers').classList.remove('hidden');
+                document.getElementById('tab-constructors').classList.add('hidden');
+                document.getElementById('btn-drivers').className = "text-sm font-mono px-4 py-2 bg-white text-black transition-all rounded-md";
+                document.getElementById('btn-constructors').className = "text-sm font-mono px-4 py-2 text-gray-400 hover:text-white transition-all rounded-md";
+            } else {
+                document.getElementById('tab-drivers').classList.add('hidden');
+                document.getElementById('tab-constructors').classList.remove('hidden');
+                document.getElementById('btn-drivers').className = "text-sm font-mono px-4 py-2 text-gray-400 hover:text-white transition-all rounded-md";
+                document.getElementById('btn-constructors').className = "text-sm font-mono px-4 py-2 bg-white text-black transition-all rounded-md";
+            }
+        }
+
+        function switchAdminModule(moduleName) {
+            document.getElementById('module-drivers').classList.add('hidden');
+            document.getElementById('module-stages').classList.add('hidden');
+            document.getElementById('module-scoring').classList.add('hidden');
+            
+            ['drivers', 'stages', 'scoring'].forEach(m => {
+                const nav = document.getElementById(`admin-nav-${m}`);
+                nav.classList.remove('bg-[#222]', 'text-white', 'border-l-[#8B0000]');
+                nav.classList.add('text-gray-400', 'border-l-transparent', 'hover:bg-[#1a1a1a]');
+            });
+
+            document.getElementById(`module-${moduleName}`).classList.remove('hidden');
+            const activeNav = document.getElementById(`admin-nav-${moduleName}`);
+            activeNav.classList.remove('text-gray-400', 'border-l-transparent', 'hover:bg-[#1a1a1a]');
+            activeNav.classList.add('bg-[#222]', 'text-white', 'border-l-[#8B0000]');
+            
+            if(moduleName === 'stages') initAdminStages();
+            if(moduleName === 'scoring') renderScoringPreview();
+            if(moduleName === 'drivers') renderAdminDrivers();
+        }
+
+        // --- PUBLIC RESULTS LOGIC ---
+        
+        function initResultsView() {
+            const roundSelect = document.getElementById('res-round-select');
+            
+            roundSelect.innerHTML = '';
+             state.rounds.forEach((r, i) => {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.text = `R${r.id}: ${r.name.toUpperCase()}`;
+                roundSelect.add(opt);
+            });
+            
+            if(!roundSelect.value && state.rounds.length > 2) roundSelect.value = 2;
+            else if (!roundSelect.value) roundSelect.value = 0;
+            
+            roundSelect.onchange = () => {
+                populateStages(roundSelect.value);
+                renderStageResults();
+            };
+
+            populateStages(roundSelect.value);
+            renderStageResults();
+        }
+
+        function populateStages(roundIndex) {
+            const stageSelect = document.getElementById('res-stage-select');
+            if(!state.rounds[roundIndex]) return;
+
+            const previousIdx = stageSelect.value;
+            
+            stageSelect.innerHTML = '';
+            const stages = state.rounds[roundIndex].stages;
+            
+            stages.forEach((s, i) => {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.text = s.toUpperCase();
+                stageSelect.add(opt);
+            });
+            
+            if(previousIdx && stages[previousIdx]) {
+                stageSelect.value = previousIdx;
+            } else {
+                stageSelect.value = 0;
+            }
+            
+            stageSelect.onchange = renderStageResults;
+        }
+
+        function changeRound(dir) {
+            const sel = document.getElementById('res-round-select');
+            let newIdx = parseInt(sel.value) + dir;
+            if(newIdx < 0) newIdx = state.rounds.length - 1;
+            if(newIdx >= state.rounds.length) newIdx = 0;
+            
+            sel.value = newIdx;
+            populateStages(newIdx);
+            renderStageResults();
+        }
+
+        function changeStage(dir) {
+            const sel = document.getElementById('res-stage-select');
+            const roundIdx = parseInt(document.getElementById('res-round-select').value);
+            
+            if(!state.rounds[roundIdx]) return;
+
+            const stageCount = state.rounds[roundIdx].stages.length;
+            let newIdx = parseInt(sel.value) + dir;
+
+            if(newIdx < 0) newIdx = stageCount - 1;
+            if(newIdx >= stageCount) newIdx = 0;
+            
+            sel.value = newIdx;
+            renderStageResults();
+        }
+
+        function renderStageResults() {
+            const tbody = document.getElementById('stage-results-body');
+            tbody.innerHTML = '';
+            
+            const rIdx = parseInt(document.getElementById('res-round-select').value);
+            const sIdx = parseInt(document.getElementById('res-stage-select').value);
+            
+            const filtered = state.results.filter(res => res.r === rIdx && res.s === sIdx);
+            
+            if(filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-gray-500 font-mono text-sm">BRAK DANYCH DLA TEGO ODCINKA</td></tr>`;
+                return;
+            }
+
+            filtered.sort((a,b) => a.ms - b.ms);
+            
+            const winnerMs = filtered[0].ms;
+
+            filtered.forEach((res, i) => {
+                const driver = state.drivers.find(d => d.id === res.d);
+                if(!driver) return;
+                
+                const diff = i === 0 ? '-' : formatTimeDiff(res.ms - winnerMs);
+                const isWinner = i === 0;
+                
+                const tr = document.createElement('tr');
+                tr.className = isWinner ? "bg-zinc-200 text-black" : "hover:bg-[#151515] transition-colors border-l-2 border-transparent text-gray-300";
+                
+                tr.innerHTML = `
+                    <td class="py-3 pl-4 text-sm ${isWinner ? 'text-black font-bold' : 'text-gray-500'}">${i+1}</td>
+                    <td class="py-3 font-bold font-mono ${isWinner ? 'text-black' : 'text-gray-300'}">${driver.name}</td>
+                    <td class="py-3 text-right font-mono tracking-wide ${isWinner ? 'text-black font-bold' : 'text-white'}">${res.time}</td>
+                    <td class="py-3 text-right text-sm font-mono ${isWinner ? 'text-gray-800' : 'text-gray-500'}">${diff}</td>
+                    <td class="py-3 text-right pr-4 font-mono text-sm ${isWinner ? 'text-gray-800' : 'text-gray-400'}">+${res.cp}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- PUBLIC CHAMPIONSHIP LOGIC ---
+
+        function renderDriversTable() {
+            const tbody = document.getElementById('drivers-ranking-body');
+            const header = document.getElementById('drivers-table-header');
+            
+            // Update headers
+            header.innerHTML = '';
+            const headers = ['POZ', 'KIEROWCA', 'ZESPÓŁ'];
+            
+            // Add round headers
+            for (let i = 0; i < state.rounds.length; i++) {
+                headers.push(`R${i+1}`);
+            }
+            
+            headers.push('BONUS');
+            headers.push('WYRÓW.');
+            headers.push('SUMA');
+            
+            headers.forEach((text, index) => {
+                const th = document.createElement('th');
+                th.className = "py-4 px-4 font-normal";
+                
+                if (text === 'SUMA') {
+                    th.classList.add('text-[#8B0000]');
+                }
+                
+                if (text === 'WYRÓW.') {
+                    th.classList.add('text-purple-400');
+                }
+                
+                if (index >= 3 && index < headers.length - 3) {
+                    th.classList.add('text-right');
+                } else if (text === 'BONUS' || text === 'WYRÓW.' || text === 'SUMA') {
+                    th.classList.add('text-right');
+                }
+                
+                th.textContent = text;
+                header.appendChild(th);
+            });
+            
+            // Update body
+            tbody.innerHTML = '';
+            
+            const driverStats = calculateDriverStats();
+            driverStats.sort((a, b) => b.total - a.total);
+
+            driverStats.forEach((driver, index) => {
+                const isLeader = index === 0;
+                const tr = document.createElement('tr');
+                tr.className = isLeader ? "bg-zinc-200 text-black" : "hover:bg-[#111] transition-colors border-l-2 border-transparent text-gray-300";
+                
+                // Position
+                let td = document.createElement('td');
+                td.className = `py-4 px-4 font-mono ${isLeader ? 'text-black font-bold' : 'text-gray-400'}`;
+                td.textContent = index + 1;
+                tr.appendChild(td);
+                
+                // Driver Name
+                td = document.createElement('td');
+                td.className = `py-4 px-4 font-bold ${isLeader ? 'text-black' : 'text-white'}`;
+                td.textContent = driver.name;
+                tr.appendChild(td);
+                
+                // Team
+                td = document.createElement('td');
+                td.className = `py-4 px-4 text-sm ${isLeader ? 'text-gray-600' : 'text-gray-400'}`;
+                td.textContent = driver.team;
+                tr.appendChild(td);
+                
+                // Round points
+                for (let i = 0; i < state.rounds.length; i++) {
+                    td = document.createElement('td');
+                    td.className = `py-4 px-4 text-right ${isLeader ? 'text-gray-800' : 'text-gray-500'}`;
+                    td.textContent = driver.points[i] || '-';
+                    tr.appendChild(td);
+                }
+                
+                // Bonus points
+                td = document.createElement('td');
+                td.className = `py-4 px-4 text-right font-mono ${isLeader ? 'text-gray-800' : 'text-gray-400'}`;
+                td.textContent = `+${driver.bonus}`;
+                tr.appendChild(td);
+                
+                // Equalization points
+                td = document.createElement('td');
+                td.className = `py-4 px-4 text-right font-mono text-purple-400 ${isLeader ? 'font-bold' : ''}`;
+                td.textContent = driver.equalization > 0 ? `+${driver.equalization}` : '-';
+                tr.appendChild(td);
+                
+                // Total points
+                td = document.createElement('td');
+                td.className = "py-4 px-4 text-right font-bold text-lg text-[#8B0000]";
+                td.textContent = driver.total;
+                tr.appendChild(td);
+                
+                tbody.appendChild(tr);
+            });
+        }
+        
+        function renderConstructorsTable() {
+            const tbody = document.getElementById('constructors-ranking-body');
+            tbody.innerHTML = '';
+            
+            const constructorStats = calculateConstructorStats();
+
+            constructorStats.forEach((constructor, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-[#111] transition-colors";
+                
+                // Position
+                let td = document.createElement('td');
+                td.className = "py-4 px-4 text-gray-400 font-mono";
+                td.textContent = index + 1;
+                tr.appendChild(td);
+                
+                // Constructor Name
+                td = document.createElement('td');
+                td.className = "py-4 px-4 font-bold text-white";
+                td.textContent = constructor.team;
+                tr.appendChild(td);
+                
+                // Drivers
+                td = document.createElement('td');
+                td.className = "py-4 px-4 text-sm text-gray-400";
+                td.textContent = constructor.drivers.join(', ');
+                tr.appendChild(td);
+                
+                // Total Points
+                td = document.createElement('td');
+                td.className = "py-4 px-4 text-right text-[#8B0000] font-bold text-lg";
+                td.textContent = constructor.points;
+                tr.appendChild(td);
+                
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- NOWA POPRAWIONA FUNKCJA updateTeamAssignments ---
+        function updateTeamAssignments() {
+            console.log("Aktualizacja przypisań teamów...", state.drivers);
+            
+            // Inicjalizuj obiekt zespołów
+            const teams = {
+                'Ford': { driver1: '', driver2: '' },
+                'Volkswagen': { driver1: '', driver2: '' },
+                'Škoda': { driver1: '', driver2: '' },
+                'Peugeot': { driver1: '', driver2: '' },
+                'Mitsubishi': { driver1: '', driver2: '' },
+                'Citroën': { driver1: '', driver2: '' }
+            };
+            
+            // Zbierz kierowców dla każdego zespołu
+            state.drivers.forEach(driver => {
+                if (teams[driver.team]) {
+                    if (!teams[driver.team].driver1) {
+                        teams[driver.team].driver1 = driver.name;
+                    } else if (!teams[driver.team].driver2) {
+                        teams[driver.team].driver2 = driver.name;
+                    } else {
+                        // Jeśli są już 2 kierowcy, do nothing
+                        console.log(`Zespół ${driver.team} ma już 2 kierowców: ${teams[driver.team].driver1}, ${teams[driver.team].driver2}`);
+                    }
+                }
+            });
+            
+            console.log("Przypisani kierowcy:", teams);
+            
+            // Zaktualizuj UI dla każdego zespołu
+            for (const [team, drivers] of Object.entries(teams)) {
+                // Utwórz poprawny ID zespołu
+                let teamId;
+                switch(team) {
+                    case 'Ford':
+                        teamId = 'ford';
+                        break;
+                    case 'Volkswagen':
+                        teamId = 'volkswagen';
+                        break;
+                    case 'Škoda':
+                        teamId = 'skoda';
+                        break;
+                    case 'Peugeot':
+                        teamId = 'peugeot';
+                        break;
+                    case 'Mitsubishi':
+                        teamId = 'mitsubishi';
+                        break;
+                    case 'Citroën':
+                        teamId = 'citroen';
+                        break;
+                    default:
+                        teamId = team.toLowerCase();
+                }
+                
+                const driver1El = document.getElementById(`${teamId}-driver1`);
+                const driver2El = document.getElementById(`${teamId}-driver2`);
+                
+                if (driver1El) {
+                    if (drivers.driver1) {
+                        driver1El.textContent = drivers.driver1;
+                        driver1El.classList.remove('text-gray-400');
+                        driver1El.classList.add('text-[#8B0000]');
+                    } else {
+                        driver1El.textContent = 'Do przydziału';
+                        driver1El.classList.remove('text-[#8B0000]');
+                        driver1El.classList.add('text-gray-400');
+                    }
+                }
+                
+                if (driver2El) {
+                    if (drivers.driver2) {
+                        driver2El.textContent = drivers.driver2;
+                        driver2El.classList.remove('text-gray-400');
+                        driver2El.classList.add('text-[#8B0000]');
+                    } else {
+                        driver2El.textContent = 'Do przydziału';
+                        driver2El.classList.remove('text-[#8B0000]');
+                        driver2El.classList.add('text-gray-400');
+                    }
+                }
+            }
+        }
+
+        // --- ADMIN LOGIC ---
+
+        function renderAdminDrivers() {
+            const tbody = document.getElementById('admin-drivers-list');
+            tbody.innerHTML = '';
+            state.drivers.forEach(d => {
+                const tr = document.createElement('tr');
+                tr.className = "group hover:bg-[#151515] transition-colors";
+                tr.innerHTML = `
+                    <td class="p-4 text-gray-500 font-mono text-sm">#${String(d.id).padStart(3, '0')}</td>
+                    <td class="p-4 text-white font-bold font-mono">${d.name}</td>
+                    <td class="p-4 text-gray-400 text-sm font-mono">${d.team}</td>
+                    <td class="p-4 text-gray-500 text-sm font-mono">${d.car}</td>
+                    <td class="p-4 text-right space-x-2">
+                        <button onclick="editDriverTeamAndCar(${d.id})" class="text-xs text-blue-500 border border-blue-900 px-3 py-1 hover:bg-blue-900/20 uppercase rounded-sm">Edytuj zespół/auto</button>
+                        <button onclick="editDriverPoints(${d.id})" class="text-xs text-yellow-500 border border-yellow-900 px-3 py-1 hover:bg-yellow-900/20 uppercase rounded-sm">Edytuj punkty</button>
+                        <button onclick="deleteDriver(${d.id})" class="text-xs text-red-500 border border-red-900 px-3 py-1 hover:bg-red-900/20 uppercase rounded-sm">Usuń</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- NOWE FUNKCJE DO EDYCJI TEAMU I AUTA ---
+        function editDriverTeamAndCar(id) {
+            const driver = state.drivers.find(d => d.id === id);
+            if (!driver) return;
+            
+            const teams = ['Ford', 'Volkswagen', 'Škoda', 'Peugeot', 'Mitsubishi', 'Citroën'];
+            const cars = {
+                'Ford': ['Ford Fiesta R5'],
+                'Volkswagen': ['Volkswagen Polo GTI R5'],
+                'Škoda': ['Škoda Fabia R5'],
+                'Peugeot': ['Peugeot 208 T16 R5'],
+                'Mitsubishi': ['Mitsubishi Space Star R5'],
+                'Citroën': ['Citroën C3 R5']
+            };
+            
+            // Stwórz modal
+            const modalHtml = `
+                <div id="edit-driver-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+                    <div class="bg-[#0E0E0E] border border-[#222] rounded-xl w-full max-w-md p-6">
+                        <h3 class="font-mono text-xl font-bold mb-4 text-white">EDYTUJ KIEROWCĘ: ${driver.name}</h3>
+                        
+                        <div class="space-y-4 mb-6">
+                            <div>
+                                <label class="block text-sm font-mono text-gray-400 mb-2">ZESPÓŁ</label>
+                                <select id="modal-driver-team" class="input-dark w-full">
+                                    ${teams.map(team => 
+                                        `<option value="${team}" ${driver.team === team ? 'selected' : ''}>${team}</option>`
+                                    ).join('')}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-mono text-gray-400 mb-2">SAMOCHÓD</label>
+                                <select id="modal-driver-car" class="input-dark w-full">
+                                    ${cars[driver.team] ? cars[driver.team].map(car => 
+                                        `<option value="${car}" ${driver.car === car ? 'selected' : ''}>${car}</option>`
+                                    ).join('') : ''}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end gap-3">
+                            <button onclick="closeEditModal()" class="text-sm font-mono text-gray-400 px-4 py-2 hover:text-white rounded border border-gray-700">ANULUJ</button>
+                            <button onclick="saveDriverTeamAndCar(${id})" class="btn-accent text-sm">ZAPISZ ZMIANY</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Usuń istniejący modal jeśli jest
+            const existingModal = document.getElementById('edit-driver-modal');
+            if (existingModal) existingModal.remove();
+            
+            // Dodaj nowy modal
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // Dodaj obsługę zmiany zespołu
+            document.getElementById('modal-driver-team').addEventListener('change', function() {
+                const team = this.value;
+                const carSelect = document.getElementById('modal-driver-car');
+                
+                if (cars[team]) {
+                    carSelect.innerHTML = cars[team].map(car => 
+                        `<option value="${car}" ${car === driver.car ? 'selected' : ''}>${car}</option>`
+                    ).join('');
+                }
+            });
+        }
+
+        function closeEditModal() {
+            const modal = document.getElementById('edit-driver-modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        function saveDriverTeamAndCar(id) {
+            const driver = state.drivers.find(d => d.id === id);
+            if (!driver) return;
+            
+            const teamSelect = document.getElementById('modal-driver-team');
+            const carSelect = document.getElementById('modal-driver-car');
+            
+            if (teamSelect && carSelect) {
+                driver.team = teamSelect.value;
+                driver.car = carSelect.value;
+                
+                showAdminStatus("Dane kierowcy zaktualizowane");
+                renderAdminDrivers();
+                refreshAllViews();
+                updateTeamAssignments();
+                saveToLocalStorage();
+                closeEditModal();
+            }
+        }
+
+        function initAdminStages() {
+            const rSelect = document.getElementById('admin-stage-round');
+            const sSelect = document.getElementById('admin-stage-select');
+            const dSelect = document.getElementById('stage-driver-select');
+            
+            const currR = rSelect.value;
+            const currS = sSelect.value;
+
+            rSelect.innerHTML = '<option value="">Wybierz rajd...</option>';
+            state.rounds.forEach((r, i) => {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.text = r.name.toUpperCase();
+                rSelect.add(opt);
+            });
+            
+            if(currR !== "" && state.rounds[currR]) {
+                rSelect.value = currR;
+            }
+
+            const updateStages = () => {
+                 sSelect.innerHTML = '<option value="">Wybierz odcinek...</option>';
+                 const rIdx = rSelect.value;
+                 if(rIdx !== "" && state.rounds[rIdx]) {
+                     state.rounds[rIdx].stages.forEach((s, i) => {
+                        const opt = document.createElement('option');
+                        opt.value = i;
+                        opt.text = s.toUpperCase();
+                        sSelect.add(opt);
+                     });
+                 }
+                 renderAdminResultsTable(); 
+            };
+
+            rSelect.onchange = updateStages;
+            sSelect.onchange = renderAdminResultsTable;
+            
+            updateStages();
+            if(currS !== "" && currS !== undefined) sSelect.value = currS;
+            renderAdminResultsTable();
+
+            dSelect.innerHTML = '<option value="">Wybierz kierowcę...</option>';
+            state.drivers.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d.id;
+                opt.textContent = d.name;
+                dSelect.appendChild(opt);
+            });
+        }
+        
+        function renderAdminResultsTable() {
+            const tbody = document.getElementById('admin-stage-results-body');
+            const rIdx = parseInt(document.getElementById('admin-stage-round').value);
+            const sIdx = parseInt(document.getElementById('admin-stage-select').value);
+            
+            if (isNaN(rIdx) || isNaN(sIdx)) {
+                tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-600 text-sm">Wybierz rajd i odcinek</td></tr>'; 
+                document.getElementById('admin-table-info').textContent = "BRAK WYBORU";
+                return;
+            }
+
+            document.getElementById('admin-table-info').textContent = `${state.rounds[rIdx].name.toUpperCase()} // ${state.rounds[rIdx].stages[sIdx].toUpperCase()}`;
+
+            tbody.innerHTML = '';
+            const filtered = state.results.filter(res => res.r === rIdx && res.s === sIdx);
+            filtered.sort((a,b) => a.ms - b.ms);
+
+            if(filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-600 text-sm">BRAK WYNIKÓW DLA TEGO ODCINKA</td></tr>';
+                return;
+            }
+
+            filtered.forEach(res => {
+                const driver = state.drivers.find(d => d.id === res.d);
+                if (!driver) return;
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-3 text-gray-300 font-bold">${driver.name}</td>
+                    <td class="p-3 text-right font-mono text-gray-400">${res.time}</td>
+                    <td class="p-3 text-right font-mono text-sm text-gray-500">+${res.cp}</td>
+                    <td class="p-3 text-right space-x-2">
+                         <button onclick="editResult(${res.r}, ${res.s}, ${res.d})" class="text-[#8B0000] hover:text-white text-sm uppercase font-mono">Edytuj</button>
+                         <button onclick="deleteResult(${res.r}, ${res.s}, ${res.d})" class="text-red-500 hover:text-red-300">×</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        function editResult(r, s, d) {
+            const res = state.results.find(x => x.r === r && x.s === s && x.d === d);
+            if(!res) return;
+            
+            document.getElementById('stage-driver-select').value = res.d;
+            document.getElementById('admin-stage-time').value = res.time;
+            
+            const radios = document.getElementsByName('run_condition');
+            radios.forEach(radio => {
+                if(parseInt(radio.value) === res.cp) radio.checked = true;
+            });
+            
+            document.getElementById('admin-stage-time').focus();
+        }
+
+        function showAdminStatus(message, isError = false) {
+            const successEl = document.getElementById('admin-status-msg');
+            const errorEl = document.getElementById('admin-error-msg');
+            
+            if (isError) {
+                errorEl.textContent = message;
+                errorEl.classList.remove('hidden');
+                errorEl.classList.add('block');
+                successEl.classList.add('hidden');
+                
+                setTimeout(() => {
+                    errorEl.classList.add('hidden');
+                    errorEl.classList.remove('block');
+                }, 3000);
+            } else {
+                successEl.textContent = message;
+                successEl.classList.remove('hidden');
+                successEl.classList.add('block');
+                errorEl.classList.add('hidden');
+                
+                setTimeout(() => {
+                    successEl.classList.add('hidden');
+                    successEl.classList.remove('block');
+                }, 2000);
+            }
+        }
+
+        function submitAdminResult() {
+            const rSelect = document.getElementById('admin-stage-round');
+            const sSelect = document.getElementById('admin-stage-select');
+            const rIdx = parseInt(rSelect.value);
+            const sIdx = parseInt(sSelect.value);
+            const dId = parseInt(document.getElementById('stage-driver-select').value);
+            const timeStr = document.getElementById('admin-stage-time').value; 
+            
+            if (isNaN(rIdx) || isNaN(sIdx)) {
+                showAdminStatus("Wybierz rajd i odcinek", true);
+                return;
+            }
+            
+            if (!dId) {
+                showAdminStatus("Wybierz kierowcę", true);
+                return;
+            }
+            
+            if (!timeStr || !timeStr.includes(':') || !timeStr.includes('.')) {
+                showAdminStatus("Wprowadź poprawny czas (MM:SS.ms)", true);
+                return;
+            }
+            
+            const radios = document.getElementsByName('run_condition');
+            let conditionPoints = 0;
+            for (let i = 0; i < radios.length; i++) {
+                if (radios[i].checked) {
+                    conditionPoints = parseInt(radios[i].value);
+                    break;
+                }
+            }
+
+            try {
+                const ms = parseTime(timeStr);
+                
+                state.results = state.results.filter(res => !(res.r === rIdx && res.s === sIdx && res.d === dId));
+                
+                state.results.push({
+                    r: rIdx,
+                    s: sIdx,
+                    d: dId,
+                    time: timeStr,
+                    ms: ms,
+                    cp: conditionPoints
+                });
+                
+                document.getElementById('admin-stage-time').value = '';
+                document.getElementById('stage-driver-select').value = '';
+                
+                renderAdminResultsTable();
+                showAdminStatus("Zapisano poprawnie");
+                refreshAllViews();
+                saveToLocalStorage();
+                
+            } catch(e) {
+                showAdminStatus("Błąd formatu czasu. Użyj MM:SS.ms", true);
+            }
+        }
+        
+        function deleteResult(r, s, d) {
+            if(confirm("Usunąć ten wynik?")) {
+                state.results = state.results.filter(res => !(res.r === r && res.s === s && res.d === d));
+                renderAdminResultsTable();
+                refreshAllViews();
+                saveToLocalStorage();
+                showAdminStatus("Wynik usunięty");
+            }
+        }
+
+        function addRally() {
+            const nameInput = document.getElementById('new-rally-name');
+            const name = nameInput.value.trim();
+            
+            if(name) {
+                state.rounds.push({
+                    id: state.rounds.length + 1,
+                    name: name,
+                    stages: []
+                });
+                nameInput.value = '';
+                initAdminStages(); 
+                document.getElementById('admin-stage-round').value = state.rounds.length - 1;
+                document.getElementById('admin-stage-round').dispatchEvent(new Event('change'));
+                showAdminStatus("Rajd dodany");
+                refreshAllViews();
+                saveToLocalStorage();
+            } else {
+                showAdminStatus("Wprowadź nazwę rajdu", true);
+            }
+        }
+
+        function addStage() {
+            const nameInput = document.getElementById('new-stage-name');
+            const name = nameInput.value.trim();
+            const rIdx = parseInt(document.getElementById('admin-stage-round').value);
+            
+            if(name && !isNaN(rIdx)) {
+                state.rounds[rIdx].stages.push(name);
+                nameInput.value = '';
+                initAdminStages();
+                document.getElementById('admin-stage-round').value = rIdx;
+                const event = new Event('change');
+                document.getElementById('admin-stage-round').dispatchEvent(event);
+                document.getElementById('admin-stage-select').value = state.rounds[rIdx].stages.length - 1;
+                renderAdminResultsTable();
+                showAdminStatus("Odcinek dodany");
+                refreshAllViews();
+                saveToLocalStorage();
+            } else {
+                showAdminStatus("Wybierz rajd i wprowadź nazwę odcinka", true);
+            }
+        }
+
+        function renderScoringPreview() {
+            const tbody = document.getElementById('admin-scoring-preview');
+            tbody.innerHTML = '';
+            
+            const driverStats = calculateDriverStats();
+            driverStats.sort((a,b) => b.total - a.total);
+            
+            driverStats.slice(0, 5).forEach((d, i) => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-[#222] hover:bg-[#1a1a1a]";
+                tr.innerHTML = `
+                    <td class="py-2 text-gray-500">${i+1}</td>
+                    <td class="py-2 text-gray-300 font-mono">${d.name}</td>
+                    <td class="py-2 text-right font-bold text-[#8B0000]">${d.total}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function exportData() {
+            const exportData = {
+                rounds: state.rounds,
+                drivers: state.drivers,
+                results: state.results,
+                exportDate: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `wrc_winter_cup_data_${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showAdminStatus("Dane wyeksportowane");
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = event => {
+                    try {
+                        const importedData = JSON.parse(event.target.result);
+                        
+                        if (!importedData.rounds || !importedData.drivers || !importedData.results) {
+                            throw new Error("Nieprawidłowy format pliku");
+                        }
+                        
+                        if (confirm("Czy na pewno chcesz zaimportować dane? Obecne dane zostaną nadpisane.")) {
+                            state.rounds = importedData.rounds;
+                            state.drivers = importedData.drivers;
+                            state.results = importedData.results;
+                            
+                            // Upewnij się, że każdy kierowca ma equalizationPoints
+                            state.drivers.forEach(driver => {
+                                if (driver.equalizationPoints === undefined) {
+                                    driver.equalizationPoints = 0;
+                                }
+                            });
+                            
+                            saveToLocalStorage();
+                            refreshAllViews();
+                            showAdminStatus("Dane zaimportowane pomyślnie");
+                        }
+                    } catch (error) {
+                        showAdminStatus("Błąd podczas importu danych: " + error.message, true);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        function editDriverPoints(id) {
+            const driver = state.drivers.find(d => d.id === id);
+            if (!driver) return;
+            
+            const currentPoints = driver.points.join(', ');
+            const newPoints = prompt(`Edytuj punkty kierowcy ${driver.name} (wprowadź ${state.rounds.length} wartości oddzielonych przecinkami):`, currentPoints);
+            
+            if (newPoints !== null) {
+                try {
+                    const pointsArray = newPoints.split(',').map(p => parseInt(p.trim()) || 0);
+                    if (pointsArray.length !== state.rounds.length) {
+                        throw new Error(`Musisz podać ${state.rounds.length} wartości (dla ${state.rounds.length} rund)`);
+                    }
+                    
+                    driver.points = pointsArray;
+                    showAdminStatus("Punkty zaktualizowane");
+                    refreshAllViews();
+                    saveToLocalStorage();
+                } catch(e) {
+                    showAdminStatus(e.message, true);
+                }
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            const errorEl = document.getElementById('login-error');
+            
+            if (username === "admin" && password === "admin123") {
+                state.isLoggedIn = true;
+                errorEl.classList.add('hidden');
+                router('admin');
+                renderAdminDrivers();
+                initAdminStages();
+                renderScoringPreview();
+            } else {
+                errorEl.textContent = "Nieprawidłowy login lub hasło. Spróbuj: admin / admin123";
+                errorEl.classList.remove('hidden');
+                document.getElementById('login-password').value = '';
+            }
+        }
+
+        function logout() {
+            state.isLoggedIn = false;
+            router('home');
+            document.getElementById('login-username').value = '';
+            document.getElementById('login-password').value = '';
+            document.getElementById('login-error').classList.add('hidden');
+        }
+
+        function toggleDriverForm() {
+            const form = document.getElementById('driver-form');
+            form.classList.toggle('hidden');
+        }
+
+        function addDriver() {
+            const name = document.getElementById('new-driver-name').value.trim();
+            const team = document.getElementById('new-driver-team').value;
+            const car = document.getElementById('new-driver-car').value;
+
+            if(name && team && car) {
+                const newId = state.drivers.length > 0 ? Math.max(...state.drivers.map(d=>d.id)) + 1 : 1;
+                state.drivers.push({
+                    id: newId,
+                    name: name,
+                    team: team,
+                    car: car,
+                    points: new Array(state.rounds.length).fill(0),
+                    equalizationPoints: 0
+                });
+                
+                document.getElementById('new-driver-name').value = '';
+                document.getElementById('new-driver-team').value = '';
+                document.getElementById('new-driver-car').value = '';
+                toggleDriverForm();
+                
+                renderAdminDrivers();
+                refreshAllViews();
+                updateTeamAssignments(); // TO JEST WAŻNE!
+                saveToLocalStorage();
+                showAdminStatus("Kierowca dodany");
+            } else {
+                showAdminStatus("Wypełnij wszystkie pola", true);
+            }
+        }
+
+        function deleteDriver(id) {
+            if(confirm('Czy na pewno usunąć kierowcę? Wszystkie jego wyniki również zostaną usunięte.')) {
+                state.drivers = state.drivers.filter(d => d.id !== id);
+                state.results = state.results.filter(r => r.d !== id);
+                
+                renderAdminDrivers();
+                refreshAllViews();
+                updateTeamAssignments();
+                saveToLocalStorage();
+                showAdminStatus("Kierowca usunięty");
+            }
+        }
+
+        // --- INIT ---
+        window.addEventListener('DOMContentLoaded', () => {
+            // Wczytaj dane z LocalStorage
+            loadFromLocalStorage();
+            
+            // Oblicz punkty
+            calculateAllRoundPoints();
+            
+            // Renderuj widoki
+            renderDriversTable();
+            renderConstructorsTable();
+            updateLeaders();
+            updateTeamAssignments();
+            router('home');
+            
+            // Uruchom rotację liderów
+            startLeaderRotation();
+        });
+
+    </script>
+</body>
+</html>
