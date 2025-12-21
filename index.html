@@ -1190,45 +1190,228 @@
             return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
         }
 
-        function calculateTotalTimeForDriverInRound(driverId, roundIndex) {
-            let totalMs = 0;
-            const roundResults = state.results.filter(res => res.r === roundIndex && res.d === driverId);
-            
-            // Sprawdź czy kierowca ma DSQ w którymkolwiek OS-ie w tej rundzie
-            const hasDSQ = roundResults.some(result => result.time === "DSQ");
-            if (hasDSQ) {
-                return "DSQ";
-            }
-            
-            // Zbierz wszystkie czasy które nie są DSQ
-            const validResults = roundResults.filter(result => result.time !== "DSQ");
-            
-            // Jeśli nie ma żadnych wyników, zwróć null
-            if (validResults.length === 0) {
-                return null;
-            }
-            
-            // Znajdź najgorszy czas wśród wszystkich kierowców w tej rundzie (dla obliczeń DNF)
-            let worstTimeInRound = 0;
-            const allRoundResults = state.results.filter(res => res.r === roundIndex);
-            allRoundResults.forEach(result => {
-                if (result.time !== "DSQ" && result.time !== "DNF" && typeof result.ms === 'number') {
-                    worstTimeInRound = Math.max(worstTimeInRound, result.ms);
-                }
-            });
-            
-            // Oblicz sumę czasów
-            validResults.forEach(result => {
-                if (result.time === "DNF") {
-                    // DNF = najgorszy czas + 20 sekund
-                    totalMs += worstTimeInRound + 20000;
-                } else if (typeof result.ms === 'number') {
-                    totalMs += result.ms;
-                }
-            });
-            
-            return totalMs;
+// --- W funkcji calculateTotalTimeForDriverInRound ---
+function calculateTotalTimeForDriverInRound(driverId, roundIndex) {
+    let totalMs = 0;
+    const roundResults = state.results.filter(res => res.r === roundIndex && res.d === driverId);
+    
+    // Sprawdź czy kierowca ma DSQ w którymkolwiek OS-ie w tej rundzie
+    const hasDSQ = roundResults.some(result => result.time === "DSQ");
+    if (hasDSQ) {
+        return "DSQ";
+    }
+    
+    // Zbierz wszystkie czasy które nie są DSQ
+    const validResults = roundResults.filter(result => result.time !== "DSQ");
+    
+    // Jeśli nie ma żadnych wyników, zwróć null
+    if (validResults.length === 0) {
+        return null;
+    }
+    
+    // Znajdź najgorszy czas wśród wszystkich kierowców w tej rundzie (dla obliczeń DNF)
+    let worstTimeInRound = 0;
+    const allRoundResults = state.results.filter(res => res.r === roundIndex);
+    allRoundResults.forEach(result => {
+        if (result.time !== "DSQ" && result.time !== "DNF" && typeof result.ms === 'number') {
+            worstTimeInRound = Math.max(worstTimeInRound, result.ms);
         }
+    });
+    
+    // Dla DNF ustawiamy flagę specjalną
+    let hasDNF = false;
+    
+    // Oblicz sumę czasów
+    validResults.forEach(result => {
+        if (result.time === "DNF") {
+            // DNF = najgorszy czas + 20 sekund
+            totalMs += worstTimeInRound + 20000;
+            hasDNF = true;
+        } else if (typeof result.ms === 'number') {
+            totalMs += result.ms;
+        }
+    });
+    
+    // Zwróć obiekt z informacją o DNF
+    if (hasDNF) {
+        return {
+            totalMs: totalMs,
+            isDNF: true
+        };
+    }
+    
+    return totalMs;
+}
+
+// --- Aktualizacja funkcji formatTimeDiff ---
+function formatTimeDiff(msDiff) {
+    if (msDiff === "DSQ") return "DSQ";
+    if (typeof msDiff === 'object' && msDiff.isDNF) {
+        return "DNF";
+    }
+    
+    const sec = Math.floor(msDiff / 1000);
+    const ms = msDiff % 1000;
+    return `+${String(sec).padStart(2, '0')}.${String(ms).padStart(3, '0')}`;
+}
+
+// --- Aktualizacja funkcji formatTimeForDisplay ---
+function formatTimeForDisplay(timeData) {
+    if (timeData === "DSQ") return '<span class="status-dsq-text">DSQ</span>';
+    if (typeof timeData === 'object' && timeData.isDNF) {
+        // Oblicz rzeczywisty czas dla DNF
+        const totalMs = timeData.totalMs;
+        const totalSeconds = Math.floor(totalMs / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        const milliseconds = totalMs % 1000;
+        
+        return `<span class="status-dnf-text">${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')} (DNF)</span>`;
+    }
+    if (timeData === "DNF") {
+        return '<span class="status-dnf-text">DNF</span>';
+    }
+    
+    const totalSeconds = Math.floor(timeData / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    const milliseconds = timeData % 1000;
+    
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
+}
+
+// --- Aktualizacja funkcji getRoundStandings ---
+function getRoundStandings(roundIndex) {
+    const driverTimes = [];
+    
+    // Sprawdź, którzy kierowcy mają wyniki w tej rundzie
+    const driversInRound = [...new Set(state.results
+        .filter(res => res.r === roundIndex)
+        .map(res => res.d))];
+    
+    driversInRound.forEach(driverId => {
+        const totalTime = calculateTotalTimeForDriverInRound(driverId, roundIndex);
+        if (totalTime !== null) {
+            driverTimes.push({
+                driverId: driverId,
+                totalMs: totalTime
+            });
+        }
+    });
+    
+    // Sortuj od najszybszego do najwolniejszego
+    driverTimes.sort((a, b) => {
+        // Obsługa DSQ
+        if (a.totalMs === "DSQ") return 1;
+        if (b.totalMs === "DSQ") return -1;
+        
+        // Obsługa DNF (jako obiekt)
+        const aIsDNF = typeof a.totalMs === 'object' && a.totalMs.isDNF;
+        const bIsDNF = typeof b.totalMs === 'object' && b.totalMs.isDNF;
+        
+        if (aIsDNF && !bIsDNF) return 1;
+        if (!aIsDNF && bIsDNF) return -1;
+        if (aIsDNF && bIsDNF) {
+            return a.totalMs.totalMs - b.totalMs.totalMs;
+        }
+        
+        // Normalne czasy
+        return a.totalMs - b.totalMs;
+    });
+    
+    return driverTimes;
+}
+
+// --- Aktualizacja funkcji renderStageResults ---
+function renderStageResults() {
+    const tbody = document.getElementById('stage-results-body');
+    tbody.innerHTML = '';
+    
+    const rIdx = parseInt(document.getElementById('res-round-select').value);
+    const sIdx = parseInt(document.getElementById('res-stage-select').value);
+    
+    const filtered = state.results.filter(res => res.r === rIdx && res.s === sIdx);
+    
+    if(filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-gray-500 font-mono text-sm">BRAK DANYCH DLA TEGO ODCINKA</td></tr>`;
+        return;
+    }
+
+    // Sortowanie: normalne czasy na początku, potem DNF, potem DSQ
+    filtered.sort((a,b) => {
+        if (a.time === "DSQ") return 1;
+        if (b.time === "DSQ") return -1;
+        if (a.time === "DNF") return 1;
+        if (b.time === "DNF") return -1;
+        return a.ms - b.ms;
+    });
+    
+    // Znajdź zwycięzcę (pierwszy nie-DSQ/DNF)
+    const winner = filtered.find(res => res.time !== "DSQ" && res.time !== "DNF");
+    const winnerMs = winner ? winner.ms : 0;
+
+    filtered.forEach((res, i) => {
+        const driver = state.drivers.find(d => d.id === res.d);
+        if(!driver) return;
+        
+        let diff = '-';
+        let timeDisplay;
+        
+        if (res.time === "DSQ") {
+            timeDisplay = '<span class="status-dsq-text">DSQ</span>';
+            diff = '<span class="status-dsq-text">DSQ</span>';
+        } else if (res.time === "DNF") {
+            // DNF: oblicz rzeczywisty czas (najgorszy + 20 sekund)
+            // Najpierw znajdź najgorszy czas w tym OS-ie
+            let worstTimeInStage = 0;
+            filtered.forEach(otherRes => {
+                if (otherRes.time !== "DSQ" && otherRes.time !== "DNF" && typeof otherRes.ms === 'number') {
+                    worstTimeInStage = Math.max(worstTimeInStage, otherRes.ms);
+                }
+            });
+            
+            const dnfTime = worstTimeInStage + 20000;
+            const totalSeconds = Math.floor(dnfTime / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            const milliseconds = dnfTime % 1000;
+            
+            timeDisplay = `<span class="status-dnf-text">${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')} (DNF)</span>`;
+            diff = '<span class="status-dnf-text">DNF</span>';
+        } else {
+            timeDisplay = formatTimeForDisplay(res.ms);
+            if (i > 0) {
+                diff = formatTimeDiff(res.ms - winnerMs);
+            }
+        }
+        
+        const isWinner = i === 0 && res.time !== "DSQ" && res.time !== "DNF";
+        const isDSQ = res.time === "DSQ";
+        const isDNF = res.time === "DNF";
+        
+        const tr = document.createElement('tr');
+        if (isDSQ) {
+            tr.className = "status-dsq";
+        } else if (isDNF) {
+            tr.className = "status-dnf";
+        } else if (isWinner) {
+            tr.className = "bg-zinc-200 text-black";
+        } else {
+            tr.className = "hover:bg-[#151515] transition-colors border-l-2 border-transparent text-gray-300";
+        }
+        
+        const bonusPoints = (res.time === "DSQ" || res.time === "DNF") ? '0' : `+${res.cp}`;
+        
+        tr.innerHTML = `
+            <td class="py-3 pl-4 text-sm ${isWinner ? 'text-black font-bold' : (isDSQ ? 'status-dsq-text' : (isDNF ? 'status-dnf-text' : 'text-gray-500'))}">${i+1}</td>
+            <td class="py-3 font-bold font-mono ${isWinner ? 'text-black' : (isDSQ ? 'status-dsq-text' : (isDNF ? 'status-dnf-text' : 'text-gray-300'))}">${driver.name}</td>
+            <td class="py-3 text-right font-mono tracking-wide ${isWinner ? 'text-black font-bold' : (isDSQ ? 'status-dsq-text' : (isDNF ? 'status-dnf-text' : 'text-white'))}">${timeDisplay}</td>
+            <td class="py-3 text-right text-sm font-mono ${isWinner ? 'text-gray-800' : (isDSQ ? 'status-dsq-text' : (isDNF ? 'status-dnf-text' : 'text-gray-500'))}">${diff}</td>
+            <td class="py-3 text-right pr-4 font-mono text-sm ${isWinner ? 'text-gray-800' : (isDSQ ? 'status-dsq-text' : (isDNF ? 'status-dnf-text' : 'text-gray-400'))}">${bonusPoints}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
 
         function getRoundStandings(roundIndex) {
             const driverTimes = [];
@@ -2608,6 +2791,7 @@
     </script>
 </body>
 </html>
+
 
 
 
