@@ -273,6 +273,14 @@
             font-size: 0.75rem;
             padding: 2px 4px;
         }
+        
+        /* Dodane style dla poprawionej tabeli w panelu admina */
+        #admin-stage-results-body td:first-child {
+            width: 60px;
+            min-width: 60px;
+            max-width: 60px;
+            text-align: center;
+        }
     </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col relative">
@@ -429,7 +437,7 @@
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-8 gap-6 border-b border-[#222] pb-6">
                 <div>
                     <h2 class="text-3xl font-mono font-bold">WYNIKI SZCZEGÓŁOWE</h2>
-                    <p class="text-sm text-gray-400 font-mono mt-1">ANALIZA CZASÓW ODCINKÓW SPECJALNYCH</p>
+                    <p class="text-sm text-gray-400 font-mono mt-1">ANALIZA CZASÓW ODCINKÓW SPECJALNYOS</p>
                 </div>
                 
                 <!-- Controls -->
@@ -1323,10 +1331,11 @@
                             <table class="w-full text-left">
                                 <thead class="font-mono text-xs text-gray-400 border-b border-[#222]">
                                     <tr>
-                                        <th class="p-3">KIEROWCA</th>
-                                        <th class="p-3 text-right">CZAS</th>
-                                        <th class="p-3 text-right">BONUS</th>
-                                        <th class="p-3 text-right">AKCJE</th>
+                                        <th class="p-3 w-12 text-center font-mono text-xs text-gray-400">POZ</th>
+                                        <th class="p-3 font-mono text-xs text-gray-400">KIEROWCA</th>
+                                        <th class="p-3 text-right font-mono text-xs text-gray-400">CZAS</th>
+                                        <th class="p-3 text-right font-mono text-xs text-gray-400">BONUS</th>
+                                        <th class="p-3 text-right font-mono text-xs text-gray-400">AKCJE</th>
                                     </tr>
                                 </thead>
                                 <tbody id="admin-stage-results-body" class="font-mono text-base divide-y divide-[#222]">
@@ -3505,13 +3514,14 @@ Aktualny lider: ${reportData.leader}
             });
         }
         
+        // --- POPRAWIONA FUNKCJA renderAdminResultsTable ---
         function renderAdminResultsTable() {
             const tbody = document.getElementById('admin-stage-results-body');
             const rIdx = parseInt(document.getElementById('admin-stage-round').value);
             const sIdx = parseInt(document.getElementById('admin-stage-select').value);
             
             if (isNaN(rIdx) || isNaN(sIdx)) {
-                tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-600 text-sm">Wybierz rajd i odcinek</td></tr>'; 
+                tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-600 text-sm">Wybierz rajd i odcinek</td></tr>'; 
                 document.getElementById('admin-table-info').textContent = "BRAK WYBORU";
                 return;
             }
@@ -3521,21 +3531,39 @@ Aktualny lider: ${reportData.leader}
             tbody.innerHTML = '';
             const filtered = state.results.filter(res => res.r === rIdx && res.s === sIdx);
             
-            // Sortowanie: normalne czasy, potem DNF, potem DSQ
+            // POPRAWIONE SORTOWANIE: 
+            // 1. Normalne czasy (najszybszy na górze)
+            // 2. DNF (pomiędzy normalnymi a DSQ)
+            // 3. DSQ (na samym dole)
             filtered.sort((a,b) => {
+                // Oba są DSQ - bez zmiany
+                if (a.time === "DSQ" && b.time === "DSQ") return 0;
+                
+                // A jest DSQ, B nie jest - A idzie na dół
                 if (a.time === "DSQ") return 1;
+                
+                // B jest DSQ, A nie jest - B idzie na dół
                 if (b.time === "DSQ") return -1;
+                
+                // Oba są DNF - bez zmiany
+                if (a.time === "DNF" && b.time === "DNF") return 0;
+                
+                // A jest DNF, B nie jest (i nie jest DSQ) - A idzie pod B
                 if (a.time === "DNF") return 1;
+                
+                // B jest DNF, A nie jest (i nie jest DSQ) - B idzie pod A
                 if (b.time === "DNF") return -1;
+                
+                // Oba są normalnymi czasami - sortuj od najszybszego
                 return a.ms - b.ms;
             });
 
             if(filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-600 text-sm">BRAK WYNIKÓW DLA TEGO ODCINKA</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-600 text-sm">BRAK WYNIKÓW DLA TEGO ODCINKA</td></tr>';
                 return;
             }
 
-            filtered.forEach(res => {
+            filtered.forEach((res, index) => {
                 const driver = state.drivers.find(d => d.id === res.d);
                 if (!driver) return;
                 
@@ -3551,7 +3579,15 @@ Aktualny lider: ${reportData.leader}
                     tr.className = "status-dnf";
                 }
                 
+                // Dodaj numer pozycji dla normalnych wyników
+                let position = '-';
+                if (!isDSQ && !isDNF) {
+                    // Liczymy pozycję tylko dla normalnych wyników
+                    position = (filtered.slice(0, index).filter(r => r.time !== "DSQ" && r.time !== "DNF").length + 1);
+                }
+                
                 tr.innerHTML = `
+                    <td class="p-3 text-gray-500 font-mono text-center">${position}</td>
                     <td class="p-3 text-gray-300 font-bold ${isDSQ ? 'status-dsq-text' : (isDNF ? 'status-dnf-text' : '')}">${driver.name}</td>
                     <td class="p-3 text-right font-mono ${isDSQ ? 'status-dsq-text' : (isDNF ? 'status-dnf-text' : 'text-gray-400')}">${timeDisplay}</td>
                     <td class="p-3 text-right font-mono text-sm ${isDSQ ? 'status-dsq-text' : (isDNF ? 'status-dnf-text' : 'text-gray-500')}">${bonusPoints}</td>
