@@ -1941,3 +1941,81 @@ Aktualny lider: ${reportData.leader}`;
             
             addDiv.appendChild(addInput);
             addDiv.appendChild(addButton);
+
+// --- INITIALIZATION ---
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log("Inicjalizacja aplikacji...");
+    
+    // 1. Załaduj dane z LocalStorage
+    await loadFromStorage();
+    
+    // 2. Ukryj ekran ładowania
+    document.getElementById('loading-state').style.display = 'none';
+    
+    // 3. Pokaż pierwszego lidera (kierowcę)
+    showLeader('driver');
+    
+    // 4. Rozpocznij rotację liderów
+    startLeaderRotation();
+    
+    // 5. Zaktualizuj statystyki na dashboardzie
+    if (document.getElementById('module-dashboard')) {
+        updateStats();
+        renderChangeLogs();
+        renderDataAlerts();
+        updateTournamentSummary();
+        loadRoundsForEdit();
+    }
+    
+    console.log("Aplikacja zainicjalizowana!");
+    
+    // 6. Dodaj event listener do zapisu przy zamknięciu strony
+    window.addEventListener('beforeunload', function() {
+        if (state.lastSaveTime && (Date.now() - state.lastSaveTime) > 30000) {
+            saveToStorage();
+        }
+    });
+});
+
+// Jeśli strona już jest załadowana (np. przy ponownym wejściu)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    // DOM już załadowany
+    initApp();
+}
+
+async function initApp() {
+    try {
+        console.log("Inicjalizacja...");
+        await loadFromStorage();
+        hideLoading();
+        showLeader('driver');
+        startLeaderRotation();
+        console.log("Gotowe!");
+    } catch (error) {
+        console.error("Błąd inicjalizacji:", error);
+        hideLoading();
+        document.getElementById('driver-leader-name').textContent = "Błąd ładowania";
+        document.getElementById('constructor-leader-name').textContent = "Błąd ładowania";
+    }
+}
+
+function hideLoading() {
+    const loadingEl = document.getElementById('loading-state');
+    if (loadingEl) {
+        loadingEl.style.display = 'none';
+    }
+}
+
+// Start rotacji liderów
+function startLeaderRotation() {
+    if (state.leaderRotationInterval) {
+        clearInterval(state.leaderRotationInterval);
+    }
+    
+    state.leaderRotationInterval = setInterval(() => {
+        const nextLeader = state.currentLeader === 'driver' ? 'constructor' : 'driver';
+        showLeader(nextLeader);
+    }, 5000); // Zmiana co 5 sekund
+}
