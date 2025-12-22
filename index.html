@@ -26,7 +26,6 @@
             font-family: 'Roboto', sans-serif;
             overflow-x: hidden;
             line-height: 1.6;
-            position: relative;
         }
 
         .font-mono {
@@ -225,272 +224,9 @@
             color: #f59e0b !important;
             font-weight: bold;
         }
-
-        /* Side images */
-        .side-image-container {
-            position: fixed;
-            top: 0;
-            width: 200px;
-            height: 100vh;
-            z-index: 0;
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        .side-image-left {
-            left: 0;
-        }
-
-        .side-image-right {
-            right: 0;
-        }
-
-        .side-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 0 20px 20px 0;
-            opacity: 0.3;
-            filter: grayscale(1) brightness(0.3);
-        }
-
-        .side-image-right .side-image {
-            border-radius: 20px 0 0 20px;
-        }
-
-        @media (max-width: 1024px) {
-            .side-image-container {
-                display: none;
-            }
-        }
-
-        /* Edit stage modal */
-        .edit-stage-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-        }
-
-        .edit-stage-input {
-            flex: 1;
-        }
-
-        .stage-length-input {
-            width: 100px;
-        }
-
-        /* Table fixes for consistent time positioning */
-        table {
-            table-layout: fixed;
-            width: 100%;
-        }
-        
-        /* Results table specific fixes */
-        #view-results table th:nth-child(1),
-        #view-results table td:nth-child(1) {
-            width: 60px;
-            min-width: 60px;
-            max-width: 60px;
-        }
-        
-        #view-results table th:nth-child(2),
-        #view-results table td:nth-child(2) {
-            width: auto;
-            min-width: 150px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        
-        #view-results table th:nth-child(3),
-        #view-results table td:nth-child(3) {
-            width: 120px;
-            min-width: 120px;
-            max-width: 120px;
-            text-align: right;
-            font-variant-numeric: tabular-nums;
-            font-feature-settings: "tnum";
-            font-family: 'Source Code Pro', monospace;
-            letter-spacing: 0.5px;
-        }
-        
-        #view-results table th:nth-child(4),
-        #view-results table td:nth-child(4) {
-            width: 100px;
-            min-width: 100px;
-            max-width: 100px;
-            text-align: right;
-            font-variant-numeric: tabular-nums;
-            font-feature-settings: "tnum";
-            font-family: 'Source Code Pro', monospace;
-            letter-spacing: 0.5px;
-        }
-        
-        #view-results table th:nth-child(5),
-        #view-results table td:nth-child(5) {
-            width: 120px;
-            min-width: 120px;
-            max-width: 120px;
-            text-align: right;
-            padding-right: 1rem;
-            font-variant-numeric: tabular-nums;
-            font-feature-settings: "tnum";
-            font-family: 'Source Code Pro', monospace;
-        }
-
-        /* Championship table fixes */
-        #view-championship table {
-            table-layout: fixed;
-        }
-        
-        #drivers-table-header th:nth-child(1),
-        #drivers-ranking-body td:nth-child(1) {
-            width: 60px;
-            min-width: 60px;
-            max-width: 60px;
-            text-align: center;
-        }
-        
-        #drivers-table-header th:nth-child(2),
-        #drivers-ranking-body td:nth-child(2) {
-            width: 180px;
-            min-width: 180px;
-            max-width: 180px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        
-        #drivers-table-header th:nth-child(3),
-        #drivers-ranking-body td:nth-child(3) {
-            width: 120px;
-            min-width: 120px;
-            max-width: 120px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        
-        /* Round columns - dynamic width */
-        #drivers-table-header th:nth-child(n+4):not(:last-child):not(:nth-last-child(2)):not(:nth-last-child(3)),
-        #drivers-ranking-body td:nth-child(n+4):not(:last-child):not(:nth-last-child(2)):not(:nth-last-child(3)) {
-            width: 50px;
-            min-width: 50px;
-            max-width: 50px;
-            text-align: center;
-        }
-        
-        /* Bonus, Equalization and Total columns */
-        #drivers-table-header th:nth-last-child(3),
-        #drivers-ranking-body td:nth-last-child(3),
-        #drivers-table-header th:nth-last-child(2),
-        #drivers-ranking-body td:nth-last-child(2),
-        #drivers-table-header th:nth-last-child(1),
-        #drivers-ranking-body td:nth-last-child(1) {
-            width: 80px;
-            min-width: 80px;
-            max-width: 80px;
-            text-align: right;
-            padding-right: 1rem;
-        }
-
-        /* Admin tables fixes */
-        #admin-stage-results-body td:nth-child(1) {
-            width: 200px;
-            min-width: 200px;
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        
-        #admin-stage-results-body td:nth-child(2),
-        #admin-stage-results-body th:nth-child(2) {
-            width: 120px;
-            min-width: 120px;
-            max-width: 120px;
-            text-align: right;
-            font-variant-numeric: tabular-nums;
-            font-feature-settings: "tnum";
-            font-family: 'Source Code Pro', monospace;
-        }
-        
-        #admin-stage-results-body td:nth-child(3),
-        #admin-stage-results-body th:nth-child(3) {
-            width: 80px;
-            min-width: 80px;
-            max-width: 80px;
-            text-align: right;
-            font-variant-numeric: tabular-nums;
-            font-feature-settings: "tnum";
-            font-family: 'Source Code Pro', monospace;
-        }
-        
-        #admin-stage-results-body td:nth-child(4),
-        #admin-stage-results-body th:nth-child(4) {
-            width: 100px;
-            min-width: 100px;
-            max-width: 100px;
-            text-align: right;
-        }
-
-        /* Constructors table fixes */
-        #constructors-ranking-body td:nth-child(1) {
-            width: 60px;
-            min-width: 60px;
-            max-width: 60px;
-            text-align: center;
-        }
-        
-        #constructors-ranking-body td:nth-child(2) {
-            width: 150px;
-            min-width: 150px;
-            max-width: 150px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        
-        #constructors-ranking-body td:nth-child(3) {
-            width: auto;
-            min-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        
-        #constructors-ranking-body td:nth-child(4) {
-            width: 100px;
-            min-width: 100px;
-            max-width: 100px;
-            text-align: right;
-            padding-right: 1rem;
-            font-variant-numeric: tabular-nums;
-            font-feature-settings: "tnum";
-            font-family: 'Source Code Pro', monospace;
-        }
-
-        /* Tabular numbers for all time columns */
-        .tabular-nums {
-            font-variant-numeric: tabular-nums;
-            font-feature-settings: "tnum";
-        }
     </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col relative">
-
-    <!-- Side Images -->
-    <div class="side-image-container side-image-left">
-        <img src="https://images.unsplash.com/photo-1593941707882-a5bba5330fda?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Rally car side view" class="side-image">
-    </div>
-    
-    <div class="side-image-container side-image-right">
-        <img src="https://images.unsplash.com/photo-1591703166380-7a8fdcb6a17f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Rally track" class="side-image">
-    </div>
 
     <!-- Header / Navigation -->
     <header class="sticky top-0 z-50 bg-[#0A0A0A]/95 backdrop-blur-md border-b border-[#222]">
@@ -1106,7 +842,6 @@
                             <button onclick="switchAdminModule('drivers')" id="admin-nav-drivers" class="w-full text-left px-4 py-3 font-mono text-sm uppercase tracking-wide transition-all border-l-2 rounded-r-md hover:bg-[#1a1a1a]">KIEROWCY</button>
                             <button onclick="switchAdminModule('stages')" id="admin-nav-stages" class="w-full text-left px-4 py-3 font-mono text-sm uppercase tracking-wide transition-all border-l-2 rounded-r-md hover:bg-[#1a1a1a]">ETAPY I WYNIKI</button>
                             <button onclick="switchAdminModule('scoring')" id="admin-nav-scoring" class="w-full text-left px-4 py-3 font-mono text-sm uppercase tracking-wide transition-all border-l-2 rounded-r-md hover:bg-[#1a1a1a]">PUNKTACJA</button>
-                            <button onclick="switchAdminModule('editStages')" id="admin-nav-editStages" class="w-full text-left px-4 py-3 font-mono text-sm uppercase tracking-wide transition-all border-l-2 rounded-r-md hover:bg-[#1a1a1a]">EDYCJA ODCINKÓW</button>
                             <div class="h-4"></div>
                             <button onclick="logout()" class="w-full text-left px-4 py-3 font-mono text-sm uppercase tracking-wide text-red-500 border border-red-900/30 hover:bg-red-900/10 rounded-md">WYLOGUJ</button>
                         </nav>
@@ -1327,38 +1062,6 @@
                         </div>
                      </div>
 
-                     <!-- MODULE: EDIT STAGES -->
-                     <div id="module-editStages" class="hidden space-y-6">
-                        <h2 class="font-mono text-xl font-bold mb-4">EDYCJA ODCINKÓW SPECJALNYCH</h2>
-                        
-                        <div class="technical-border bg-[#0E0E0E] rounded-xl overflow-hidden">
-                            <div class="p-4 border-b border-[#222] bg-[#111]">
-                                <h3 class="font-mono text-lg font-bold">ZARZĄDZANIE ODCINKAMI</h3>
-                                <p class="text-sm text-gray-400 font-mono mt-1">Modyfikuj nazwy i długości odcinków specjalnych</p>
-                            </div>
-                            
-                            <div class="p-6">
-                                <div class="mb-6">
-                                    <label class="block text-sm font-mono text-gray-400 mb-2">WYBIERZ RAJD DO EDYCJI</label>
-                                    <select id="edit-stage-round" class="input-dark cursor-pointer" onchange="loadStagesForEdit()">
-                                        <!-- JS GENERATED -->
-                                    </select>
-                                </div>
-                                
-                                <div id="edit-stages-container" class="space-y-4">
-                                    <!-- Stages will be loaded here -->
-                                </div>
-                                
-                                <div class="mt-6 flex justify-end gap-3">
-                                    <button onclick="saveEditedStages()" class="btn-accent">ZAPISZ ZMIANY</button>
-                                    <button onclick="cancelEditStages()" class="btn-primary">ANULUJ</button>
-                                </div>
-                                
-                                <div id="edit-stages-status" class="mt-4 hidden p-3 rounded-md"></div>
-                            </div>
-                        </div>
-                     </div>
-
                 </div>
             </div>
         </section>
@@ -1387,85 +1090,15 @@
         // PUSTE dane początkowe
         const DEFAULT_DATA = {
             rounds: [
-                { 
-                    id: 1, 
-                    name: "Monte Carlo", 
-                    stages: [
-                        { name: "OS1: Col de Turini", length: 10.5 },
-                        { name: "OS2: La Bollène", length: 12.3 },
-                        { name: "OS3: Pra d'Alart", length: 8.7 }
-                    ] 
-                },
-                { 
-                    id: 2, 
-                    name: "Szkocja", 
-                    stages: [
-                        { name: "OS1: Glencoe", length: 15.2 },
-                        { name: "OS2: Kielder", length: 18.4 },
-                        { name: "OS3: Glendevon", length: 11.8 }
-                    ] 
-                },
-                { 
-                    id: 3, 
-                    name: "Argentyna", 
-                    stages: [
-                        { name: "OS1: El Condor", length: 22.6 },
-                        { name: "OS2: Mina Clavero", length: 19.3 },
-                        { name: "OS3: Giulio Cesare", length: 16.7 }
-                    ] 
-                },
-                { 
-                    id: 4, 
-                    name: "Szwecja", 
-                    stages: [
-                        { name: "OS1: Vargåsen", length: 14.8 },
-                        { name: "OS2: Colin's Crest", length: 13.5 },
-                        { name: "OS3: Torsby", length: 17.2 }
-                    ] 
-                },
-                { 
-                    id: 5, 
-                    name: "Walia", 
-                    stages: [
-                        { name: "OS1: Sweet Lamb", length: 9.4 },
-                        { name: "OS2: Dyfnant", length: 11.1 },
-                        { name: "OS3: Gartheiniog", length: 13.9 }
-                    ] 
-                },
-                { 
-                    id: 6, 
-                    name: "Nowa Zelandia", 
-                    stages: [
-                        { name: "OS1: Te Awanga", length: 20.3 },
-                        { name: "OS2: Ocean Beach", length: 16.8 },
-                        { name: "OS3: Waimarama", length: 18.5 }
-                    ] 
-                },
-                { 
-                    id: 7, 
-                    name: "Niemcy", 
-                    stages: [
-                        { name: "OS1: Panzerplatte", length: 24.1 },
-                        { name: "OS2: Arena", length: 8.9 },
-                        { name: "OS3: Mittelmosel", length: 12.4 }
-                    ] 
-                },
-                { 
-                    id: 8, 
-                    name: "Polska", 
-                    stages: [
-                        { name: "OS1: Mikołajki", length: 14.2 },
-                        { name: "OS2: Baranowo", length: 16.7 },
-                        { name: "OS3: Wieliczki", length: 19.3 }
-                    ] 
-                },
-                { 
-                    id: 9, 
-                    name: "USA (Power Stage)", 
-                    stages: [
-                        { name: "OS1: Power Stage", length: 25.0 }
-                    ] 
-                }
+                { id: 1, name: "Monte Carlo", stages: ["OS1: Col de Turini", "OS2: La Bollène", "OS3: Pra d'Alart"] },
+                { id: 2, name: "Szkocja", stages: ["OS1: Glencoe", "OS2: Kielder", "OS3: Glendevon"] },
+                { id: 3, name: "Argentyna", stages: ["OS1: El Condor", "OS2: Mina Clavero", "OS3: Giulio Cesare"] },
+                { id: 4, name: "Szwecja", stages: ["OS1: Vargåsen", "OS2: Colin's Crest", "OS3: Torsby"] },
+                { id: 5, name: "Walia", stages: ["OS1: Sweet Lamb", "OS2: Dyfnant", "OS3: Gartheiniog"] },
+                { id: 6, name: "Nowa Zelandia", stages: ["OS1: Te Awanga", "OS2: Ocean Beach", "OS3: Waimarama"] },
+                { id: 7, name: "Niemcy", stages: ["OS1: Panzerplatte", "OS2: Arena", "OS3: Mittelmosel"] },
+                { id: 8, name: "Polska", stages: ["OS1: Mikołajki", "OS2: Baranowo", "OS3: Wieliczki"] },
+                { id: 9, name: "USA (Power Stage)", stages: ["OS1: Power Stage"] }
             ],
             drivers: [],
             results: []
@@ -1477,7 +1110,7 @@
                 rounds: state.rounds,
                 drivers: state.drivers,
                 results: state.results,
-                version: "1.4"
+                version: "1.3"
             };
             localStorage.setItem('wrc_winter_cup_data', JSON.stringify(dataToSave));
         }
@@ -1487,20 +1120,6 @@
             if (savedData) {
                 try {
                     const parsed = JSON.parse(savedData);
-                    
-                    // Migracja starych danych (string stages -> object stages)
-                    if (parsed.rounds && parsed.rounds.length > 0) {
-                        parsed.rounds.forEach(round => {
-                            if (round.stages && round.stages.length > 0 && typeof round.stages[0] === 'string') {
-                                // Konwersja starych danych
-                                round.stages = round.stages.map((stageName, index) => ({
-                                    name: stageName,
-                                    length: 10.0 + (index * 2) // Domyślna długość
-                                }));
-                            }
-                        });
-                    }
-                    
                     state.rounds = parsed.rounds || DEFAULT_DATA.rounds;
                     state.drivers = parsed.drivers || DEFAULT_DATA.drivers;
                     state.results = parsed.results || DEFAULT_DATA.results;
@@ -1563,15 +1182,15 @@
         }
 
         function formatTimeForDisplay(ms) {
-            if (ms === "DSQ") return '<span class="status-dsq-text tabular-nums">DSQ</span>';
-            if (ms === "DNF") return '<span class="status-dnf-text tabular-nums">DNF</span>';
+            if (ms === "DSQ") return '<span class="status-dsq-text">DSQ</span>';
+            if (ms === "DNF") return '<span class="status-dnf-text">DNF</span>';
             
             const totalSeconds = Math.floor(ms / 1000);
             const minutes = Math.floor(totalSeconds / 60);
             const seconds = totalSeconds % 60;
             const milliseconds = ms % 1000;
             
-            return `<span class="tabular-nums">${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}</span>`;
+            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
         }
 
         function calculateTotalTimeForDriverInRound(driverId, roundIndex) {
@@ -1971,27 +1590,21 @@
             document.getElementById('module-drivers').classList.add('hidden');
             document.getElementById('module-stages').classList.add('hidden');
             document.getElementById('module-scoring').classList.add('hidden');
-            document.getElementById('module-editStages').classList.add('hidden');
             
-            ['drivers', 'stages', 'scoring', 'editStages'].forEach(m => {
+            ['drivers', 'stages', 'scoring'].forEach(m => {
                 const nav = document.getElementById(`admin-nav-${m}`);
-                if (nav) {
-                    nav.classList.remove('bg-[#222]', 'text-white', 'border-l-[#8B0000]');
-                    nav.classList.add('text-gray-400', 'border-l-transparent', 'hover:bg-[#1a1a1a]');
-                }
+                nav.classList.remove('bg-[#222]', 'text-white', 'border-l-[#8B0000]');
+                nav.classList.add('text-gray-400', 'border-l-transparent', 'hover:bg-[#1a1a1a]');
             });
 
             document.getElementById(`module-${moduleName}`).classList.remove('hidden');
             const activeNav = document.getElementById(`admin-nav-${moduleName}`);
-            if (activeNav) {
-                activeNav.classList.remove('text-gray-400', 'border-l-transparent', 'hover:bg-[#1a1a1a]');
-                activeNav.classList.add('bg-[#222]', 'text-white', 'border-l-[#8B0000]');
-            }
+            activeNav.classList.remove('text-gray-400', 'border-l-transparent', 'hover:bg-[#1a1a1a]');
+            activeNav.classList.add('bg-[#222]', 'text-white', 'border-l-[#8B0000]');
             
             if(moduleName === 'stages') initAdminStages();
             if(moduleName === 'scoring') renderScoringPreview();
             if(moduleName === 'drivers') renderAdminDrivers();
-            if(moduleName === 'editStages') initEditStagesModule();
         }
 
         // --- PUBLIC RESULTS LOGIC ---
@@ -2000,7 +1613,7 @@
             const roundSelect = document.getElementById('res-round-select');
             
             roundSelect.innerHTML = '';
-            state.rounds.forEach((r, i) => {
+             state.rounds.forEach((r, i) => {
                 const opt = document.createElement('option');
                 opt.value = i;
                 opt.text = `R${r.id}: ${r.name.toUpperCase()}`;
@@ -2032,7 +1645,7 @@
             stages.forEach((s, i) => {
                 const opt = document.createElement('option');
                 opt.value = i;
-                opt.text = s.name.toUpperCase() + (s.length ? ` (${s.length} km)` : '');
+                opt.text = s.toUpperCase();
                 stageSelect.add(opt);
             });
             
@@ -2164,8 +1777,8 @@
                 let diffClass = '';
                 
                 if (res.type === 'dsq') {
-                    timeDisplay = '<span class="status-dsq-text tabular-nums">DSQ</span>';
-                    diff = '<span class="status-dsq-text tabular-nums">DSQ</span>';
+                    timeDisplay = '<span class="text-red-500">DSQ</span>';
+                    diff = '<span class="text-red-500">DSQ</span>';
                     rowClass = "hover:bg-[#151515] transition-colors";
                     timeClass = 'text-red-500';
                     diffClass = 'text-red-500';
@@ -2293,27 +1906,27 @@
                 // Round points
                 for (let i = 0; i < state.rounds.length; i++) {
                     td = document.createElement('td');
-                    td.className = `py-4 px-4 text-right tabular-nums ${isLeader ? 'text-gray-800' : 'text-gray-500'}`;
+                    td.className = `py-4 px-4 text-right ${isLeader ? 'text-gray-800' : 'text-gray-500'}`;
                     td.textContent = driver.points[i] || '-';
                     tr.appendChild(td);
                 }
                 
                 // Bonus points
                 td = document.createElement('td');
-                td.className = `py-4 px-4 text-right font-mono tabular-nums ${isLeader ? 'text-gray-800' : 'text-gray-400'}`;
+                td.className = `py-4 px-4 text-right font-mono ${isLeader ? 'text-gray-800' : 'text-gray-400'}`;
                 td.textContent = `+${driver.bonus}`;
                 tr.appendChild(td);
                 
                 // Equalization points
                 td = document.createElement('td');
                 const hasEqualization = driver.equalization > 0;
-                td.className = `py-4 px-4 text-right font-mono tabular-nums ${hasEqualization ? 'text-grey-400 font-bold' : (isLeader ? 'text-gray-800' : 'text-gray-500')}`;
+                td.className = `py-4 px-4 text-right font-mono ${hasEqualization ? 'text-grey-400 font-bold' : (isLeader ? 'text-gray-800' : 'text-gray-500')}`;
                 td.textContent = hasEqualization ? `+${driver.equalization}` : '-';
                 tr.appendChild(td);
                 
                 // Total points
                 td = document.createElement('td');
-                td.className = "py-4 px-4 text-right font-bold text-lg text-[#8B0000] tabular-nums";
+                td.className = "py-4 px-4 text-right font-bold text-lg text-[#8B0000]";
                 td.textContent = driver.total;
                 tr.appendChild(td);
                 
@@ -2340,7 +1953,7 @@
                 
                 // Position
                 let td = document.createElement('td');
-                td.className = "py-4 px-4 text-gray-400 font-mono tabular-nums";
+                td.className = "py-4 px-4 text-gray-400 font-mono";
                 td.textContent = index + 1;
                 tr.appendChild(td);
                 
@@ -2358,7 +1971,7 @@
                 
                 // Total Points
                 td = document.createElement('td');
-                td.className = "py-4 px-4 text-right text-[#8B0000] font-bold text-lg tabular-nums";
+                td.className = "py-4 px-4 text-right text-[#8B0000] font-bold text-lg";
                 td.textContent = constructor.points;
                 tr.appendChild(td);
                 
@@ -2603,7 +2216,7 @@
                      state.rounds[rIdx].stages.forEach((s, i) => {
                         const opt = document.createElement('option');
                         opt.value = i;
-                        opt.text = s.name.toUpperCase() + (s.length ? ` (${s.length} km)` : '');
+                        opt.text = s.toUpperCase();
                         sSelect.add(opt);
                      });
                  }
@@ -2637,7 +2250,7 @@
                 return;
             }
 
-            document.getElementById('admin-table-info').textContent = `${state.rounds[rIdx].name.toUpperCase()} // ${state.rounds[rIdx].stages[sIdx].name.toUpperCase()}`;
+            document.getElementById('admin-table-info').textContent = `${state.rounds[rIdx].name.toUpperCase()} // ${state.rounds[rIdx].stages[sIdx].toUpperCase()}`;
 
             tbody.innerHTML = '';
             const filtered = state.results.filter(res => res.r === rIdx && res.s === sIdx);
@@ -2674,8 +2287,8 @@
                 
                 tr.innerHTML = `
                     <td class="p-3 text-gray-300 font-bold ${isDSQ ? 'status-dsq-text' : (isDNF ? 'status-dnf-text' : '')}">${driver.name}</td>
-                    <td class="p-3 text-right font-mono tabular-nums ${isDSQ ? 'status-dsq-text' : (isDNF ? 'status-dnf-text' : 'text-gray-400')}">${timeDisplay}</td>
-                    <td class="p-3 text-right font-mono text-sm tabular-nums ${isDSQ ? 'status-dsq-text' : (isDNF ? 'status-dnf-text' : 'text-gray-500')}">${bonusPoints}</td>
+                    <td class="p-3 text-right font-mono ${isDSQ ? 'status-dsq-text' : (isDNF ? 'status-dnf-text' : 'text-gray-400')}">${timeDisplay}</td>
+                    <td class="p-3 text-right font-mono text-sm ${isDSQ ? 'status-dsq-text' : (isDNF ? 'status-dnf-text' : 'text-gray-500')}">${bonusPoints}</td>
                     <td class="p-3 text-right space-x-2">
                          <button onclick="editResult(${res.r}, ${res.s}, ${res.d})" class="text-[#8B0000] hover:text-white text-sm uppercase font-mono">Edytuj</button>
                          <button onclick="deleteResult(${res.r}, ${res.s}, ${res.d})" class="text-red-500 hover:text-red-300">×</button>
@@ -2843,12 +2456,246 @@
             const rIdx = parseInt(document.getElementById('admin-stage-round').value);
             
             if(name && !isNaN(rIdx)) {
-                state.rounds[rIdx].stages.push({
-                    name: name,
-                    length: 10.0 // Domyślna długość
-                });
+                state.rounds[rIdx].stages.push(name);
                 nameInput.value = '';
                 initAdminStages();
                 document.getElementById('admin-stage-round').value = rIdx;
                 const event = new Event('change');
                 document.getElementById('admin-stage-round').dispatchEvent(event);
+                document.getElementById('admin-stage-select').value = state.rounds[rIdx].stages.length - 1;
+                renderAdminResultsTable();
+                showAdminStatus("Odcinek dodany");
+                refreshAllViews();
+                saveToLocalStorage();
+            } else {
+                showAdminStatus("Wybierz rajd i wprowadź nazwę odcinka", true);
+            }
+        }
+
+        function renderScoringPreview() {
+            const tbody = document.getElementById('admin-scoring-preview');
+            tbody.innerHTML = '';
+            
+            const driverStats = calculateDriverStats();
+            driverStats.sort((a,b) => b.total - a.total);
+            
+            const driversToShow = driverStats.slice(0, 5);
+            
+            if (driversToShow.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-gray-500 text-sm">BRAK DANYCH</td></tr>`;
+                return;
+            }
+            
+            driversToShow.forEach((d, i) => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-[#222] hover:bg-[#1a1a1a]";
+                tr.innerHTML = `
+                    <td class="py-2 text-gray-500">${i+1}</td>
+                    <td class="py-2 text-gray-300 font-mono">${d.name}</td>
+                    <td class="py-2 text-right font-bold text-[#8B0000]">${d.total}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function exportData() {
+            const exportData = {
+                rounds: state.rounds,
+                drivers: state.drivers,
+                results: state.results,
+                exportDate: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `wrc_winter_cup_data_${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showAdminStatus("Dane wyeksportowane");
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = event => {
+                    try {
+                        const importedData = JSON.parse(event.target.result);
+                        
+                        if (!importedData.rounds || !importedData.drivers || !importedData.results) {
+                            throw new Error("Nieprawidłowy format pliku");
+                        }
+                        
+                        if (confirm("Czy na pewno chcesz zaimportować dane? Obecne dane zostaną nadpisane.")) {
+                            state.rounds = importedData.rounds;
+                            state.drivers = importedData.drivers;
+                            state.results = importedData.results;
+                            
+                            // Upewnij się, że każdy kierowca ma equalizationPoints
+                            state.drivers.forEach(driver => {
+                                if (driver.equalizationPoints === undefined) {
+                                    driver.equalizationPoints = 0;
+                                }
+                            });
+                            
+                            saveToLocalStorage();
+                            refreshAllViews();
+                            showAdminStatus("Dane zaimportowane pomyślnie");
+                        }
+                    } catch (error) {
+                        showAdminStatus("Błąd podczas importu danych: " + error.message, true);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        function editDriverPoints(id) {
+            const driver = state.drivers.find(d => d.id === id);
+            if (!driver) return;
+            
+            const currentPoints = driver.points.join(', ');
+            const newPoints = prompt(`Edytuj punkty kierowcy ${driver.name} (wprowadź ${state.rounds.length} wartości oddzielonych przecinkami):`, currentPoints);
+            
+            if (newPoints !== null) {
+                try {
+                    const pointsArray = newPoints.split(',').map(p => parseInt(p.trim()) || 0);
+                    if (pointsArray.length !== state.rounds.length) {
+                        throw new Error(`Musisz podać ${state.rounds.length} wartości (dla ${state.rounds.length} rund)`);
+                    }
+                    
+                    driver.points = pointsArray;
+                    showAdminStatus("Punkty zaktualizowane");
+                    refreshAllViews();
+                    saveToLocalStorage();
+                } catch(e) {
+                    showAdminStatus(e.message, true);
+                }
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            const errorEl = document.getElementById('login-error');
+            
+            if (username === "admin" && password === "prc2025") {
+                state.isLoggedIn = true;
+                errorEl.classList.add('hidden');
+                router('admin');
+                renderAdminDrivers();
+                initAdminStages();
+                renderScoringPreview();
+            } else {
+                errorEl.textContent = "Nieprawidłowy login lub hasło.";
+                errorEl.classList.remove('hidden');
+                document.getElementById('login-password').value = '';
+            }
+        }
+
+        function logout() {
+            state.isLoggedIn = false;
+            router('home');
+            document.getElementById('login-username').value = '';
+            document.getElementById('login-password').value = '';
+            document.getElementById('login-error').classList.add('hidden');
+        }
+
+        function toggleDriverForm() {
+            const form = document.getElementById('driver-form');
+            form.classList.toggle('hidden');
+        }
+
+        function addDriver() {
+            const name = document.getElementById('new-driver-name').value.trim();
+            const team = document.getElementById('new-driver-team').value;
+            const car = document.getElementById('new-driver-car').value;
+
+            if(name && team && car) {
+                const newId = state.drivers.length > 0 ? Math.max(...state.drivers.map(d=>d.id)) + 1 : 1;
+                state.drivers.push({
+                    id: newId,
+                    name: name,
+                    team: team,
+                    car: car,
+                    points: new Array(state.rounds.length).fill(0),
+                    equalizationPoints: 0
+                });
+                
+                document.getElementById('new-driver-name').value = '';
+                document.getElementById('new-driver-team').value = '';
+                document.getElementById('new-driver-car').value = '';
+                toggleDriverForm();
+                
+                renderAdminDrivers();
+                refreshAllViews();
+                updateTeamAssignments();
+                saveToLocalStorage();
+                showAdminStatus("Kierowca dodany");
+            } else {
+                showAdminStatus("Wypełnij wszystkie pola", true);
+            }
+        }
+
+        function deleteDriver(id) {
+            if(confirm('Czy na pewno usunąć kierowcę? Wszystkie jego wyniki również zostaną usunięte.')) {
+                state.drivers = state.drivers.filter(d => d.id !== id);
+                state.results = state.results.filter(r => r.d !== id);
+                
+                renderAdminDrivers();
+                refreshAllViews();
+                updateTeamAssignments();
+                saveToLocalStorage();
+                showAdminStatus("Kierowca usunięty");
+            }
+        }
+
+        // --- INIT ---
+        window.addEventListener('DOMContentLoaded', () => {
+            // Wczytaj dane z LocalStorage
+            loadFromLocalStorage();
+            
+            // Oblicz punkty
+            calculateAllRoundPoints();
+            
+            // Renderuj widoki
+            renderDriversTable();
+            renderConstructorsTable();
+            updateLeaders();
+            updateTeamAssignments();
+            router('home');
+            
+            // Uruchom rotację liderów
+            startLeaderRotation();
+        });
+
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
