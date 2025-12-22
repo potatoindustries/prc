@@ -282,6 +282,203 @@
         .stage-length-input {
             width: 100px;
         }
+
+        /* Table fixes for consistent time positioning */
+        table {
+            table-layout: fixed;
+            width: 100%;
+        }
+        
+        /* Results table specific fixes */
+        #view-results table th:nth-child(1),
+        #view-results table td:nth-child(1) {
+            width: 60px;
+            min-width: 60px;
+            max-width: 60px;
+        }
+        
+        #view-results table th:nth-child(2),
+        #view-results table td:nth-child(2) {
+            width: auto;
+            min-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        #view-results table th:nth-child(3),
+        #view-results table td:nth-child(3) {
+            width: 120px;
+            min-width: 120px;
+            max-width: 120px;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "tnum";
+            font-family: 'Source Code Pro', monospace;
+            letter-spacing: 0.5px;
+        }
+        
+        #view-results table th:nth-child(4),
+        #view-results table td:nth-child(4) {
+            width: 100px;
+            min-width: 100px;
+            max-width: 100px;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "tnum";
+            font-family: 'Source Code Pro', monospace;
+            letter-spacing: 0.5px;
+        }
+        
+        #view-results table th:nth-child(5),
+        #view-results table td:nth-child(5) {
+            width: 120px;
+            min-width: 120px;
+            max-width: 120px;
+            text-align: right;
+            padding-right: 1rem;
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "tnum";
+            font-family: 'Source Code Pro', monospace;
+        }
+
+        /* Championship table fixes */
+        #view-championship table {
+            table-layout: fixed;
+        }
+        
+        #drivers-table-header th:nth-child(1),
+        #drivers-ranking-body td:nth-child(1) {
+            width: 60px;
+            min-width: 60px;
+            max-width: 60px;
+            text-align: center;
+        }
+        
+        #drivers-table-header th:nth-child(2),
+        #drivers-ranking-body td:nth-child(2) {
+            width: 180px;
+            min-width: 180px;
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        #drivers-table-header th:nth-child(3),
+        #drivers-ranking-body td:nth-child(3) {
+            width: 120px;
+            min-width: 120px;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        /* Round columns - dynamic width */
+        #drivers-table-header th:nth-child(n+4):not(:last-child):not(:nth-last-child(2)):not(:nth-last-child(3)),
+        #drivers-ranking-body td:nth-child(n+4):not(:last-child):not(:nth-last-child(2)):not(:nth-last-child(3)) {
+            width: 50px;
+            min-width: 50px;
+            max-width: 50px;
+            text-align: center;
+        }
+        
+        /* Bonus, Equalization and Total columns */
+        #drivers-table-header th:nth-last-child(3),
+        #drivers-ranking-body td:nth-last-child(3),
+        #drivers-table-header th:nth-last-child(2),
+        #drivers-ranking-body td:nth-last-child(2),
+        #drivers-table-header th:nth-last-child(1),
+        #drivers-ranking-body td:nth-last-child(1) {
+            width: 80px;
+            min-width: 80px;
+            max-width: 80px;
+            text-align: right;
+            padding-right: 1rem;
+        }
+
+        /* Admin tables fixes */
+        #admin-stage-results-body td:nth-child(1) {
+            width: 200px;
+            min-width: 200px;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        #admin-stage-results-body td:nth-child(2),
+        #admin-stage-results-body th:nth-child(2) {
+            width: 120px;
+            min-width: 120px;
+            max-width: 120px;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "tnum";
+            font-family: 'Source Code Pro', monospace;
+        }
+        
+        #admin-stage-results-body td:nth-child(3),
+        #admin-stage-results-body th:nth-child(3) {
+            width: 80px;
+            min-width: 80px;
+            max-width: 80px;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "tnum";
+            font-family: 'Source Code Pro', monospace;
+        }
+        
+        #admin-stage-results-body td:nth-child(4),
+        #admin-stage-results-body th:nth-child(4) {
+            width: 100px;
+            min-width: 100px;
+            max-width: 100px;
+            text-align: right;
+        }
+
+        /* Constructors table fixes */
+        #constructors-ranking-body td:nth-child(1) {
+            width: 60px;
+            min-width: 60px;
+            max-width: 60px;
+            text-align: center;
+        }
+        
+        #constructors-ranking-body td:nth-child(2) {
+            width: 150px;
+            min-width: 150px;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        #constructors-ranking-body td:nth-child(3) {
+            width: auto;
+            min-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        #constructors-ranking-body td:nth-child(4) {
+            width: 100px;
+            min-width: 100px;
+            max-width: 100px;
+            text-align: right;
+            padding-right: 1rem;
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "tnum";
+            font-family: 'Source Code Pro', monospace;
+        }
+
+        /* Tabular numbers for all time columns */
+        .tabular-nums {
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "tnum";
+        }
     </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col relative">
@@ -1366,15 +1563,15 @@
         }
 
         function formatTimeForDisplay(ms) {
-            if (ms === "DSQ") return '<span class="status-dsq-text">DSQ</span>';
-            if (ms === "DNF") return '<span class="status-dnf-text">DNF</span>';
+            if (ms === "DSQ") return '<span class="status-dsq-text tabular-nums">DSQ</span>';
+            if (ms === "DNF") return '<span class="status-dnf-text tabular-nums">DNF</span>';
             
             const totalSeconds = Math.floor(ms / 1000);
             const minutes = Math.floor(totalSeconds / 60);
             const seconds = totalSeconds % 60;
             const milliseconds = ms % 1000;
             
-            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
+            return `<span class="tabular-nums">${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}</span>`;
         }
 
         function calculateTotalTimeForDriverInRound(driverId, roundIndex) {
@@ -1967,8 +2164,8 @@
                 let diffClass = '';
                 
                 if (res.type === 'dsq') {
-                    timeDisplay = '<span class="text-red-500">DSQ</span>';
-                    diff = '<span class="text-red-500">DSQ</span>';
+                    timeDisplay = '<span class="status-dsq-text tabular-nums">DSQ</span>';
+                    diff = '<span class="status-dsq-text tabular-nums">DSQ</span>';
                     rowClass = "hover:bg-[#151515] transition-colors";
                     timeClass = 'text-red-500';
                     diffClass = 'text-red-500';
@@ -2096,27 +2293,27 @@
                 // Round points
                 for (let i = 0; i < state.rounds.length; i++) {
                     td = document.createElement('td');
-                    td.className = `py-4 px-4 text-right ${isLeader ? 'text-gray-800' : 'text-gray-500'}`;
+                    td.className = `py-4 px-4 text-right tabular-nums ${isLeader ? 'text-gray-800' : 'text-gray-500'}`;
                     td.textContent = driver.points[i] || '-';
                     tr.appendChild(td);
                 }
                 
                 // Bonus points
                 td = document.createElement('td');
-                td.className = `py-4 px-4 text-right font-mono ${isLeader ? 'text-gray-800' : 'text-gray-400'}`;
+                td.className = `py-4 px-4 text-right font-mono tabular-nums ${isLeader ? 'text-gray-800' : 'text-gray-400'}`;
                 td.textContent = `+${driver.bonus}`;
                 tr.appendChild(td);
                 
                 // Equalization points
                 td = document.createElement('td');
                 const hasEqualization = driver.equalization > 0;
-                td.className = `py-4 px-4 text-right font-mono ${hasEqualization ? 'text-grey-400 font-bold' : (isLeader ? 'text-gray-800' : 'text-gray-500')}`;
+                td.className = `py-4 px-4 text-right font-mono tabular-nums ${hasEqualization ? 'text-grey-400 font-bold' : (isLeader ? 'text-gray-800' : 'text-gray-500')}`;
                 td.textContent = hasEqualization ? `+${driver.equalization}` : '-';
                 tr.appendChild(td);
                 
                 // Total points
                 td = document.createElement('td');
-                td.className = "py-4 px-4 text-right font-bold text-lg text-[#8B0000]";
+                td.className = "py-4 px-4 text-right font-bold text-lg text-[#8B0000] tabular-nums";
                 td.textContent = driver.total;
                 tr.appendChild(td);
                 
@@ -2143,7 +2340,7 @@
                 
                 // Position
                 let td = document.createElement('td');
-                td.className = "py-4 px-4 text-gray-400 font-mono";
+                td.className = "py-4 px-4 text-gray-400 font-mono tabular-nums";
                 td.textContent = index + 1;
                 tr.appendChild(td);
                 
@@ -2161,11 +2358,11 @@
                 
                 // Total Points
                 td = document.createElement('td');
-                td.className = "py-4 px-4 text-right text-[#8B0000] font-bold text-lg";
+                td.className = "py-4 px-4 text-right text-[#8B0000] font-bold text-lg tabular-nums";
                 td.textContent = constructor.points;
                 tr.appendChild(td);
                 
-                tbody.appendChild(td);
+                tbody.appendChild(tr);
             });
             
             // Jeśli nie ma konstruktorów, pokaż komunikat
@@ -2477,8 +2674,8 @@
                 
                 tr.innerHTML = `
                     <td class="p-3 text-gray-300 font-bold ${isDSQ ? 'status-dsq-text' : (isDNF ? 'status-dnf-text' : '')}">${driver.name}</td>
-                    <td class="p-3 text-right font-mono ${isDSQ ? 'status-dsq-text' : (isDNF ? 'status-dnf-text' : 'text-gray-400')}">${timeDisplay}</td>
-                    <td class="p-3 text-right font-mono text-sm ${isDSQ ? 'status-dsq-text' : (isDNF ? 'status-dnf-text' : 'text-gray-500')}">${bonusPoints}</td>
+                    <td class="p-3 text-right font-mono tabular-nums ${isDSQ ? 'status-dsq-text' : (isDNF ? 'status-dnf-text' : 'text-gray-400')}">${timeDisplay}</td>
+                    <td class="p-3 text-right font-mono text-sm tabular-nums ${isDSQ ? 'status-dsq-text' : (isDNF ? 'status-dnf-text' : 'text-gray-500')}">${bonusPoints}</td>
                     <td class="p-3 text-right space-x-2">
                          <button onclick="editResult(${res.r}, ${res.s}, ${res.d})" class="text-[#8B0000] hover:text-white text-sm uppercase font-mono">Edytuj</button>
                          <button onclick="deleteResult(${res.r}, ${res.s}, ${res.d})" class="text-red-500 hover:text-red-300">×</button>
@@ -2655,363 +2852,3 @@
                 document.getElementById('admin-stage-round').value = rIdx;
                 const event = new Event('change');
                 document.getElementById('admin-stage-round').dispatchEvent(event);
-                document.getElementById('admin-stage-select').value = state.rounds[rIdx].stages.length - 1;
-                renderAdminResultsTable();
-                showAdminStatus("Odcinek dodany");
-                refreshAllViews();
-                saveToLocalStorage();
-            } else {
-                showAdminStatus("Wybierz rajd i wprowadź nazwę odcinka", true);
-            }
-        }
-
-        // --- FUNKCJE DO EDYCJI ODCINKÓW ---
-        function initEditStagesModule() {
-            const select = document.getElementById('edit-stage-round');
-            select.innerHTML = '<option value="">Wybierz rajd...</option>';
-            
-            state.rounds.forEach((round, index) => {
-                const option = document.createElement('option');
-                option.value = index;
-                option.textContent = `${round.id}: ${round.name}`;
-                select.appendChild(option);
-            });
-            
-            select.onchange = loadStagesForEdit;
-            
-            // Wyczyść kontener
-            document.getElementById('edit-stages-container').innerHTML = '';
-        }
-
-        function loadStagesForEdit() {
-            const roundIndex = document.getElementById('edit-stage-round').value;
-            if (roundIndex === "") {
-                document.getElementById('edit-stages-container').innerHTML = '';
-                return;
-            }
-            
-            const round = state.rounds[roundIndex];
-            const container = document.getElementById('edit-stages-container');
-            container.innerHTML = '';
-            
-            round.stages.forEach((stage, index) => {
-                const stageItem = document.createElement('div');
-                stageItem.className = 'edit-stage-item';
-                stageItem.innerHTML = `
-                    <div class="flex-grow">
-                        <label class="block text-xs font-mono text-gray-400 mb-1">NAZWA ODCINKA ${index + 1}</label>
-                        <input type="text" class="input-dark edit-stage-input" value="${stage.name}" data-index="${index}" data-field="name">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-mono text-gray-400 mb-1">DŁUGOŚĆ (km)</label>
-                        <input type="number" step="0.1" class="input-dark stage-length-input" value="${stage.length || 10.0}" data-index="${index}" data-field="length">
-                    </div>
-                    <div class="flex items-end">
-                        <button onclick="deleteStageFromRound(${roundIndex}, ${index})" class="text-red-500 hover:text-red-300 px-3 py-2">×</button>
-                    </div>
-                `;
-                container.appendChild(stageItem);
-            });
-            
-            // Dodaj przycisk do dodania nowego odcinka
-            const addButton = document.createElement('button');
-            addButton.type = 'button';
-            addButton.className = 'btn-primary w-full mt-4';
-            addButton.textContent = '+ DODAJ NOWY ODCINEK';
-            addButton.onclick = () => addNewStageToEdit(roundIndex);
-            container.appendChild(addButton);
-        }
-
-        function addNewStageToEdit(roundIndex) {
-            const round = state.rounds[roundIndex];
-            const newStage = {
-                name: `OS${round.stages.length + 1}: Nowy odcinek`,
-                length: 10.0
-            };
-            round.stages.push(newStage);
-            loadStagesForEdit();
-            showEditStatus("Nowy odcinek dodany", false);
-        }
-
-        function deleteStageFromRound(roundIndex, stageIndex) {
-            if (confirm("Czy na pewno chcesz usunąć ten odcinek? Wszystkie wyniki dla tego odcinka również zostaną usunięte.")) {
-                const round = state.rounds[roundIndex];
-                
-                // Usuń odcinek
-                round.stages.splice(stageIndex, 1);
-                
-                // Usuń wyniki dla tego odcinka
-                state.results = state.results.filter(res => !(res.r === parseInt(roundIndex) && res.s === stageIndex));
-                
-                // Aktualizuj indeksy dla pozostałych wyników w tej rundzie
-                state.results.forEach(res => {
-                    if (res.r === parseInt(roundIndex) && res.s > stageIndex) {
-                        res.s -= 1;
-                    }
-                });
-                
-                loadStagesForEdit();
-                refreshAllViews();
-                saveToLocalStorage();
-                showEditStatus("Odcinek usunięty", false);
-            }
-        }
-
-        function saveEditedStages() {
-            const roundIndex = document.getElementById('edit-stage-round').value;
-            if (roundIndex === "") {
-                showEditStatus("Wybierz rajd do edycji", true);
-                return;
-            }
-            
-            const round = state.rounds[roundIndex];
-            const inputs = document.querySelectorAll('#edit-stages-container input');
-            
-            inputs.forEach(input => {
-                const index = input.dataset.index;
-                const field = input.dataset.field;
-                if (index !== undefined && round.stages[index]) {
-                    if (field === 'length') {
-                        round.stages[index][field] = parseFloat(input.value) || 10.0;
-                    } else {
-                        round.stages[index][field] = input.value;
-                    }
-                }
-            });
-            
-            saveToLocalStorage();
-            refreshAllViews();
-            showEditStatus("Zmiany zapisane pomyślnie!", false);
-        }
-
-        function cancelEditStages() {
-            document.getElementById('edit-stage-round').value = "";
-            document.getElementById('edit-stages-container').innerHTML = "";
-            document.getElementById('edit-stages-status').classList.add('hidden');
-        }
-
-        function showEditStatus(message, isError) {
-            const statusEl = document.getElementById('edit-stages-status');
-            statusEl.textContent = message;
-            statusEl.className = isError ? 'p-3 bg-red-900/20 border border-red-900/30 text-red-500 rounded-md' : 'p-3 bg-green-900/20 border border-green-900/30 text-green-500 rounded-md';
-            statusEl.classList.remove('hidden');
-            
-            setTimeout(() => {
-                statusEl.classList.add('hidden');
-            }, 3000);
-        }
-
-        function renderScoringPreview() {
-            const tbody = document.getElementById('admin-scoring-preview');
-            tbody.innerHTML = '';
-            
-            const driverStats = calculateDriverStats();
-            driverStats.sort((a,b) => b.total - a.total);
-            
-            const driversToShow = driverStats.slice(0, 5);
-            
-            if (driversToShow.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-gray-500 text-sm">BRAK DANYCH</td></tr>`;
-                return;
-            }
-            
-            driversToShow.forEach((d, i) => {
-                const tr = document.createElement('tr');
-                tr.className = "border-b border-[#222] hover:bg-[#1a1a1a]";
-                tr.innerHTML = `
-                    <td class="py-2 text-gray-500">${i+1}</td>
-                    <td class="py-2 text-gray-300 font-mono">${d.name}</td>
-                    <td class="py-2 text-right font-bold text-[#8B0000]">${d.total}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function exportData() {
-            const exportData = {
-                rounds: state.rounds,
-                drivers: state.drivers,
-                results: state.results,
-                exportDate: new Date().toISOString()
-            };
-            
-            const dataStr = JSON.stringify(exportData, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            
-            const exportFileDefaultName = `wrc_winter_cup_data_${new Date().toISOString().split('T')[0]}.json`;
-            
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', exportFileDefaultName);
-            linkElement.click();
-            
-            showAdminStatus("Dane wyeksportowane");
-        }
-
-        function importData() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            
-            input.onchange = e => {
-                const file = e.target.files[0];
-                if (!file) return;
-                
-                const reader = new FileReader();
-                reader.onload = event => {
-                    try {
-                        const importedData = JSON.parse(event.target.result);
-                        
-                        if (!importedData.rounds || !importedData.drivers || !importedData.results) {
-                            throw new Error("Nieprawidłowy format pliku");
-                        }
-                        
-                        if (confirm("Czy na pewno chcesz zaimportować dane? Obecne dane zostaną nadpisane.")) {
-                            state.rounds = importedData.rounds;
-                            state.drivers = importedData.drivers;
-                            state.results = importedData.results;
-                            
-                            // Upewnij się, że każdy kierowca ma equalizationPoints
-                            state.drivers.forEach(driver => {
-                                if (driver.equalizationPoints === undefined) {
-                                    driver.equalizationPoints = 0;
-                                }
-                            });
-                            
-                            saveToLocalStorage();
-                            refreshAllViews();
-                            showAdminStatus("Dane zaimportowane pomyślnie");
-                        }
-                    } catch (error) {
-                        showAdminStatus("Błąd podczas importu danych: " + error.message, true);
-                    }
-                };
-                reader.readAsText(file);
-            };
-            
-            input.click();
-        }
-
-        function editDriverPoints(id) {
-            const driver = state.drivers.find(d => d.id === id);
-            if (!driver) return;
-            
-            const currentPoints = driver.points.join(', ');
-            const newPoints = prompt(`Edytuj punkty kierowcy ${driver.name} (wprowadź ${state.rounds.length} wartości oddzielonych przecinkami):`, currentPoints);
-            
-            if (newPoints !== null) {
-                try {
-                    const pointsArray = newPoints.split(',').map(p => parseInt(p.trim()) || 0);
-                    if (pointsArray.length !== state.rounds.length) {
-                        throw new Error(`Musisz podać ${state.rounds.length} wartości (dla ${state.rounds.length} rund)`);
-                    }
-                    
-                    driver.points = pointsArray;
-                    showAdminStatus("Punkty zaktualizowane");
-                    refreshAllViews();
-                    saveToLocalStorage();
-                } catch(e) {
-                    showAdminStatus(e.message, true);
-                }
-            }
-        }
-
-        function handleLogin(e) {
-            e.preventDefault();
-            const username = document.getElementById('login-username').value;
-            const password = document.getElementById('login-password').value;
-            const errorEl = document.getElementById('login-error');
-            
-            if (username === "admin" && password === "prc2025") {
-                state.isLoggedIn = true;
-                errorEl.classList.add('hidden');
-                router('admin');
-                renderAdminDrivers();
-                initAdminStages();
-                renderScoringPreview();
-            } else {
-                errorEl.textContent = "Nieprawidłowy login lub hasło.";
-                errorEl.classList.remove('hidden');
-                document.getElementById('login-password').value = '';
-            }
-        }
-
-        function logout() {
-            state.isLoggedIn = false;
-            router('home');
-            document.getElementById('login-username').value = '';
-            document.getElementById('login-password').value = '';
-            document.getElementById('login-error').classList.add('hidden');
-        }
-
-        function toggleDriverForm() {
-            const form = document.getElementById('driver-form');
-            form.classList.toggle('hidden');
-        }
-
-        function addDriver() {
-            const name = document.getElementById('new-driver-name').value.trim();
-            const team = document.getElementById('new-driver-team').value;
-            const car = document.getElementById('new-driver-car').value;
-
-            if(name && team && car) {
-                const newId = state.drivers.length > 0 ? Math.max(...state.drivers.map(d=>d.id)) + 1 : 1;
-                state.drivers.push({
-                    id: newId,
-                    name: name,
-                    team: team,
-                    car: car,
-                    points: new Array(state.rounds.length).fill(0),
-                    equalizationPoints: 0
-                });
-                
-                document.getElementById('new-driver-name').value = '';
-                document.getElementById('new-driver-team').value = '';
-                document.getElementById('new-driver-car').value = '';
-                toggleDriverForm();
-                
-                renderAdminDrivers();
-                refreshAllViews();
-                updateTeamAssignments();
-                saveToLocalStorage();
-                showAdminStatus("Kierowca dodany");
-            } else {
-                showAdminStatus("Wypełnij wszystkie pola", true);
-            }
-        }
-
-        function deleteDriver(id) {
-            if(confirm('Czy na pewno usunąć kierowcę? Wszystkie jego wyniki również zostaną usunięte.')) {
-                state.drivers = state.drivers.filter(d => d.id !== id);
-                state.results = state.results.filter(r => r.d !== id);
-                
-                renderAdminDrivers();
-                refreshAllViews();
-                updateTeamAssignments();
-                saveToLocalStorage();
-                showAdminStatus("Kierowca usunięty");
-            }
-        }
-
-        // --- INIT ---
-        window.addEventListener('DOMContentLoaded', () => {
-            // Wczytaj dane z LocalStorage
-            loadFromLocalStorage();
-            
-            // Oblicz punkty
-            calculateAllRoundPoints();
-            
-            // Renderuj widoki
-            renderDriversTable();
-            renderConstructorsTable();
-            updateLeaders();
-            updateTeamAssignments();
-            router('home');
-            
-            // Uruchom rotację liderów
-            startLeaderRotation();
-        });
-
-    </script>
-</body>
-</html>
