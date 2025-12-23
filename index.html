@@ -2232,6 +2232,8 @@ Aktualny lider: ${reportData.leader}
                     }
                 });
                 
+                // Przelicz punkty
+                calculateAllRoundPoints();
                 loadStagesForEdit();
                 saveData();
                 refreshVisibleView();
@@ -2489,7 +2491,10 @@ Aktualny lider: ${reportData.leader}
                 cp: finalConditionPoints
             });
             
+            // Przelicz punkty
+            calculateAllRoundPoints();
             saveData();
+            refreshVisibleView();
             showAdminStatus("Zapisano wynik kierowcy");
         }
         
@@ -2561,6 +2566,8 @@ Aktualny lider: ${reportData.leader}
                 savedCount++;
             }
             
+            // Przelicz punkty po zapisie wszystkich wyników
+            calculateAllRoundPoints();
             saveData();
             refreshVisibleView();
             
@@ -2600,6 +2607,8 @@ Aktualny lider: ${reportData.leader}
                 // Usuń wyniki dla tego odcinka
                 state.results = state.results.filter(res => !(res.r === roundIndex && res.s === stageIndex));
                 
+                // Przelicz punkty
+                calculateAllRoundPoints();
                 saveData();
                 refreshTableResults();
                 refreshVisibleView();
@@ -2885,30 +2894,7 @@ Aktualny lider: ${reportData.leader}
             return totalMs;
         }
 
-        // OPTIMIZATION: Cached points calculation
-        function calculateRoundPoints(roundIndex) {
-            if (state.isCalculating) return;
-            
-            const standings = getRoundStandings(roundIndex);
-            const pointsSystem = [15, 12, 10, 8, 6, 4, 2, 1];
-            
-            let position = 0;
-            standings.forEach((standing) => {
-                const driver = state.drivers.find(d => d.id === standing.driverId);
-                if (driver) {
-                    if (standing.totalMs === "DSQ") {
-                        driver.points[roundIndex] = 0;
-                    } else if (position < pointsSystem.length) {
-                        driver.points[roundIndex] = pointsSystem[position];
-                        position++;
-                    } else {
-                        driver.points[roundIndex] = 0;
-                    }
-                }
-            });
-        }
-
-        // --- OPTIMIZED POINTS CALCULATION FUNCTIONS ---
+        // --- POPRAWIONE FUNKCJE PUNKTACJI ---
         function calculateEqualizationPoints() {
             if (state.isCalculating) return;
             
@@ -2971,7 +2957,7 @@ Aktualny lider: ${reportData.leader}
                     if (positionInFirstTwo > 6 && positionInThird <= 4) {
                         driver.equalizationPoints = 4;
                     }
-                } else if (totalDrivers === 10) {
+                } else if (totalDrivers >= 10) {
                     if (positionInFirstTwo > 6 && positionInThird <= 5) {
                         driver.equalizationPoints = 4;
                     }
@@ -2988,9 +2974,32 @@ Aktualny lider: ${reportData.leader}
             state.isCalculating = true;
             
             try {
-                // Dla każdej rundy oblicz punkty
-                for (let i = 0; i < state.rounds.length; i++) {
-                    calculateRoundPoints(i);
+                // Resetuj punkty kierowców
+                state.drivers.forEach(driver => {
+                    if (!driver.points) {
+                        driver.points = new Array(state.rounds.length).fill(0);
+                    } else {
+                        driver.points.fill(0);
+                    }
+                });
+                
+                // Dla każdej rundy oblicz punkty za miejsca
+                for (let roundIndex = 0; roundIndex < state.rounds.length; roundIndex++) {
+                    const standings = getRoundStandings(roundIndex);
+                    const pointsSystem = [15, 12, 10, 8, 6, 4, 2, 1];
+                    
+                    let position = 0;
+                    for (let i = 0; i < standings.length; i++) {
+                        const standing = standings[i];
+                        const driver = state.drivers.find(d => d.id === standing.driverId);
+                        
+                        if (driver && standing.totalMs !== "DSQ") {
+                            if (position < pointsSystem.length) {
+                                driver.points[roundIndex] = pointsSystem[position];
+                                position++;
+                            }
+                        }
+                    }
                 }
                 
                 // Oblicz punkty wyrównawcze
@@ -2998,7 +3007,6 @@ Aktualny lider: ${reportData.leader}
             } finally {
                 state.isCalculating = false;
                 
-                // Jeśli podczas obliczeń pojawiły się nowe zmiany, przelicz ponownie
                 if (state.needsRecalculation) {
                     state.needsRecalculation = false;
                     setTimeout(calculateAllRoundPoints, 100);
@@ -3028,7 +3036,7 @@ Aktualny lider: ${reportData.leader}
             });
             
             const result = state.drivers.map(d => {
-                const basePoints = d.points.reduce((a,b) => a + b, 0);
+                const basePoints = d.points ? d.points.reduce((a,b) => a + b, 0) : 0;
                 const bonus = bonusMap[d.id] || 0;
                 const equalization = d.equalizationPoints || 0;
                 
@@ -4114,6 +4122,8 @@ Aktualny lider: ${reportData.leader}
             document.getElementById('admin-stage-time').value = '';
             document.getElementById('stage-driver-select').value = '';
             
+            // Przelicz punkty
+            calculateAllRoundPoints();
             renderAdminResultsTable();
             showAdminStatus("Zapisano poprawnie");
             refreshVisibleView();
@@ -4123,6 +4133,9 @@ Aktualny lider: ${reportData.leader}
         function deleteResult(r, s, d) {
             if(confirm("Usunąć ten wynik?")) {
                 state.results = state.results.filter(res => !(res.r === r && res.s === s && res.d === d));
+                
+                // Przelicz punkty po usunięciu
+                calculateAllRoundPoints();
                 renderAdminResultsTable();
                 refreshVisibleView();
                 saveData();
@@ -4367,6 +4380,8 @@ Aktualny lider: ${reportData.leader}
                 state.drivers = state.drivers.filter(d => d.id !== id);
                 state.results = state.results.filter(r => r.d !== id);
                 
+                // Przelicz punkty
+                calculateAllRoundPoints();
                 renderAdminDrivers();
                 refreshVisibleView();
                 updateTeamAssignments();
