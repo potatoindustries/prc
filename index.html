@@ -1445,24 +1445,14 @@
     <!-- JavaScript Logic -->
     <script>
         // --- CLOUD CONFIGURATION ---
-        // Użyj JSONBin.io jako darmowej bazy danych w chmurze
-        // Musisz stworzyć własny bin na https://jsonbin.io/ i wstawić poniższe dane
-        
         const CLOUD_CONFIG = {
-            // Twój bin ID z JSONBin.io
-            BIN_ID: '6949d4fcd0ea881f403a8769', // Przykładowy ID - ZASTĄP SWOIM!
-            
-            // Twój X-Master-Key z JSONBin.io
-            API_KEY: '$2a$10$VsoQROU7MdLnmfsQggP/Kuq5jIrZzxTRB./nHz5Bbj2DfzuV8Yfey', // Przykładowy klucz - ZASTĄP SWOIM!
-            
-            // URL endpointów
+            BIN_ID: '6949d4fcd0ea881f403a8769',
+            API_KEY: '$2a$10$VsoQROU7MdLnmfsQggP/Kuq5jIrZzxTRB./nHz5Bbj2DfzuV8Yfey',
             BASE_URL: 'https://api.jsonbin.io/v3/b',
-            
-            // Wersja danych
-            DATA_VERSION: '2.0'
+            DATA_VERSION: '3.0' // Updated version for cache system
         };
 
-        // --- DATA STORE ---
+        // --- OPTIMIZED DATA STORE WITH CACHE ---
         const state = {
             view: 'home',
             isLoggedIn: false,
@@ -1474,7 +1464,25 @@
             changeLogs: [],
             cloudStatus: 'offline',
             lastSync: null,
-            pendingChanges: false
+            pendingChanges: false,
+            // OPTIMIZATION: Cache system
+            dataVersion: 0,
+            cache: {},
+            isCalculating: false,
+            needsRecalculation: false
+        };
+
+        // OPTIMIZATION: Debounce timer for cloud saves
+        let saveDebounceTimer = null;
+        const SAVE_DEBOUNCE_DELAY = 2000; // 2 seconds
+
+        // OPTIMIZATION: Cache keys
+        const CACHE_KEYS = {
+            DRIVER_STATS: 'driverStats',
+            CONSTRUCTOR_STATS: 'constructorStats',
+            DRIVER_LEADER: 'driverLeader',
+            CONSTRUCTOR_LEADER: 'constructorLeader',
+            ROUND_STANDINGS: 'roundStandings'
         };
 
         // PUSTE dane początkowe
@@ -1496,7 +1504,25 @@
             version: CLOUD_CONFIG.DATA_VERSION
         };
 
-        // --- CLOUD SYNC FUNCTIONS ---
+        // --- OPTIMIZED CACHE FUNCTIONS ---
+        function invalidateCache() {
+            state.dataVersion++;
+            state.cache = {};
+            state.needsRecalculation = true;
+        }
+
+        function getCached(key) {
+            const cacheKey = `${key}_${state.dataVersion}`;
+            return state.cache[cacheKey];
+        }
+
+        function setCached(key, value) {
+            const cacheKey = `${key}_${state.dataVersion}`;
+            state.cache[cacheKey] = value;
+            return value;
+        }
+
+        // --- OPTIMIZED CLOUD SYNC WITH DEBOUNCE ---
         function updateCloudStatus(status, message = '') {
             state.cloudStatus = status;
             const statusEl = document.getElementById('cloud-status');
@@ -1568,7 +1594,10 @@
                 
                 // Aktualizuj timestamp na dashboardzie
                 if (state.view === 'admin') {
-                    document.getElementById('last-cloud-sync').textContent = state.lastSync.toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'});
+                    const syncEl = document.getElementById('last-cloud-sync');
+                    if (syncEl) {
+                        syncEl.textContent = state.lastSync.toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'});
+                    }
                 }
                 
                 return true;
@@ -1583,6 +1612,18 @@
                 
                 return false;
             }
+        }
+
+        // OPTIMIZATION: Debounced save function
+        function debouncedSaveToCloud() {
+            if (saveDebounceTimer) {
+                clearTimeout(saveDebounceTimer);
+            }
+            
+            saveDebounceTimer = setTimeout(async () => {
+                await saveToCloud();
+                saveDebounceTimer = null;
+            }, SAVE_DEBOUNCE_DELAY);
         }
 
         async function loadFromCloud() {
@@ -1616,6 +1657,9 @@
                         if (driver.equalizationPoints === undefined) {
                             driver.equalizationPoints = 0;
                         }
+                        if (!driver.points) {
+                            driver.points = new Array(state.rounds.length).fill(0);
+                        }
                     });
                     
                     // Zapisz lokalnie
@@ -1627,6 +1671,7 @@
                     showCloudSpinner(false);
                     
                     console.log('Dane załadowane z chmury');
+                    invalidateCache(); // Invalidate cache after loading
                     return true;
                 } else {
                     throw new Error('Nieprawidłowy format danych z chmury');
@@ -1648,6 +1693,9 @@
                             if (driver.equalizationPoints === undefined) {
                                 driver.equalizationPoints = 0;
                             }
+                            if (!driver.points) {
+                                driver.points = new Array(state.rounds.length).fill(0);
+                            }
                         });
                         
                         updateCloudStatus('offline', 'USING LOCAL DATA');
@@ -1660,6 +1708,7 @@
                         }
                         
                         console.log('Dane załadowane z localStorage');
+                        invalidateCache(); // Invalidate cache after loading
                         return true;
                     } catch (e) {
                         console.error("Błąd podczas wczytywania danych z localStorage:", e);
@@ -1692,21 +1741,21 @@
             state.results = JSON.parse(JSON.stringify(DEFAULT_DATA.results));
             state.changeLogs = [];
             state.pendingChanges = false;
+            invalidateCache();
         }
 
         function resetToDefaults() {
             if (confirm("Czy na pewno chcesz zresetować wszystkie dane do ustawień domyślnych? Ta operacja jest nieodwracalna i usunie wszystkich kierowców i wyniki.")) {
                 loadDefaultData();
                 saveToCloud();
-                refreshAllViews();
+                refreshVisibleView();
                 showAdminStatus("Dane zresetowane do pustych domyślnych");
                 addLog("Reset danych do domyślnych", "system");
             }
         }
 
-        // --- ZMIENIONA FUNKCJA saveToLocalStorage ---
-        // Teraz zapisuje do chmury zamiast localStorage
-        async function saveToLocalStorage() {
+        // OPTIMIZATION: Intelligent save function
+        async function saveData() {
             state.pendingChanges = true;
             
             // Zapisz lokalnie jako backup
@@ -1721,11 +1770,11 @@
             localStorage.setItem('wrc_winter_cup_data', JSON.stringify(dataToSave));
             localStorage.setItem('wrc_pending_changes', 'true');
             
-            // Spróbuj zsynchronizować z chmurą
-            await saveToCloud();
+            // Spróbuj zsynchronizować z chmurą z debouncing
+            debouncedSaveToCloud();
         }
 
-        // --- DASHBOARD FUNCTIONS ---
+        // --- OPTIMIZED DASHBOARD FUNCTIONS ---
         function addLog(action, type = "user") {
             const timestamp = new Date().toLocaleString('pl-PL');
             const log = {
@@ -1742,7 +1791,7 @@
                 state.changeLogs = state.changeLogs.slice(0, 50);
             }
             
-            saveToLocalStorage();
+            saveData();
             
             // Aktualizuj dashboard jeśli jest widoczny
             if (state.view === 'admin' && document.getElementById('module-dashboard') && !document.getElementById('module-dashboard').classList.contains('hidden')) {
@@ -1753,7 +1802,7 @@
         function clearLogs() {
             if (confirm("Czy na pewno wyczyścić wszystkie logi?")) {
                 state.changeLogs = [];
-                saveToLocalStorage();
+                saveData();
                 renderChangeLogs();
                 addLog("Wyczyszczono logi zmian", "system");
             }
@@ -2096,8 +2145,8 @@ Aktualny lider: ${reportData.leader}
                 state.rounds[roundIndex].stages.push(name);
                 input.value = '';
                 loadStagesForEdit();
-                saveToLocalStorage();
-                refreshAllViews();
+                saveData();
+                refreshVisibleView();
                 addLog(`Dodano odcinek: ${name} do ${state.rounds[roundIndex].name}`, "system");
                 showAdminStatus("Odcinek dodany");
             }
@@ -2121,8 +2170,8 @@ Aktualny lider: ${reportData.leader}
                 });
                 
                 loadStagesForEdit();
-                saveToLocalStorage();
-                refreshAllViews();
+                saveData();
+                refreshVisibleView();
                 addLog(`Usunięto odcinek: ${stageName} z ${state.rounds[roundIndex].name}`, "system");
                 showAdminStatus("Odcinek usunięty");
             }
@@ -2153,8 +2202,8 @@ Aktualny lider: ${reportData.leader}
             });
             
             if (hasChanges) {
-                saveToLocalStorage();
-                refreshAllViews();
+                saveData();
+                refreshVisibleView();
                 showAdminStatus("Zmiany zapisane");
             } else {
                 showAdminStatus("Brak zmian do zapisania");
@@ -2213,7 +2262,7 @@ Aktualny lider: ${reportData.leader}
             addLog("Przeprowadzono test reguł punktacji", "system");
         }
 
-        // --- NOWE FUNKCJE DLA MODUŁU TABELE ---
+        // --- OPTIMIZED TABLE MODULE FUNCTIONS ---
         
         function loadTableStages() {
             const roundSelect = document.getElementById('table-round-select');
@@ -2378,7 +2427,7 @@ Aktualny lider: ${reportData.leader}
                 cp: finalConditionPoints
             });
             
-            saveToLocalStorage();
+            saveData();
             showAdminStatus("Zapisano wynik kierowcy");
             
             const driver = state.drivers.find(d => d.id === driverId);
@@ -2455,8 +2504,8 @@ Aktualny lider: ${reportData.leader}
                 savedCount++;
             }
             
-            saveToLocalStorage();
-            refreshAllViews();
+            saveData();
+            refreshVisibleView();
             
             if (errorCount > 0) {
                 showAdminStatus(`Zapisano ${savedCount} wyników, ${errorCount} błędów`, true);
@@ -2498,9 +2547,9 @@ Aktualny lider: ${reportData.leader}
                 // Usuń wyniki dla tego odcinka
                 state.results = state.results.filter(res => !(res.r === roundIndex && res.s === stageIndex));
                 
-                saveToLocalStorage();
+                saveData();
                 refreshTableResults();
-                refreshAllViews();
+                refreshVisibleView();
                 showAdminStatus("Wyniki wyczyszczone");
                 
                 const roundName = state.rounds[roundIndex]?.name || `Rajd ${roundIndex+1}`;
@@ -2676,7 +2725,7 @@ Aktualny lider: ${reportData.leader}
             }
         }
 
-        // --- HELPER FUNCTIONS ---
+        // --- OPTIMIZED HELPER FUNCTIONS ---
         function parseTime(timeStr) {
             if (timeStr.toUpperCase() === "DSQ" || timeStr.toUpperCase() === "DNF") {
                 return timeStr.toUpperCase();
@@ -2710,6 +2759,42 @@ Aktualny lider: ${reportData.leader}
             const milliseconds = ms % 1000;
             
             return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
+        }
+
+        // OPTIMIZATION: Memoized function for round standings
+        function getRoundStandings(roundIndex) {
+            const cacheKey = `${CACHE_KEYS.ROUND_STANDINGS}_${roundIndex}`;
+            const cached = getCached(cacheKey);
+            if (cached) return cached;
+            
+            const driverTimes = [];
+            
+            // Sprawdź, którzy kierowcy mają wyniki w tej rundzie
+            const driversInRound = [...new Set(state.results
+                .filter(res => res.r === roundIndex)
+                .map(res => res.d))];
+            
+            driversInRound.forEach(driverId => {
+                const totalTime = calculateTotalTimeForDriverInRound(driverId, roundIndex);
+                if (totalTime !== null) {
+                    driverTimes.push({
+                        driverId: driverId,
+                        totalMs: totalTime
+                    });
+                }
+            });
+            
+            // Sortuj od najszybszego do najwolniejszego
+            // DSQ zawsze na końcu
+            driverTimes.sort((a, b) => {
+                if (a.totalMs === "DSQ") return 1;
+                if (b.totalMs === "DSQ") return -1;
+                if (a.totalMs === "DNF") return 1;
+                if (b.totalMs === "DNF") return -1;
+                return a.totalMs - b.totalMs;
+            });
+            
+            return setCached(cacheKey, driverTimes);
         }
 
         function calculateTotalTimeForDriverInRound(driverId, roundIndex) {
@@ -2752,45 +2837,12 @@ Aktualny lider: ${reportData.leader}
             return totalMs;
         }
 
-        function getRoundStandings(roundIndex) {
-            const driverTimes = [];
-            
-            // Sprawdź, którzy kierowcy mają wyniki w tej rundzie
-            const driversInRound = [...new Set(state.results
-                .filter(res => res.r === roundIndex)
-                .map(res => res.d))];
-            
-            driversInRound.forEach(driverId => {
-                const totalTime = calculateTotalTimeForDriverInRound(driverId, roundIndex);
-                if (totalTime !== null) {
-                    driverTimes.push({
-                        driverId: driverId,
-                        totalMs: totalTime
-                    });
-                }
-            });
-            
-            // Sortuj od najszybszego do najwolniejszego
-            // DSQ zawsze na końcu
-            driverTimes.sort((a, b) => {
-                if (a.totalMs === "DSQ") return 1;
-                if (b.totalMs === "DSQ") return -1;
-                if (a.totalMs === "DNF") return 1;
-                if (b.totalMs === "DNF") return -1;
-                return a.totalMs - b.totalMs;
-            });
-            
-            return driverTimes;
-        }
-
+        // OPTIMIZATION: Cached points calculation
         function calculateRoundPoints(roundIndex) {
+            if (state.isCalculating) return;
+            
             const standings = getRoundStandings(roundIndex);
             const pointsSystem = [15, 12, 10, 8, 6, 4, 2, 1];
-            
-            // Resetuj punkty dla tej rundy
-            state.drivers.forEach(driver => {
-                driver.points[roundIndex] = 0;
-            });
             
             let position = 0;
             standings.forEach((standing) => {
@@ -2808,8 +2860,10 @@ Aktualny lider: ${reportData.leader}
             });
         }
 
-        // --- FUNKCJA DO OBLICZANIA PUNKTÓW WYRÓWNAWCZYCH ---
+        // --- OPTIMIZED POINTS CALCULATION FUNCTIONS ---
         function calculateEqualizationPoints() {
+            if (state.isCalculating) return;
+            
             // Resetuj punkty wyrównawcze
             state.drivers.forEach(driver => {
                 driver.equalizationPoints = 0;
@@ -2874,110 +2928,163 @@ Aktualny lider: ${reportData.leader}
         }
 
         function calculateAllRoundPoints() {
-            // Resetuj wszystkie punkty
-            state.drivers.forEach(driver => {
-                driver.points = new Array(state.rounds.length).fill(0);
-            });
-            
-            // Dla każdej rundy oblicz punkty
-            for (let i = 0; i < state.rounds.length; i++) {
-                calculateRoundPoints(i);
+            if (state.isCalculating) {
+                state.needsRecalculation = true;
+                return;
             }
             
-            // Oblicz punkty wyrównawcze
-            calculateEqualizationPoints();
+            state.isCalculating = true;
             
-            // Zapisz do chmury
-            saveToLocalStorage();
+            try {
+                // Dla każdej rundy oblicz punkty
+                for (let i = 0; i < state.rounds.length; i++) {
+                    calculateRoundPoints(i);
+                }
+                
+                // Oblicz punkty wyrównawcze
+                calculateEqualizationPoints();
+            } finally {
+                state.isCalculating = false;
+                
+                // Jeśli podczas obliczeń pojawiły się nowe zmiany, przelicz ponownie
+                if (state.needsRecalculation) {
+                    state.needsRecalculation = false;
+                    setTimeout(calculateAllRoundPoints, 100);
+                }
+            }
         }
 
+        // OPTIMIZATION: Cached driver stats calculation
         function calculateDriverStats() {
+            const cached = getCached(CACHE_KEYS.DRIVER_STATS);
+            if (cached) return cached;
+            
             // Najpierw przelicz punkty za miejsca w rundach i wyrównawcze
             calculateAllRoundPoints();
             
-            return state.drivers.map(d => {
-                const basePoints = d.points.reduce((a,b)=>a+b, 0);
-                const bonusPoints = state.results.filter(r => r.d === d.id).reduce((a, b) => {
-                    // DSQ i DNF nie dostają punktów bonusowych
-                    if (b.time === "DSQ" || b.time === "DNF") {
-                        return a;
-                    }
-                    return a + (b.cp || 0);
-                }, 0);
-                const equalizationPoints = d.equalizationPoints || 0;
+            // Przygotuj mapę bonusowych punktów
+            const bonusMap = {};
+            state.results.forEach(result => {
+                // DSQ i DNF nie dostają punktów bonusowych
+                if (result.time === "DSQ" || result.time === "DNF") {
+                    return;
+                }
+                if (!bonusMap[result.d]) {
+                    bonusMap[result.d] = 0;
+                }
+                bonusMap[result.d] += (result.cp || 0);
+            });
+            
+            const result = state.drivers.map(d => {
+                const basePoints = d.points.reduce((a,b) => a + b, 0);
+                const bonus = bonusMap[d.id] || 0;
+                const equalization = d.equalizationPoints || 0;
                 
                 return {
                     ...d,
-                    bonus: bonusPoints,
-                    equalization: equalizationPoints,
-                    total: basePoints + bonusPoints + equalizationPoints
+                    bonus: bonus,
+                    equalization: equalization,
+                    total: basePoints + bonus + equalization
                 };
             });
+            
+            return setCached(CACHE_KEYS.DRIVER_STATS, result);
         }
 
+        // OPTIMIZATION: Cached constructor stats calculation
         function calculateConstructorStats() {
+            const cached = getCached(CACHE_KEYS.CONSTRUCTOR_STATS);
+            if (cached) return cached;
+            
             const teams = {};
             const teamDrivers = {};
             
-            state.drivers.forEach(d => {
-                if(!teams[d.team]) {
+            const driverStats = calculateDriverStats();
+            
+            driverStats.forEach(d => {
+                if (!teams[d.team]) {
                     teams[d.team] = 0;
                     teamDrivers[d.team] = [];
                 }
-                const driverStats = calculateDriverStats().find(ds => ds.id === d.id);
-                teams[d.team] += driverStats ? driverStats.total : 0;
+                teams[d.team] += d.total;
                 teamDrivers[d.team].push(d.name);
             });
 
-            return Object.entries(teams).sort((a,b) => b[1] - a[1]).map(([team, points]) => ({
-                team,
-                points,
-                drivers: teamDrivers[team]
-            }));
+            const result = Object.entries(teams)
+                .sort((a,b) => b[1] - a[1])
+                .map(([team, points]) => ({
+                    team,
+                    points,
+                    drivers: teamDrivers[team]
+                }));
+            
+            return setCached(CACHE_KEYS.CONSTRUCTOR_STATS, result);
         }
 
+        // OPTIMIZATION: Cached leader calculations
         function calculateDriverLeader() {
+            const cached = getCached(CACHE_KEYS.DRIVER_LEADER);
+            if (cached) return cached;
+            
             const driverStats = calculateDriverStats();
             driverStats.sort((a, b) => b.total - a.total);
-            return driverStats[0] || { name: "Brak danych", total: 0 };
+            const result = driverStats[0] || { name: "Brak danych", total: 0 };
+            
+            return setCached(CACHE_KEYS.DRIVER_LEADER, result);
         }
 
         function calculateConstructorLeader() {
+            const cached = getCached(CACHE_KEYS.CONSTRUCTOR_LEADER);
+            if (cached) return cached;
+            
             const constructorStats = calculateConstructorStats();
-            return constructorStats[0] || { team: "Brak danych", points: 0 };
+            const result = constructorStats[0] || { team: "Brak danych", points: 0 };
+            
+            return setCached(CACHE_KEYS.CONSTRUCTOR_LEADER, result);
         }
 
-        // --- FUNKCJE DO AKTUALIZACJI WSZYSTKICH WIDOKÓW ---
-        function refreshAllViews() {
-            // Aktualizuj liderów na stronie głównej
-            updateLeaders();
+        // --- OPTIMIZED VIEW REFRESHING ---
+        function refreshVisibleView() {
+            invalidateCache(); // Invalidate cache when data changes
             
-            // Aktualizuj tabele w widoku mistrzostw
-            renderDriversTable();
-            renderConstructorsTable();
-            
-            // Aktualizuj podgląd punktacji w panelu admina
-            if (state.view === 'admin') {
-                renderScoringPreview();
+            // Aktualizuj tylko widoczny widok
+            switch(state.view) {
+                case 'home':
+                    updateLeaders();
+                    break;
+                case 'championship':
+                    renderDriversTable();
+                    renderConstructorsTable();
+                    break;
+                case 'results':
+                    renderStageResults();
+                    break;
+                case 'teams':
+                    updateTeamAssignments();
+                    break;
+                case 'admin':
+                    // W panelu admina odświeżamy aktualny moduł
+                    if (document.getElementById('module-dashboard') && !document.getElementById('module-dashboard').classList.contains('hidden')) {
+                        refreshDashboard();
+                    } else if (document.getElementById('module-tables') && !document.getElementById('module-tables').classList.contains('hidden')) {
+                        loadTableResults();
+                    } else if (document.getElementById('module-drivers') && !document.getElementById('module-drivers').classList.contains('hidden')) {
+                        renderAdminDrivers();
+                    } else if (document.getElementById('module-stages') && !document.getElementById('module-stages').classList.contains('hidden')) {
+                        renderAdminResultsTable();
+                    } else if (document.getElementById('module-scoring') && !document.getElementById('module-scoring').classList.contains('hidden')) {
+                        renderScoringPreview();
+                    }
+                    break;
+                default:
+                    break;
             }
-            
-            // Aktualizuj listę kierowców w panelu admina jeśli jest aktywny
-            if (state.view === 'admin' && document.getElementById('admin-drivers-list')) {
-                renderAdminDrivers();
-            }
-            
-            // Aktualizuj widok wyników jeśli jest aktywny
-            if (state.view === 'results') {
-                renderStageResults();
-            }
-            
-            // Aktualizuj widok teamów
-            updateTeamAssignments();
         }
 
         function recalculateAllPoints() {
+            invalidateCache();
             calculateAllRoundPoints();
-            refreshAllViews();
+            refreshVisibleView();
             showAdminStatus("Punkty przeliczone pomyślnie");
             addLog("Przeliczono wszystkie punkty", "system");
         }
@@ -3715,9 +3822,9 @@ Aktualny lider: ${reportData.leader}
                 
                 showAdminStatus("Dane kierowcy zaktualizowane");
                 renderAdminDrivers();
-                refreshAllViews();
+                refreshVisibleView();
                 updateTeamAssignments();
-                saveToLocalStorage();
+                saveData();
                 closeEditModal();
                 
                 addLog(`Zmieniono zespół/samochód kierowcy ${driver.name}: ${oldTeam} (${oldCar}) → ${driver.team} (${driver.car})`, "system");
@@ -3949,8 +4056,8 @@ Aktualny lider: ${reportData.leader}
             
             renderAdminResultsTable();
             showAdminStatus("Zapisano poprawnie");
-            refreshAllViews();
-            saveToLocalStorage();
+            refreshVisibleView();
+            saveData();
             
             const driver = state.drivers.find(d => d.id === dId);
             const roundName = state.rounds[rIdx]?.name || `Rajd ${rIdx+1}`;
@@ -3962,8 +4069,8 @@ Aktualny lider: ${reportData.leader}
             if(confirm("Usunąć ten wynik?")) {
                 state.results = state.results.filter(res => !(res.r === r && res.s === s && res.d === d));
                 renderAdminResultsTable();
-                refreshAllViews();
-                saveToLocalStorage();
+                refreshVisibleView();
+                saveData();
                 showAdminStatus("Wynik usunięty");
                 
                 const driver = state.drivers.find(drv => drv.id === d);
@@ -3988,8 +4095,8 @@ Aktualny lider: ${reportData.leader}
                 document.getElementById('admin-stage-round').value = state.rounds.length - 1;
                 document.getElementById('admin-stage-round').dispatchEvent(new Event('change'));
                 showAdminStatus("Rajd dodany");
-                refreshAllViews();
-                saveToLocalStorage();
+                refreshVisibleView();
+                saveData();
                 addLog(`Dodano rajd: ${name}`, "system");
             } else {
                 showAdminStatus("Wprowadź nazwę rajdu", true);
@@ -4011,8 +4118,8 @@ Aktualny lider: ${reportData.leader}
                 document.getElementById('admin-stage-select').value = state.rounds[rIdx].stages.length - 1;
                 renderAdminResultsTable();
                 showAdminStatus("Odcinek dodany");
-                refreshAllViews();
-                saveToLocalStorage();
+                refreshVisibleView();
+                saveData();
                 addLog(`Dodano odcinek: ${name} do ${state.rounds[rIdx].name}`, "system");
             } else {
                 showAdminStatus("Wybierz rajd i wprowadź nazwę odcinka", true);
@@ -4098,10 +4205,13 @@ Aktualny lider: ${reportData.leader}
                                 if (driver.equalizationPoints === undefined) {
                                     driver.equalizationPoints = 0;
                                 }
+                                if (!driver.points) {
+                                    driver.points = new Array(state.rounds.length).fill(0);
+                                }
                             });
                             
-                            saveToLocalStorage();
-                            refreshAllViews();
+                            saveData();
+                            refreshVisibleView();
                             showAdminStatus("Dane zaimportowane pomyślnie");
                             addLog("Zaimportowano dane z pliku", "system");
                         }
@@ -4131,8 +4241,8 @@ Aktualny lider: ${reportData.leader}
                     
                     driver.points = pointsArray;
                     showAdminStatus("Punkty zaktualizowane");
-                    refreshAllViews();
-                    saveToLocalStorage();
+                    refreshVisibleView();
+                    saveData();
                     addLog(`Edytowano punkty kierowcy: ${driver.name}`, "system");
                 } catch(e) {
                     showAdminStatus(e.message, true);
@@ -4199,9 +4309,9 @@ Aktualny lider: ${reportData.leader}
                 toggleDriverForm();
                 
                 renderAdminDrivers();
-                refreshAllViews();
+                refreshVisibleView();
                 updateTeamAssignments();
-                saveToLocalStorage();
+                saveData();
                 showAdminStatus("Kierowca dodany");
                 addLog(`Dodano kierowcę: ${name} (${team})`, "system");
             } else {
@@ -4218,9 +4328,9 @@ Aktualny lider: ${reportData.leader}
                 state.results = state.results.filter(r => r.d !== id);
                 
                 renderAdminDrivers();
-                refreshAllViews();
+                refreshVisibleView();
                 updateTeamAssignments();
-                saveToLocalStorage();
+                saveData();
                 showAdminStatus("Kierowca usunięty");
                 addLog(`Usunięto kierowcę: ${driver.name}`, "system");
             }
@@ -4258,4 +4368,3 @@ Aktualny lider: ${reportData.leader}
     </script>
 </body>
 </html>
-
