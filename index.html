@@ -962,7 +962,7 @@
                         </div>
                         
                         <!-- New: Equalization Points -->
-                        <div class="mt-4 p-3 bg-[#111] rounded-lg border-l-4 border-purple-600">
+                        <div class="mt-4 p-3 bg-[#111] rounded-lg border-l-4 border-grey-600">
                             <h4 class="font-mono text-sm font-bold text-white mb-2">🔄 Punkty Wyrównawcze (+4 PKT):</h4>
                             <ul class="font-mono text-xs text-gray-300 space-y-1">
                                 <li>• <strong>Przy 6 graczach:</strong> Jeśli w 2 pierwszych etapach miejsce poniżej 5. i w 3. etapie miejsce 3. lub wyższe</li>
@@ -1587,7 +1587,7 @@
             BIN_ID: '6949d4fcd0ea881f403a8769',
             API_KEY: '$2a$10$VsoQROU7MdLnmfsQggP/Kuq5jIrZzxTRB./nHz5Bbj2DfzuV8Yfey',
             BASE_URL: 'https://api.jsonbin.io/v3/b',
-            DATA_VERSION: '4.0' // Updated version for corrected equalization points
+            DATA_VERSION: '3.0' // Updated version for cache system
         };
 
         // --- OPTIMIZED DATA STORE WITH CACHE ---
@@ -2255,7 +2255,6 @@ Aktualny lider: ${reportData.leader}
             }
         }
 
-        // --- POPRAWIONA FUNKCJA testScoringRules ---
         function testScoringRules() {
             const position = parseInt(document.getElementById('test-position').value);
             const condition = parseInt(document.getElementById('test-condition').value);
@@ -2277,40 +2276,20 @@ Aktualny lider: ${reportData.leader}
                 const positions = firstTwoInput.split(',').map(p => parseInt(p.trim()));
                 if (positions.length === 2) {
                     const [pos1, pos2] = positions;
+                    const avgPosition = (pos1 + pos2) / 2;
                     
-                    // Poprawna logika dla punktów wyrównawczych
-                    const totalDrivers = prompt("Dla ilu graczy symulować punkty wyrównawcze? (6, 8 lub 10)", "6");
-                    
-                    if (totalDrivers) {
-                        const total = parseInt(totalDrivers);
-                        
-                        if (total === 6) {
-                            // Przy 6 graczach: Jeśli w 2 pierwszych etapach miejsce poniżej 5. i w 3. etapie miejsce 3. lub wyższe
-                            if (pos1 > 5 && pos2 > 5 && thirdPosition <= 3) {
-                                equalizationPoints = 4;
-                                equalizationLogic = `Przy 6 graczach: pozycje ${pos1},${pos2} (>5) i 3. etap: ${thirdPosition} (≤3) = +4 PKT`;
-                            } else {
-                                equalizationLogic = `Przy 6 graczach: pozycje ${pos1},${pos2} i 3. etap: ${thirdPosition} = 0 PKT wyrównawczych`;
-                            }
-                        } else if (total === 8) {
-                            // Przy 8 graczach: Jeśli w 2 pierwszych etapach miejsce poniżej 6. i w 3. etapie miejsce 4. lub wyższe
-                            if (pos1 > 6 && pos2 > 6 && thirdPosition <= 4) {
-                                equalizationPoints = 4;
-                                equalizationLogic = `Przy 8 graczach: pozycje ${pos1},${pos2} (>6) i 3. etap: ${thirdPosition} (≤4) = +4 PKT`;
-                            } else {
-                                equalizationLogic = `Przy 8 graczach: pozycje ${pos1},${pos2} i 3. etap: ${thirdPosition} = 0 PKT wyrównawczych`;
-                            }
-                        } else if (total === 10) {
-                            // Przy 10 graczach: Jeśli w 2 pierwszych etapach miejsce poniżej 7. i w 3. etapie miejsce 5. lub wyższe
-                            if (pos1 > 7 && pos2 > 7 && thirdPosition <= 5) {
-                                equalizationPoints = 4;
-                                equalizationLogic = `Przy 10 graczach: pozycje ${pos1},${pos2} (>7) i 3. etap: ${thirdPosition} (≤5) = +4 PKT`;
-                            } else {
-                                equalizationLogic = `Przy 10 graczach: pozycje ${pos1},${pos2} i 3. etap: ${thirdPosition} = 0 PKT wyrównawczych`;
-                            }
-                        } else {
-                            equalizationLogic = `Dla ${total} graczy: pozycje ${pos1},${pos2} i 3. etap: ${thirdPosition} = 0 PKT wyrównawczych`;
-                        }
+                    // Symulacja dla 6, 8 i 10 graczy
+                    if (avgPosition > 5 && thirdPosition <= 3) {
+                        equalizationPoints = 4;
+                        equalizationLogic = `Średnia z pierwszych 2 etapów: ${avgPosition.toFixed(1)} (>5) i 3. etap: ${thirdPosition} (≤3) = +4 PKT`;
+                    } else if (avgPosition > 6 && thirdPosition <= 4) {
+                        equalizationPoints = 4;
+                        equalizationLogic = `Średnia z pierwszych 2 etapów: ${avgPosition.toFixed(1)} (>6) i 3. etap: ${thirdPosition} (≤4) = +4 PKT`;
+                    } else if (avgPosition > 7 && thirdPosition <= 5) {
+                        equalizationPoints = 4;
+                        equalizationLogic = `Średnia z pierwszych 2 etapów: ${avgPosition.toFixed(1)} (>7) i 3. etap: ${thirdPosition} (≤5) = +4 PKT`;
+                    } else {
+                        equalizationLogic = `Średnia z pierwszych 2 etapów: ${avgPosition.toFixed(1)}, 3. etap: ${thirdPosition} = 0 PKT wyrównawczych`;
                     }
                 }
             }
@@ -2321,7 +2300,7 @@ Aktualny lider: ${reportData.leader}
             WYNIK SYMULACJI:
             • Miejsce: ${position}. = ${positionPoints} PKT
             • Stan auta: ${condition === 2 ? 'Czysty' : condition === 1 ? 'Lekkie uszk.' : 'Uszkodzenia'} = +${conditionPoints} PKT
-            • Punkty wyrównawcze: ${equalizationLogic}
+            • ${equalizationLogic}
             • SUMA: ${totalPoints} PKT
             `;
             
@@ -2897,23 +2876,7 @@ Aktualny lider: ${reportData.leader}
             return totalMs;
         }
 
-        // --- NOWA FUNKCJA POMOCNICZA do uzyskiwania pozycji w rundzie ---
-        function getPositionsForRound(roundIndex) {
-            const standings = getRoundStandings(roundIndex);
-            const positions = {};
-            
-            // Tworzymy mapę driverId -> pozycja (1-indexed)
-            standings.forEach((standing, index) => {
-                // Pomijamy DSQ w rankingu (nie dostają punktów)
-                if (standing.totalMs !== "DSQ") {
-                    positions[standing.driverId] = index + 1;
-                }
-            });
-            
-            return positions;
-        }
-
-        // --- POPRAWIONA FUNKCJA calculateEqualizationPoints ---
+        // --- POPRAWIONA FUNKCJA PUNKTÓW WYRÓWNAWCZYCH ---
         function calculateEqualizationPoints() {
             if (state.isCalculating) return;
             
@@ -2929,94 +2892,59 @@ Aktualny lider: ${reportData.leader}
                 return;
             }
             
-            // Obliczamy pozycje w pierwszych 3 rundach
-            const positionsRound1 = getPositionsForRound(0);
-            const positionsRound2 = getPositionsForRound(1);
-            const positionsRound3 = getPositionsForRound(2);
+            // Obliczamy pozycje w każdej z pierwszych 3 rund
+            const round0Standings = getRoundStandings(0);
+            const round1Standings = getRoundStandings(1);
+            const round2Standings = getRoundStandings(2);
             
-            // Dla każdego kierowcy sprawdź warunki
+            // Tworzymy mapy driverId -> pozycja w każdej rundzie
+            const positionInRound0 = {};
+            const positionInRound1 = {};
+            const positionInRound2 = {};
+            
+            round0Standings.forEach((standing, index) => {
+                positionInRound0[standing.driverId] = index + 1;
+            });
+            
+            round1Standings.forEach((standing, index) => {
+                positionInRound1[standing.driverId] = index + 1;
+            });
+            
+            round2Standings.forEach((standing, index) => {
+                positionInRound2[standing.driverId] = index + 1;
+            });
+            
+            // Dla każdego kierowcy sprawdzamy warunki
             state.drivers.forEach(driver => {
-                const pos1 = positionsRound1[driver.id];
-                const pos2 = positionsRound2[driver.id];
-                const pos3 = positionsRound3[driver.id];
+                const pos0 = positionInRound0[driver.id];
+                const pos1 = positionInRound1[driver.id];
+                const pos2 = positionInRound2[driver.id];
                 
-                // Jeśli brakuje którejś pozycji (kierowca nie startował), pomiń
-                if (pos1 === undefined || pos2 === undefined || pos3 === undefined) {
+                // Jeśli brakuje którejś pozycji, pomijamy
+                if (pos0 === undefined || pos1 === undefined || pos2 === undefined) {
                     return;
                 }
                 
-                // Sprawdź warunki w zależności od liczby graczy
+                const avgPositionFirstTwo = (pos0 + pos1) / 2;
+                
+                // Warunki zgodnie z zasadami
                 if (totalDrivers === 6) {
                     // Przy 6 graczach: Jeśli w 2 pierwszych etapach miejsce poniżej 5. i w 3. etapie miejsce 3. lub wyższe
-                    // "poniżej 5." oznacza 6. miejsce lub gorsze, czyli >5
-                    if (pos1 > 5 && pos2 > 5 && pos3 <= 3) {
+                    if (avgPositionFirstTwo > 5 && pos2 <= 3) {
                         driver.equalizationPoints = 4;
-                        console.log(`Kierowca ${driver.name} otrzymuje +4 PKT wyrównawcze: pozycje ${pos1},${pos2},${pos3}`);
                     }
                 } else if (totalDrivers === 8) {
                     // Przy 8 graczach: Jeśli w 2 pierwszych etapach miejsce poniżej 6. i w 3. etapie miejsce 4. lub wyższe
-                    if (pos1 > 6 && pos2 > 6 && pos3 <= 4) {
+                    if (avgPositionFirstTwo > 6 && pos2 <= 4) {
                         driver.equalizationPoints = 4;
-                        console.log(`Kierowca ${driver.name} otrzymuje +4 PKT wyrównawcze: pozycje ${pos1},${pos2},${pos3}`);
                     }
-                } else if (totalDrivers === 10) {
+                } else if (totalDrivers >= 10) {
                     // Przy 10 graczach: Jeśli w 2 pierwszych etapach miejsce poniżej 7. i w 3. etapie miejsce 5. lub wyższe
-                    if (pos1 > 7 && pos2 > 7 && pos3 <= 5) {
+                    if (avgPositionFirstTwo > 7 && pos2 <= 5) {
                         driver.equalizationPoints = 4;
-                        console.log(`Kierowca ${driver.name} otrzymuje +4 PKT wyrównawcze: pozycje ${pos1},${pos2},${pos3}`);
-                    }
-                } else if (totalDrivers > 10) {
-                    // Dla więcej niż 10 graczy - skalowalny system
-                    const thresholdFirstTwo = Math.floor(totalDrivers * 0.7); // 70% od końca
-                    const thresholdThird = Math.ceil(totalDrivers * 0.3); // Top 30%
-                    
-                    if (pos1 > thresholdFirstTwo && pos2 > thresholdFirstTwo && pos3 <= thresholdThird) {
-                        driver.equalizationPoints = 4;
-                        console.log(`Kierowca ${driver.name} otrzymuje +4 PKT wyrównawcze: pozycje ${pos1},${pos2},${pos3} (próg: ${thresholdFirstTwo}/${thresholdThird})`);
                     }
                 }
             });
-        }
-
-        // --- FUNKCJA DIAGNOSTYCZNA do debugowania punktów wyrównawczych ---
-        function debugEqualizationPoints() {
-            console.log("=== DEBUG: Punkty wyrównawcze ===");
-            console.log("Liczba kierowców:", state.drivers.length);
-            console.log("Liczba rund:", state.rounds.length);
-            
-            if (state.rounds.length >= 3) {
-                const positionsRound1 = getPositionsForRound(0);
-                const positionsRound2 = getPositionsForRound(1);
-                const positionsRound3 = getPositionsForRound(2);
-                
-                console.log("\nPozycje w 1. rundzie:", positionsRound1);
-                console.log("Pozycje w 2. rundzie:", positionsRound2);
-                console.log("Pozycje w 3. rundzie:", positionsRound3);
-                
-                state.drivers.forEach(driver => {
-                    const pos1 = positionsRound1[driver.id];
-                    const pos2 = positionsRound2[driver.id];
-                    const pos3 = positionsRound3[driver.id];
-                    
-                    console.log(`\n${driver.name}:`);
-                    console.log(`  Runda 1: ${pos1 !== undefined ? pos1 : 'brak'}`);
-                    console.log(`  Runda 2: ${pos2 !== undefined ? pos2 : 'brak'}`);
-                    console.log(`  Runda 3: ${pos3 !== undefined ? pos3 : 'brak'}`);
-                    console.log(`  Punkty wyrównawcze: ${driver.equalizationPoints || 0}`);
-                    
-                    // Sprawdź warunki
-                    const totalDrivers = state.drivers.length;
-                    if (totalDrivers === 6 && pos1 > 5 && pos2 > 5 && pos3 <= 3) {
-                        console.log(`  WARUNEK 6 GRACZY SPEŁNIONY!`);
-                    } else if (totalDrivers === 8 && pos1 > 6 && pos2 > 6 && pos3 <= 4) {
-                        console.log(`  WARUNEK 8 GRACZY SPEŁNIONY!`);
-                    } else if (totalDrivers === 10 && pos1 > 7 && pos2 > 7 && pos3 <= 5) {
-                        console.log(`  WARUNEK 10 GRACZY SPEŁNIONY!`);
-                    }
-                });
-            } else {
-                console.log("Za mało rund do obliczeń (potrzebne 3)");
-            }
         }
 
         function calculateAllRoundPoints() {
@@ -3678,11 +3606,11 @@ Aktualny lider: ${reportData.leader}
                 }
                 
                 if (text === 'WYRÓW.') {
-                    th.classList.add('text-purple-400', 'font-bold');
+                    th.classList.add('text-grey-400', 'font-bold');
                 }
                 
                 if (text === 'BONUS') {
-                    th.classList.add('text-gray-400');
+                    th.classList.add('text-grey-400');
                 }
                 
                 if (index >= 3 && index < headers.length - 3) {
@@ -3703,7 +3631,6 @@ Aktualny lider: ${reportData.leader}
 
             driverStats.forEach((driver, index) => {
                 const isLeader = index === 0;
-                const hasEqualization = driver.equalization > 0;
                 const tr = document.createElement('tr');
                 tr.className = isLeader ? "bg-zinc-200 text-black" : "hover:bg-[#111] transition-colors border-l-2 border-transparent text-gray-300";
                 
@@ -3741,12 +3668,9 @@ Aktualny lider: ${reportData.leader}
                 
                 // Equalization points
                 td = document.createElement('td');
-                td.className = `py-3 md:py-4 px-2 md:px-4 text-right font-mono ${hasEqualization ? 'text-purple-400 font-bold' : (isLeader ? 'text-gray-800' : 'text-gray-500')}`;
-                if (hasEqualization) {
-                    td.innerHTML = `<span class="badge-equalization">+${driver.equalization}</span>`;
-                } else {
-                    td.textContent = '-';
-                }
+                const hasEqualization = driver.equalization > 0;
+                td.className = `py-3 md:py-4 px-2 md:px-4 text-right font-mono ${hasEqualization ? 'text-grey-400 font-bold' : (isLeader ? 'text-gray-800' : 'text-gray-500')}`;
+                td.textContent = hasEqualization ? `+${driver.equalization}` : '-';
                 tr.appendChild(td);
                 
                 // Total points
