@@ -2709,7 +2709,23 @@ Aktualny lider: ${reportData.leader}
                 if (timeStr === "DSQ") {
                     timeMs = Infinity;
                 } else if (timeStr === "DNF") {
-                    timeMs = Infinity - 1;
+                    // DNF - oblicz czas jako najgorszy czas + 20 sekund
+                    // Najpierw musimy znaleźć najgorszy czas wśród normalnych wyników
+                    let worstTime = 0;
+                    for (let j = 0; j < timeInputs.length; j++) {
+                        const otherTimeStr = timeInputs[j].value.trim().toUpperCase();
+                        if (otherTimeStr !== "DSQ" && otherTimeStr !== "DNF" && otherTimeStr.includes(':') && otherTimeStr.includes('.')) {
+                            try {
+                                const otherTimeMs = parseTime(otherTimeStr);
+                                if (typeof otherTimeMs === 'number' && otherTimeMs > worstTime) {
+                                    worstTime = otherTimeMs;
+                                }
+                            } catch(e) {
+                                // Ignoruj błędne formaty
+                            }
+                        }
+                    }
+                    timeMs = worstTime + 20000; // +20 sekund
                 } else {
                     try {
                         timeMs = parseTime(timeStr);
@@ -2733,7 +2749,11 @@ Aktualny lider: ${reportData.leader}
             let previewText = "PODGLĄD WYNIKÓW:\n\n";
             results.forEach((result, index) => {
                 const position = index + 1;
-                previewText += `${position}. ${result.driverName}: ${result.timeStr}\n`;
+                previewText += `${position}. ${result.driverName}: ${result.timeStr}`;
+                if (result.timeStr === "DNF") {
+                    previewText += ` (${formatTimeForDisplay(result.timeMs)})`;
+                }
+                previewText += '\n';
             });
             
             alert(previewText);
@@ -2797,6 +2817,10 @@ Aktualny lider: ${reportData.leader}
             if (ms === "DSQ") return '<span class="status-dsq-text">DSQ</span>';
             if (ms === "DNF") return '<span class="status-dnf-text">DNF</span>';
             
+            if (typeof ms !== 'number') {
+                return ms;
+            }
+            
             const totalSeconds = Math.floor(ms / 1000);
             const minutes = Math.floor(totalSeconds / 60);
             const seconds = totalSeconds % 60;
@@ -2829,7 +2853,7 @@ Aktualny lider: ${reportData.leader}
             });
             
             // Sortuj od najszybszego do najwolniejszego
-            // DSQ zawsze na końcu
+            // DNF jest traktowany jako konkretny czas, DSQ zawsze na końcu
             driverTimes.sort((a, b) => {
                 if (a.totalMs === "DSQ") return 1;
                 if (b.totalMs === "DSQ") return -1;
@@ -3415,8 +3439,9 @@ Aktualny lider: ${reportData.leader}
             // Przygotuj tablicę wszystkich wyników do wyświetlenia
             const allResults = [];
             
-            // Normalne wyniki
-            normalResults.forEach(res => {
+            // Normalne wyniki - sortuj według czasu
+            const sortedNormalResults = [...normalResults].sort((a, b) => a.ms - b.ms);
+            sortedNormalResults.forEach(res => {
                 allResults.push({
                     ...res,
                     computedTime: res.ms,
@@ -3425,10 +3450,24 @@ Aktualny lider: ${reportData.leader}
                 });
             });
             
-            // DNF - dodaj 20 sekund do najgorszego czasu
+            // DNF - oblicz czas jako najgorszy czas + 20 sekund i wstaw w odpowiednie miejsce
             dnfResults.forEach(res => {
                 const computedTime = worstNormalTime + 20000;
-                allResults.push({
+                // Znajdź pozycję gdzie wstawić DNF (zgodnie z czasem)
+                let insertIndex = allResults.length;
+                for (let i = 0; i < allResults.length; i++) {
+                    if (allResults[i].type === 'dsq') {
+                        // DSQ zawsze na końcu
+                        continue;
+                    }
+                    if (computedTime < allResults[i].computedTime || 
+                        (allResults[i].type === 'normal' && computedTime < allResults[i].computedTime)) {
+                        insertIndex = i;
+                        break;
+                    }
+                }
+                
+                allResults.splice(insertIndex, 0, {
                     ...res,
                     computedTime: computedTime,
                     type: 'dnf',
@@ -3444,14 +3483,6 @@ Aktualny lider: ${reportData.leader}
                     type: 'dsq',
                     displayTime: "DSQ"
                 });
-            });
-            
-            // Sortuj według obliczonego czasu
-            allResults.sort((a, b) => {
-                if (a.computedTime === Infinity && b.computedTime === Infinity) return 0;
-                if (a.computedTime === Infinity) return 1;
-                if (b.computedTime === Infinity) return -1;
-                return a.computedTime - b.computedTime;
             });
             
             // Znajdź czas zwycięzcy (pierwszy nie-DSQ)
@@ -3949,27 +3980,65 @@ Aktualny lider: ${reportData.leader}
             tbody.innerHTML = '';
             const filtered = state.results.filter(res => res.r === rIdx && res.s === sIdx);
             
-            // Sortowanie: normalne czasy, potem DNF, potem DSQ
-            filtered.sort((a,b) => {
-                if (a.time === "DSQ") return 1;
-                if (b.time === "DSQ") return -1;
-                if (a.time === "DNF") return 1;
-                if (b.time === "DNF") return -1;
-                return a.ms - b.ms;
-            });
-
-            if(filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-600 text-sm">BRAK WYNIKÓW DLA TEGO ODCINKA</td></tr>';
-                return;
+            // Znajdź najgorszy czas wśród normalnych wyników
+            let worstTimeInStage = 0;
+            const normalResults = filtered.filter(res => res.time !== "DSQ" && res.time !== "DNF" && typeof res.ms === 'number');
+            if (normalResults.length > 0) {
+                worstTimeInStage = Math.max(...normalResults.map(res => res.ms));
             }
-
+            
+            // Przygotuj tablicę do sortowania
+            const resultsToSort = [];
+            
             filtered.forEach(res => {
                 const driver = state.drivers.find(d => d.id === res.d);
                 if (!driver) return;
                 
+                let sortTime;
+                let displayTime;
+                
+                if (res.time === "DSQ") {
+                    sortTime = Infinity;
+                    displayTime = "DSQ";
+                } else if (res.time === "DNF") {
+                    // DNF = najgorszy czas + 20 sekund
+                    sortTime = worstTimeInStage + 20000;
+                    displayTime = "DNF";
+                } else {
+                    sortTime = res.ms;
+                    displayTime = res.ms;
+                }
+                
+                resultsToSort.push({
+                    res: res,
+                    driver: driver,
+                    sortTime: sortTime,
+                    displayTime: displayTime
+                });
+            });
+            
+            // Sortuj wyniki
+            resultsToSort.sort((a, b) => {
+                // DSQ zawsze na końcu
+                if (a.res.time === "DSQ" && b.res.time !== "DSQ") return 1;
+                if (a.res.time !== "DSQ" && b.res.time === "DSQ") return -1;
+                // Sortuj według czasu
+                return a.sortTime - b.sortTime;
+            });
+
+            if(resultsToSort.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-600 text-sm">BRAK WYNIKÓW DLA TEGO ODCINKA</td></tr>';
+                return;
+            }
+
+            resultsToSort.forEach(result => {
+                const res = result.res;
+                const driver = result.driver;
+                const displayTime = result.displayTime;
+                
                 const isDSQ = res.time === "DSQ";
                 const isDNF = res.time === "DNF";
-                const timeDisplay = formatTimeForDisplay(res.time === "DSQ" ? "DSQ" : (res.time === "DNF" ? "DNF" : res.ms));
+                const timeDisplay = formatTimeForDisplay(displayTime);
                 const bonusPoints = (isDSQ || isDNF) ? '0' : `+${res.cp}`;
                 
                 const tr = document.createElement('tr');
@@ -4414,6 +4483,3 @@ Aktualny lider: ${reportData.leader}
     </script>
 </body>
 </html>
-
-
-
