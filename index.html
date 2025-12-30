@@ -1944,87 +1944,95 @@
             }
         }
 
-        function calculateRoundPoints(roundIndex) {
-            // Get all results for this round
-            const roundResults = state.results.filter(res => res.r === roundIndex);
-            
-            // Group results by driver
-            const driverResults = {};
-            
-            roundResults.forEach(result => {
-                if (!driverResults[result.d]) {
-                    driverResults[result.d] = {
-                        times: [],
-                        totalTime: 0,
-                        hasDSQ: false,
-                        dnfCount: 0
-                    };
-                }
-                
-                if (result.time === "DSQ") {
-                    driverResults[result.d].hasDSQ = true;
-                } else if (result.time === "DNF") {
-                    driverResults[result.d].dnfCount++;
-                } else if (typeof result.ms === 'number') {
-                    driverResults[result.d].times.push(result.ms);
-                    driverResults[result.d].totalTime += result.ms;
-                }
+       function calculateRoundPoints(roundIndex) {
+    const roundResults = state.results.filter(res => res.r === roundIndex);
+    
+    // Znajdź najgorszy normalny czas dla każdego odcinka
+    const worstNormalTimesPerStage = {};
+    
+    roundResults.forEach(result => {
+        if (result.time !== "DSQ" && result.time !== "DNF" && typeof result.ms === 'number') {
+            const stageIdx = result.s;
+            if (!worstNormalTimesPerStage[stageIdx] || result.ms > worstNormalTimesPerStage[stageIdx]) {
+                worstNormalTimesPerStage[stageIdx] = result.ms;
+            }
+        }
+    });
+    
+    // Grupuj wyniki po kierowcach
+    const driverResults = {};
+    
+    roundResults.forEach(result => {
+        if (!driverResults[result.d]) {
+            driverResults[result.d] = {
+                times: [],
+                totalTime: 0,
+                hasDSQ: false,
+                dnfStages: []
+            };
+        }
+        
+        if (result.time === "DSQ") {
+            driverResults[result.d].hasDSQ = true;
+        } else if (result.time === "DNF") {
+            driverResults[result.d].dnfStages.push(result.s);
+        } else if (typeof result.ms === 'number') {
+            driverResults[result.d].times.push({stage: result.s, time: result.ms});
+            driverResults[result.d].totalTime += result.ms;
+        }
+    });
+    
+    // Oblicz czasy końcowe
+    const driverTimes = [];
+    
+    Object.keys(driverResults).forEach(driverId => {
+        const driverResult = driverResults[driverId];
+        
+        if (driverResult.hasDSQ) {
+            driverTimes.push({
+                driverId: parseInt(driverId),
+                totalMs: Infinity,
+                isDSQ: true
             });
+        } else {
+            let totalTime = driverResult.totalTime;
             
-            // Find worst time among normal results for DNF penalty calculation
-            let worstNormalTime = 0;
-            Object.values(driverResults).forEach(driverResult => {
-                driverResult.times.forEach(time => {
-                    if (time > worstNormalTime) worstNormalTime = time;
-                });
-            });
-            
-            // Calculate final times for each driver
-            const driverTimes = [];
-            
-            Object.keys(driverResults).forEach(driverId => {
-                const driverResult = driverResults[driverId];
-                
-                if (driverResult.hasDSQ) {
-                    driverTimes.push({
-                        driverId: parseInt(driverId),
-                        totalMs: Infinity,
-                        isDSQ: true
-                    });
+            // Dodaj kary za DNF
+            driverResult.dnfStages.forEach(stageIdx => {
+                if (worstNormalTimesPerStage[stageIdx]) {
+                    totalTime += worstNormalTimesPerStage[stageIdx] + 20000;
                 } else {
-                    let totalTime = driverResult.totalTime;
-                    
-                    // Add DNF penalties
-                    for (let i = 0; i < driverResult.dnfCount; i++) {
-                        totalTime += worstNormalTime + 20000;
-                    }
-                    
-                    driverTimes.push({
-                        driverId: parseInt(driverId),
-                        totalMs: totalTime,
-                        isDSQ: false
-                    });
+                    // Jeśli brak normalnych czasów w odcinku
+                    totalTime += 300000; // 5 minut default
                 }
             });
             
-            // Sort by time (DSQ at the end)
-            driverTimes.sort((a, b) => {
-                if (a.isDSQ && b.isDSQ) return 0;
-                if (a.isDSQ) return 1;
-                if (b.isDSQ) return -1;
-                return a.totalMs - b.totalMs;
-            });
-            
-            // Award points based on position
-            const pointsSystem = [15, 12, 10, 8, 6, 4, 2, 1];
-            
-            driverTimes.forEach((driverTime, position) => {
-                const driver = state.drivers.find(d => d.id === driverTime.driverId);
-                if (driver && !driverTime.isDSQ && position < pointsSystem.length) {
-                    driver.points[roundIndex] = pointsSystem[position];
-                }
+            driverTimes.push({
+                driverId: parseInt(driverId),
+                totalMs: totalTime,
+                isDSQ: false
             });
         }
+    });
+    
+    // Sortuj (DSQ na końcu)
+    driverTimes.sort((a, b) => {
+        if (a.isDSQ && b.isDSQ) return 0;
+        if (a.isDSQ) return 1;
+        if (b.isDSQ) return -1;
+        return a.totalMs - b.totalMs;
+    });
+    
+    // Przyznaj punkty
+    const pointsSystem = [15, 12, 10, 8, 6, 4, 2, 1];
+    
+    driverTimes.forEach((driverTime, position) => {
+        const driver = state.drivers.find(d => d.id === driverTime.driverId);
+        if (driver && !driverTime.isDSQ && position < pointsSystem.length) {
+            driver.points[roundIndex] = pointsSystem[position];
+        }
+    });
+}
 
         function calculateBonusPoints() {
             // Reset bonus points
@@ -2217,18 +2225,24 @@
 
         // --- HELPER FUNCTIONS ---
         function parseTime(timeStr) {
-            if (timeStr.toUpperCase() === "DSQ" || timeStr.toUpperCase() === "DNF") {
-                return timeStr.toUpperCase();
-            }
-            
-            const parts = timeStr.split(':');
-            if (parts.length < 2) throw new Error("Format");
-            const min = parseInt(parts[0]);
-            const secParts = parts[1].split('.');
-            const sec = parseInt(secParts[0]);
-            const ms = parseInt(secParts[1] || 0);
-            return (min * 60 * 1000) + (sec * 1000) + ms;
-        }
+    if (!timeStr) throw new Error("Pusty czas");
+    if (timeStr.toUpperCase() === "DSQ" || timeStr.toUpperCase() === "DNF") {
+        return timeStr.toUpperCase();
+    }
+    
+    const parts = timeStr.split(':');
+    if (parts.length < 2) throw new Error("Format");
+    const min = parseInt(parts[0]);
+    const secParts = parts[1].split('.');
+    const sec = parseInt(secParts[0]);
+    const ms = parseInt(secParts[1] || 0);
+    
+    if (isNaN(min) || isNaN(sec) || isNaN(ms)) {
+        throw new Error("Nieprawidłowy format czasu");
+    }
+    
+    return (min * 60 * 1000) + (sec * 1000) + ms;
+}
 
         function formatTimeDiff(msDiff) {
             if (msDiff === "DSQ") return "DSQ";
@@ -2238,18 +2252,18 @@
             const ms = msDiff % 1000;
             return `+${String(sec).padStart(2, '0')}.${String(ms).padStart(3, '0')}`;
         }
-
-        function formatTimeForDisplay(ms) {
-            if (ms === "DSQ") return '<span class="status-dsq-text">DSQ</span>';
-            if (ms === "DNF") return '<span class="status-dnf-text">DNF</span>';
-            
-            const totalSeconds = Math.floor(ms / 1000);
-            const minutes = Math.floor(totalSeconds / 60);
-            const seconds = totalSeconds % 60;
-            const milliseconds = ms % 1000;
-            
-            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
-        }
+function formatTimeForDisplay(ms) {
+    if (ms === "DSQ") return '<span class="status-dsq-text">DSQ</span>';
+    if (ms === "DNF") return '<span class="status-dnf-text">DNF</span>';
+    if (ms === Infinity) return '<span class="status-dsq-text">DSQ</span>';
+    
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    const milliseconds = ms % 1000;
+    
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
+}
 
         // --- MODIFIED FUNCTIONS TO RECALCULATE POINTS ---
         function saveSingleDriverResult(driverId) {
@@ -2795,40 +2809,41 @@
                 }
             });
             
-            let worstNormalTime = 0;
-            if (normalResults.length > 0) {
-                worstNormalTime = Math.max(...normalResults.map(res => res.ms));
-            }
-            
-            const allResults = [];
-            
-            normalResults.forEach(res => {
-                allResults.push({
-                    ...res,
-                    computedTime: res.ms,
-                    type: 'normal',
-                    displayTime: res.ms
-                });
-            });
-            
-            dnfResults.forEach(res => {
-                const computedTime = worstNormalTime + 20000;
-                allResults.push({
-                    ...res,
-                    computedTime: computedTime,
-                    type: 'dnf',
-                    displayTime: computedTime
-                });
-            });
-            
-            dsqResults.forEach(res => {
-                allResults.push({
-                    ...res,
-                    computedTime: Infinity,
-                    type: 'dsq',
-                    displayTime: "DSQ"
-                });
-            });
+    let worstNormalTime = 0;
+    normalResults.forEach(res => {
+        if (res.ms > worstNormalTime) worstNormalTime = res.ms;
+    });
+    
+    const allResults = [];
+    
+    normalResults.forEach(res => {
+        allResults.push({
+            ...res,
+            computedTime: res.ms,
+            type: 'normal',
+            displayTime: res.ms
+        });
+    });
+    
+    // Dla DNF: najgorszy czas + 20 sekund
+    dnfResults.forEach(res => {
+        const penaltyTime = worstNormalTime + 20000; // 20 sekund = 20000ms
+        allResults.push({
+            ...res,
+            computedTime: penaltyTime,
+            type: 'dnf',
+            displayTime: penaltyTime
+        });
+    });
+    
+    dsqResults.forEach(res => {
+        allResults.push({
+            ...res,
+            computedTime: Infinity,
+            type: 'dsq',
+            displayTime: "DSQ"
+        });
+    });
             
             allResults.sort((a, b) => {
                 if (a.computedTime === Infinity && b.computedTime === Infinity) return 0;
@@ -2952,40 +2967,72 @@
             });
             
             // Find worst time among normal results for DNF penalty calculation
-            let worstNormalTime = 0;
-            Object.values(driverResults).forEach(driverResult => {
-                driverResult.times.forEach(time => {
-                    if (time > worstNormalTime) worstNormalTime = time;
-                });
-            });
-            
-            // Calculate final times for each driver
-            const driverTimes = [];
-            
-            Object.keys(driverResults).forEach(driverId => {
-                const driverResult = driverResults[driverId];
-                
-                if (driverResult.hasDSQ) {
-                    driverTimes.push({
-                        driverId: parseInt(driverId),
-                        totalMs: Infinity,
-                        isDSQ: true
-                    });
-                } else {
-                    let totalTime = driverResult.totalTime;
-                    
-                    // Add DNF penalties
-                    for (let i = 0; i < driverResult.dnfCount; i++) {
-                        totalTime += worstNormalTime + 20000;
-                    }
-                    
-                    driverTimes.push({
-                        driverId: parseInt(driverId),
-                        totalMs: totalTime,
-                        isDSQ: false
-                    });
-                }
-            });
+const worstNormalTimes = {};
+
+roundResults.forEach(result => {
+    if (result.time !== "DSQ" && result.time !== "DNF" && result.ms) {
+        const stageIdx = result.s;
+        if (!worstNormalTimes[stageIdx] || result.ms > worstNormalTimes[stageIdx]) {
+            worstNormalTimes[stageIdx] = result.ms;
+        }
+    }
+});
+
+// Grupuj wyniki po kierowcach
+const driverResults = {};
+
+roundResults.forEach(result => {
+    if (!driverResults[result.d]) {
+        driverResults[result.d] = {
+            times: [],
+            totalTime: 0,
+            hasDSQ: false,
+            dnfStages: []
+        };
+    }
+    
+    if (result.time === "DSQ") {
+        driverResults[result.d].hasDSQ = true;
+    } else if (result.time === "DNF") {
+        driverResults[result.d].dnfStages.push(result.s);
+    } else if (typeof result.ms === 'number') {
+        driverResults[result.d].times.push({stage: result.s, time: result.ms});
+        driverResults[result.d].totalTime += result.ms;
+    }
+});
+
+// Oblicz czasy końcowe z karami
+const driverTimes = [];
+
+Object.keys(driverResults).forEach(driverId => {
+    const driverResult = driverResults[driverId];
+    
+    if (driverResult.hasDSQ) {
+        driverTimes.push({
+            driverId: parseInt(driverId),
+            totalMs: Infinity,
+            isDSQ: true
+        });
+    } else {
+        let totalTime = driverResult.totalTime;
+        
+        // Dodaj kary za DNF (najgorszy czas w danym odcinku + 20s)
+        driverResult.dnfStages.forEach(stageIdx => {
+            if (worstNormalTimes[stageIdx]) {
+                totalTime += worstNormalTimes[stageIdx] + 20000;
+            } else {
+                // Jeśli nie ma normalnych czasów w tym odcinku, użyj domyślnego dużego czasu
+                totalTime += 300000; // 5 minut jako default
+            }
+        });
+        
+        driverTimes.push({
+            driverId: parseInt(driverId),
+            totalMs: totalTime,
+            isDSQ: false
+        });
+    }
+});
             
             // Sort by time (DSQ at the end)
             driverTimes.sort((a, b) => {
@@ -4516,3 +4563,4 @@ Aktualny lider: ${reportData.leader}
     </script>
 </body>
 </html>
+
