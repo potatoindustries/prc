@@ -1068,7 +1068,7 @@
                     </div>
                     <div>
                         <label class="block text-sm font-mono text-gray-400 mb-2">HASŁO DOSTĘPU</label>
-                        <input type="psx" id="login-psx" placeholder="Wprowadź hasło" class="input-dark bg-[#080808] border-[#333] focus:border-[#8B0000]">
+                        <input type="password" id="login-password" placeholder="Wprowadź hasło" class="input-dark bg-[#080808] border-[#333] focus:border-[#8B0000]">
                     </div>
                     <div id="login-error" class="hidden text-xs text-red-500 font-mono p-2 bg-red-900/20 border border-red-900/30 rounded-md">
                         Nieprawidłowy login lub hasło
@@ -4288,10 +4288,10 @@ Aktualny lider: ${reportData.leader}
         function handleLogin(e) {
             e.preventDefault();
             const usx = document.getElementById('login-usx').value;
-            const psx = document.getElementById('login-psx').value;
+            const password = document.getElementById('login-password').value;
             const errorEl = document.getElementById('login-error');
             
-            if (usx === "admin" && psx === "prc3!") {
+            if (usx === "admin" && password === "prc3!") {
                 state.isLoggedIn = true;
                 errorEl.classList.add('hidden');
                 router('admin');
@@ -4303,7 +4303,7 @@ Aktualny lider: ${reportData.leader}
             } else {
                 errorEl.textContent = "Nieprawidłowy login lub hasło.";
                 errorEl.classList.remove('hidden');
-                document.getElementById('login-psx').value = '';
+                document.getElementById('login-password').value = '';
             }
         }
 
@@ -4311,7 +4311,7 @@ Aktualny lider: ${reportData.leader}
             state.isLoggedIn = false;
             router('home');
             document.getElementById('login-usx').value = '';
-            document.getElementById('login-psx').value = '';
+            document.getElementById('login-password').value = '';
             document.getElementById('login-error').classList.add('hidden');
         }
 
@@ -4414,5 +4414,6 @@ Aktualny lider: ${reportData.leader}
     </script>
 </body>
 </html>
+
 
 
