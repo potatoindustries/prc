@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Potato Rally Championship</title>
+    <title>PRC WINTER RALLY CUP 2025</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -316,136 +316,6 @@
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
-
-        /* Mobile Navigation */
-        .mobile-menu {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background-color: var(--bg-color);
-            border-bottom: 1px solid var(--border-color);
-            z-index: 40;
-        }
-
-        .mobile-menu.active {
-            display: block;
-        }
-
-        /* Responsive improvements */
-        @media (max-width: 768px) {
-            .container-padding {
-                padding-left: 1rem;
-                padding-right: 1rem;
-            }
-            
-            .text-responsive {
-                font-size: 0.875rem;
-            }
-            
-            .btn-primary, .btn-accent {
-                padding: 0.5rem 1rem;
-                font-size: 0.75rem;
-            }
-            
-            .technical-border {
-                border-width: 1px;
-            }
-            
-            .table-input, .table-select {
-                font-size: 0.7rem;
-                padding: 2px;
-            }
-            
-            /* Home page adjustments */
-            #rotating-leaders {
-                height: 150px;
-            }
-            
-            /* Championship table */
-            #drivers-ranking-body td,
-            #constructors-ranking-body td {
-                padding: 0.5rem 0.25rem;
-                font-size: 0.75rem;
-            }
-            
-            /* Results controls */
-            .flex-wrap {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-            
-            .flex-wrap > div {
-                width: 100%;
-            }
-            
-            /* Teams grid */
-            .grid-cols-1 {
-                grid-template-columns: 1fr;
-            }
-            
-            /* Schedule grid */
-            .grid-cols-1 {
-                grid-template-columns: 1fr;
-            }
-            
-            /* Rules grid */
-            .grid-cols-1 {
-                grid-template-columns: 1fr;
-            }
-            
-            /* Admin dashboard */
-            .grid-cols-1 {
-                grid-template-columns: 1fr;
-            }
-            
-            .grid-cols-2 {
-                grid-template-columns: 1fr;
-            }
-            
-            .grid-cols-4 {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            /* Table module */
-            .min-w-\[800px\] {
-                min-width: 300px;
-            }
-            
-            /* Stage module form */
-            .grid-cols-12 > div {
-                grid-column: span 12;
-            }
-            
-            /* Hide some non-essential elements on mobile */
-            .hidden-mobile {
-                display: none;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .text-3xl {
-                font-size: 1.5rem;
-            }
-            
-            .text-2xl {
-                font-size: 1.25rem;
-            }
-            
-            .text-xl {
-                font-size: 1.125rem;
-            }
-            
-            .grid-cols-4 {
-                grid-template-columns: 1fr;
-            }
-            
-            /* Make buttons full width on very small screens */
-            .btn-full-mobile {
-                width: 100%;
-            }
-        }
     </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col relative">
@@ -465,12 +335,10 @@
                     <div class="flex items-center gap-2">
                         <!-- WRC Logo -->
                         <div>
-                            <img src="wrc2.png" width="80px" class="max-w-[60px] md:max-w-[80px]">
+                            <img src="wrc.png" width="80px">
                         </div>
                     </div>
                 </div>
-                
-                <!-- Desktop Navigation -->
                 <nav class="hidden md:flex space-x-8">
                     <button onclick="router('home')" id="nav-home" class="text-sm font-mono uppercase tracking-widest hover:text-[#8B0000] transition-colors text-gray-300">Start</button>
                     <button onclick="router('championship')" id="nav-champ" class="text-sm font-mono uppercase tracking-widest hover:text-[#8B0000] transition-colors text-gray-300">Mistrzostwa</button>
@@ -480,26 +348,6 @@
                     <button onclick="router('rules')" id="nav-rules" class="text-sm font-mono uppercase tracking-widest hover:text-[#8B0000] transition-colors text-gray-300">Zasady</button>
                     <button onclick="router('login')" id="nav-login" class="text-sm font-mono uppercase tracking-widest hover:text-[#8B0000] transition-colors text-gray-300">Panel Admina</button>
                 </nav>
-                
-                <!-- Mobile Menu Button -->
-                <button id="mobile-menu-button" class="md:hidden text-gray-300 hover:text-[#8B0000] transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
-                </button>
-            </div>
-            
-            <!-- Mobile Navigation -->
-            <div id="mobile-menu" class="mobile-menu md:hidden">
-                <div class="flex flex-col space-y-4 p-4">
-                    <button onclick="router('home'); closeMobileMenu()" class="text-sm font-mono uppercase tracking-widest hover:text-[#8B0000] transition-colors text-gray-300 text-left">Start</button>
-                    <button onclick="router('championship'); closeMobileMenu()" class="text-sm font-mono uppercase tracking-widest hover:text-[#8B0000] transition-colors text-gray-300 text-left">Mistrzostwa</button>
-                    <button onclick="router('results'); closeMobileMenu()" class="text-sm font-mono uppercase tracking-widest hover:text-[#8B0000] transition-colors text-gray-300 text-left">Wyniki</button>
-                    <button onclick="router('teams'); closeMobileMenu()" class="text-sm font-mono uppercase tracking-widest hover:text-[#8B0000] transition-colors text-gray-300 text-left">Teamy</button>
-                    <button onclick="router('schedule'); closeMobileMenu()" class="text-sm font-mono uppercase tracking-widest hover:text-[#8B0000] transition-colors text-gray-300 text-left">Harmonogram</button>
-                    <button onclick="router('rules'); closeMobileMenu()" class="text-sm font-mono uppercase tracking-widest hover:text-[#8B0000] transition-colors text-gray-300 text-left">Zasady</button>
-                    <button onclick="router('login'); closeMobileMenu()" class="text-sm font-mono uppercase tracking-widest hover:text-[#8B0000] transition-colors text-gray-300 text-left">Panel Admina</button>
-                </div>
             </div>
         </div>
     </header>
@@ -508,9 +356,9 @@
     <main id="app" class="flex-grow w-full relative">
         
         <!-- VIEW: HOME -->
-        <section id="view-home" class="fade-in w-full px-4 pt-8 container-padding">
+        <section id="view-home" class="fade-in w-full px-4 pt-8">
             <div class="max-w-7xl mx-auto">
-                <div class="technical-border rounded-xl bg-[#0E0E0E] relative overflow-hidden h-[200px] md:h-[280px] w-full flex flex-col items-center justify-center group mb-6">
+                <div class="technical-border rounded-xl bg-[#0E0E0E] relative overflow-hidden h-[280px] w-full flex flex-col items-center justify-center group mb-6">
                     <!-- Background Image -->
                     <div class="absolute inset-0 z-0">
                         <img src="zdj.jpg" class="w-full h-full object-cover grayscale brightness-[0.4] group-hover:scale-105 transition-transform duration-700">
@@ -519,21 +367,21 @@
                     </div>
                     
                     <!-- Content -->
-                    <div class="relative z-10 text-center p-4 md:p-8 max-w-3xl mx-auto">
-                        <h1 class="text-2xl md:text-5xl font-mono font-bold tracking-tighter mb-4 text-white leading-tight drop-shadow-lg">
-                            POTATO RALLY<br>CHAMPIONSHIP
+                    <div class="relative z-10 text-center p-8 max-w-3xl mx-auto">
+                        <h1 class="text-3xl md:text-5xl font-mono font-bold tracking-tighter mb-4 text-white leading-tight drop-shadow-lg">
+                            WRC WINTER RALLY CUP<br>2025
                         </h1>
                         
-                        <div class="h-[1px] w-24 bg-[#8B0000] mx-auto my-4 md:my-6"></div>
+                        <div class="h-[1px] w-24 bg-[#8B0000] mx-auto my-6"></div>
                         
-                        <button onclick="router('championship')" class="btn-primary hover:bg-white hover:text-black border-white backdrop-blur-sm rounded-lg btn-full-mobile">
+                        <button onclick="router('championship')" class="btn-primary hover:bg-white hover:text-black border-white backdrop-blur-sm rounded-lg">
                             SPRAWDŹ TABELĘ
                         </button>
                     </div>
                 </div>
 
                 <!-- Dynamic Leaders Section -->
-                <div id="rotating-leaders" class="technical-border rounded-xl bg-[#0E0E0E] relative overflow-hidden h-[150px] md:h-[180px] w-full">
+                <div id="rotating-leaders" class="technical-border rounded-xl bg-[#0E0E0E] relative overflow-hidden h-[180px] w-full">
                     <!-- Background Image -->
                     <div class="absolute inset-0 z-0">
                         <div class="absolute inset-0 scanline opacity-30"></div>
@@ -544,10 +392,10 @@
                     <div id="leader-driver" class="absolute inset-0 flex flex-col items-center justify-center p-6 transition-all duration-500 opacity-100">
                         <div class="text-center">
                             <p class="text-xs font-mono text-gray-400 mb-2 uppercase tracking-widest">Aktualny Lider</p>
-                            <h3 class="text-xl md:text-2xl font-mono font-bold text-white tracking-widest mb-1" id="driver-leader-name">Ładowanie...</h3>
+                            <h3 class="text-2xl font-mono font-bold text-white tracking-widest mb-1" id="driver-leader-name">Ładowanie...</h3>
                             <p class="text-sm text-gray-300 font-mono tracking-wide">KIEROWCÓW</p>
                             <div class="mt-3 flex items-center justify-center">
-                                <span class="text-2xl md:text-3xl font-mono font-bold text-[#8B0000] mr-2" id="driver-leader-points">0</span>
+                                <span class="text-3xl font-mono font-bold text-[#8B0000] mr-2" id="driver-leader-points">0</span>
                                 <span class="text-xs text-gray-400 font-mono">PKT</span>
                             </div>
                         </div>
@@ -557,10 +405,10 @@
                     <div id="leader-constructor" class="absolute inset-0 flex flex-col items-center justify-center p-6 transition-all duration-500 opacity-0">
                         <div class="text-center">
                             <p class="text-xs font-mono text-gray-400 mb-2 uppercase tracking-widest">Aktualny Lider</p>
-                            <h3 class="text-xl md:text-2xl font-mono font-bold text-white tracking-widest mb-1" id="constructor-leader-name">Ładowanie...</h3>
+                            <h3 class="text-2xl font-mono font-bold text-white tracking-widest mb-1" id="constructor-leader-name">Ładowanie...</h3>
                             <p class="text-sm text-gray-300 font-mono tracking-wide">KONSTRUKTORÓW</p>
                             <div class="mt-3 flex items-center justify-center">
-                                <span class="text-2xl md:text-3xl font-mono font-bold text-[#8B0000] mr-2" id="constructor-leader-points">0</span>
+                                <span class="text-3xl font-mono font-bold text-[#8B0000] mr-2" id="constructor-leader-points">0</span>
                                 <span class="text-xs text-gray-400 font-mono">PKT</span>
                             </div>
                         </div>
@@ -581,27 +429,27 @@
         </section>
 
         <!-- VIEW: CHAMPIONSHIP -->
-        <section id="view-championship" class="hidden fade-in max-w-7xl mx-auto px-4 py-8 md:py-12 container-padding">
-            <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 md:mb-8 border-b border-[#222] pb-4">
-                <div class="mb-4 md:mb-0">
-                    <h2 class="text-2xl md:text-3xl font-mono font-bold">KLASYFIKACJA GENERALNA</h2>
-                    <p class="text-sm text-gray-400 font-mono mt-1">POTATO RALLY CHAMPIONSHIP</p>
+        <section id="view-championship" class="hidden fade-in max-w-7xl mx-auto px-4 py-12">
+            <div class="flex items-end justify-between mb-8 border-b border-[#222] pb-4">
+                <div>
+                    <h2 class="text-3xl font-mono font-bold">KLASYFIKACJA GENERALNA</h2>
+                    <p class="text-sm text-gray-400 font-mono mt-1">WRC WINTER RALLY CUP 2025</p>
                 </div>
-                <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 bg-[#111] p-1 border border-[#222] rounded-lg">
-                    <button onclick="switchTab('drivers')" id="btn-drivers" class="text-sm font-mono px-4 py-2 bg-white text-black transition-all rounded-md btn-full-mobile">KIEROWCY</button>
-                    <button onclick="switchTab('constructors')" id="btn-constructors" class="text-sm font-mono px-4 py-2 text-gray-400 hover:text-white transition-all rounded-md btn-full-mobile">KONSTRUKTORZY</button>
+                <div class="space-x-1 bg-[#111] p-1 border border-[#222] rounded-lg">
+                    <button onclick="switchTab('drivers')" id="btn-drivers" class="text-sm font-mono px-4 py-2 bg-white text-black transition-all rounded-md">KIEROWCY</button>
+                    <button onclick="switchTab('constructors')" id="btn-constructors" class="text-sm font-mono px-4 py-2 text-gray-400 hover:text-white transition-all rounded-md">KONSTRUKTORZY</button>
                 </div>
             </div>
 
             <!-- Drivers Table -->
             <div id="tab-drivers" class="w-full overflow-x-auto rounded-xl technical-border">
-                <table class="w-full text-left border-collapse text-responsive">
+                <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="font-mono text-sm text-gray-400 border-b border-[#222] bg-[#0F0F0F]" id="drivers-table-header">
                             <!-- Dynamic headers will be inserted here -->
                         </tr>
                     </thead>
-                    <tbody class="font-mono text-sm md:text-base divide-y divide-[#1a1a1a]" id="drivers-ranking-body">
+                    <tbody class="font-mono text-base divide-y divide-[#1a1a1a]" id="drivers-ranking-body">
                         <!-- JS GENERATED -->
                     </tbody>
                 </table>
@@ -609,16 +457,16 @@
 
             <!-- Constructors Table -->
             <div id="tab-constructors" class="w-full overflow-x-auto hidden rounded-xl technical-border">
-                <table class="w-full text-left border-collapse text-responsive">
+                <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="font-mono text-sm text-gray-400 border-b border-[#222] bg-[#0F0F0F]">
-                            <th class="py-3 md:py-4 px-2 md:px-4 font-normal">POZ</th>
-                            <th class="py-3 md:py-4 px-2 md:px-4 font-normal">KONSTRUKTOR</th>
-                            <th class="py-3 md:py-4 px-2 md:px-4 font-normal">KIEROWCY</th>
-                            <th class="py-3 md:py-4 px-2 md:px-4 font-normal text-right">PUNKTY</th>
+                            <th class="py-4 px-4 font-normal">POZ</th>
+                            <th class="py-4 px-4 font-normal">KONSTRUKTOR</th>
+                            <th class="py-4 px-4 font-normal">KIEROWCY</th>
+                            <th class="py-4 px-4 font-normal text-right">PUNKTY</th>
                         </tr>
                     </thead>
-                    <tbody class="font-mono text-sm md:text-base divide-y divide-[#1a1a1a]" id="constructors-ranking-body">
+                    <tbody class="font-mono text-base divide-y divide-[#1a1a1a]" id="constructors-ranking-body">
                         <!-- JS GENERATED -->
                     </tbody>
                 </table>
@@ -626,28 +474,28 @@
         </section>
 
         <!-- VIEW: RESULTS -->
-        <section id="view-results" class="hidden fade-in max-w-7xl mx-auto px-4 py-8 md:py-12 container-padding">
-            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-6 md:mb-8 gap-4 md:gap-6 border-b border-[#222] pb-4 md:pb-6">
-                <div class="mb-4 md:mb-0">
-                    <h2 class="text-2xl md:text-3xl font-mono font-bold">WYNIKI SZCZEGÓŁOWE</h2>
-                    <p class="text-sm text-gray-400 font-mono mt-1">ANALIZA CZASÓW ODCINKÓW SPECJALNYCH</p>
+        <section id="view-results" class="hidden fade-in max-w-7xl mx-auto px-4 py-12">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-8 gap-6 border-b border-[#222] pb-6">
+                <div>
+                    <h2 class="text-3xl font-mono font-bold">WYNIKI SZCZEGÓŁOWE</h2>
+                    <p class="text-sm text-gray-400 font-mono mt-1">ANALIZA CZASÓW ODCINKÓW SPECJALNYOS</p>
                 </div>
                 
                 <!-- Controls -->
-                <div class="flex flex-col sm:flex-row gap-3 md:gap-4 w-full lg:w-auto">
+                <div class="flex flex-wrap gap-4 w-full lg:w-auto">
                     <!-- Round Selector with Arrows -->
-                    <div class="flex items-center bg-[#111] border border-[#222] rounded-lg overflow-hidden w-full sm:w-auto">
+                    <div class="flex items-center bg-[#111] border border-[#222] rounded-lg overflow-hidden">
                         <button onclick="changeRound(-1)" class="px-3 py-2 text-gray-400 hover:text-white hover:bg-[#222] border-r border-[#222]">&lt;</button>
-                        <select id="res-round-select" class="bg-transparent text-white text-sm font-mono py-2 px-4 outline-none appearance-none min-w-[120px] md:min-w-[150px] text-center cursor-pointer">
+                        <select id="res-round-select" class="bg-transparent text-white text-sm font-mono py-2 px-4 outline-none appearance-none min-w-[150px] text-center cursor-pointer">
                             <!-- JS GENERATED -->
                         </select>
                         <button onclick="changeRound(1)" class="px-3 py-2 text-gray-400 hover:text-white hover:bg-[#222] border-l border-[#222]">&gt;</button>
                     </div>
 
                     <!-- Stage Selector with Arrows -->
-                    <div class="flex items-center bg-[#111] border border-[#222] rounded-lg overflow-hidden w-full sm:w-auto">
+                    <div class="flex items-center bg-[#111] border border-[#222] rounded-lg overflow-hidden">
                         <button onclick="changeStage(-1)" class="px-3 py-2 text-gray-400 hover:text-white hover:bg-[#222] border-r border-[#222]">&lt;</button>
-                        <select id="res-stage-select" class="bg-transparent text-white text-sm font-mono py-2 px-4 outline-none appearance-none min-w-[120px] md:min-w-[150px] text-center cursor-pointer">
+                        <select id="res-stage-select" class="bg-transparent text-white text-sm font-mono py-2 px-4 outline-none appearance-none min-w-[150px] text-center cursor-pointer">
                             <!-- JS GENERATED -->
                         </select>
                         <button onclick="changeStage(1)" class="px-3 py-2 text-gray-400 hover:text-white hover:bg-[#222] border-l border-[#222]">&gt;</button>
@@ -656,17 +504,17 @@
             </div>
 
             <div class="w-full overflow-x-auto bg-[#0F0F0F] technical-border rounded-xl">
-                <table class="w-full text-left text-responsive">
+                <table class="w-full text-left">
                     <thead>
                         <tr class="font-mono text-sm text-gray-400 border-b border-[#222] bg-[#151515]">
-                            <th class="py-3 pl-4 w-12 md:w-16">#</th>
+                            <th class="py-3 pl-4 w-16">#</th>
                             <th class="py-3">KIEROWCA</th>
                             <th class="py-3 text-right">CZAS OS</th>
                             <th class="py-3 text-right">RÓŻNICA</th>
                             <th class="py-3 text-right pr-4">PKT BONUSOWE</th>
                         </tr>
                     </thead>
-                    <tbody class="font-mono text-sm md:text-base divide-y divide-[#1a1a1a]" id="stage-results-body">
+                    <tbody class="font-mono text-base divide-y divide-[#1a1a1a]" id="stage-results-body">
                          <!-- JS GENERATED -->
                     </tbody>
                 </table>
@@ -674,18 +522,18 @@
         </section>
 
         <!-- VIEW: TEAMS -->
-        <section id="view-teams" class="hidden fade-in max-w-7xl mx-auto px-4 py-8 md:py-12 container-padding">
-            <div class="mb-6 md:mb-8">
-                <h2 class="text-2xl md:text-3xl font-mono font-bold">TEAMY I KONSTRUKTORZY</h2>
+        <section id="view-teams" class="hidden fade-in max-w-7xl mx-auto px-4 py-12">
+            <div class="mb-8">
+                <h2 class="text-3xl font-mono font-bold">TEAMY I KONSTRUKTORZY</h2>
                 <p class="text-sm text-gray-400 font-mono mt-1">PRZYDZIAŁ KIEROWCÓW I SAMOCHODÓW</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Ford Team -->
-                <div class="technical-border rounded-xl bg-[#0E0E0E] p-4 md:p-6">
+                <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="w-4 h-4 bg-blue-600 rounded-sm"></div>
-                        <h3 class="font-mono text-lg md:text-xl font-bold">FORD</h3>
+                        <h3 class="font-mono text-xl font-bold">FORD</h3>
                         <span class="badge-r5 ml-auto">R5</span>
                     </div>
                     <div class="space-y-4">
@@ -701,10 +549,10 @@
                 </div>
 
                 <!-- Volkswagen Team -->
-                <div class="technical-border rounded-xl bg-[#0E0E0E] p-4 md:p-6">
+                <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="w-4 h-4 bg-white rounded-sm"></div>
-                        <h3 class="font-mono text-lg md:text-xl font-bold">VOLKSWAGEN</h3>
+                        <h3 class="font-mono text-xl font-bold">VOLKSWAGEN</h3>
                         <span class="badge-r5 ml-auto">R5</span>
                     </div>
                     <div class="space-y-4">
@@ -720,10 +568,10 @@
                 </div>
 
                 <!-- Škoda Team -->
-                <div class="technical-border rounded-xl bg-[#0E0E0E] p-4 md:p-6">
+                <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="w-4 h-4 bg-green-600 rounded-sm"></div>
-                        <h3 class="font-mono text-lg md:text-xl font-bold">ŠKODA</h3>
+                        <h3 class="font-mono text-xl font-bold">ŠKODA</h3>
                         <span class="badge-r5 ml-auto">R5</span>
                     </div>
                     <div class="space-y-4">
@@ -739,10 +587,10 @@
                 </div>
 
                 <!-- Peugeot Team -->
-                <div class="technical-border rounded-xl bg-[#0E0E0E] p-4 md:p-6">
+                <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="w-4 h-4 bg-red-600 rounded-sm"></div>
-                        <h3 class="font-mono text-lg md:text-xl font-bold">PEUGEOT</h3>
+                        <h3 class="font-mono text-xl font-bold">PEUGEOT</h3>
                         <span class="badge-r5 ml-auto">R5</span>
                     </div>
                     <div class="space-y-4">
@@ -758,10 +606,10 @@
                 </div>
 
                 <!-- Mitsubishi Team -->
-                <div class="technical-border rounded-xl bg-[#0E0E0E] p-4 md:p-6">
+                <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="w-4 h-4 bg-yellow-600 rounded-sm"></div>
-                        <h3 class="font-mono text-lg md:text-xl font-bold">MITSUBISHI</h3>
+                        <h3 class="font-mono text-xl font-bold">MITSUBISHI</h3>
                         <span class="badge-r5 ml-auto">R5</span>
                     </div>
                     <div class="space-y-4">
@@ -777,10 +625,10 @@
                 </div>
 
                 <!-- Citroën Team -->
-                <div class="technical-border rounded-xl bg-[#0E0E0E] p-4 md:p-6">
+                <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="w-4 h-4 bg-purple-600 rounded-sm"></div>
-                        <h3 class="font-mono text-lg md:text-xl font-bold">CITROËN</h3>
+                        <h3 class="font-mono text-xl font-bold">CITROËN</h3>
                         <span class="badge-r5 ml-auto">R5</span>
                     </div>
                     <div class="space-y-4">
@@ -798,27 +646,27 @@
         </section>
 
         <!-- VIEW: SCHEDULE -->
-        <section id="view-schedule" class="hidden fade-in max-w-7xl mx-auto px-4 py-8 md:py-12 container-padding">
-            <div class="mb-6 md:mb-8">
-                <h2 class="text-2xl md:text-3xl font-mono font-bold">HARMONOGRAM TURNIEJU</h2>
+        <section id="view-schedule" class="hidden fade-in max-w-7xl mx-auto px-4 py-12">
+            <div class="mb-8">
+                <h2 class="text-3xl font-mono font-bold">HARMONOGRAM TURNIEJU</h2>
                 <p class="text-sm text-gray-400 font-mono mt-1">29-30 GRUDNIA & 1-2 STYCZNIA</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Day 1 -->
-                <div class="technical-border rounded-xl bg-[#0E0E0E] p-4 md:p-6">
+                <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="w-3 h-3 bg-[#8B0000] rounded-sm"></div>
-                        <h3 class="font-mono text-lg md:text-xl font-bold">DZIEŃ 1</h3>
+                        <h3 class="font-mono text-xl font-bold">DZIEŃ 1</h3>
                         <span class="text-xs font-mono text-gray-400 ml-auto">29.12</span>
                     </div>
                     <div class="space-y-4">
-                        <div class="p-3 md:p-4 bg-[#111] rounded-lg">
-                            <p class="font-mono text-sm text-white">Monako</p>
+                        <div class="p-4 bg-[#111] rounded-lg">
+                            <p class="font-mono text-sm text-white">Monte Carlo</p>
                             <p class="font-mono text-xs text-gray-400 mt-1">Śnieg / Asfalt</p>
                             <p class="font-mono text-xs text-[#8B0000] mt-2">3 Odcinki Specjalne</p>
                         </div>
-                        <div class="p-3 md:p-4 bg-[#111] rounded-lg">
+                        <div class="p-4 bg-[#111] rounded-lg">
                             <p class="font-mono text-sm text-white">Szkocja</p>
                             <p class="font-mono text-xs text-gray-400 mt-1">Żwir średni</p>
                             <p class="font-mono text-xs text-[#8B0000] mt-2">3 Odcinki Specjalne</p>
@@ -827,19 +675,19 @@
                 </div>
 
                 <!-- Day 2 -->
-                <div class="technical-border rounded-xl bg-[#0E0E0E] p-4 md:p-6">
+                <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="w-3 h-3 bg-[#8B0000] rounded-sm"></div>
-                        <h3 class="font-mono text-lg md:text-xl font-bold">DZIEŃ 2</h3>
+                        <h3 class="font-mono text-xl font-bold">DZIEŃ 2</h3>
                         <span class="text-xs font-mono text-gray-400 ml-auto">30.12</span>
                     </div>
                     <div class="space-y-4">
-                        <div class="p-3 md:p-4 bg-[#111] rounded-lg">
+                        <div class="p-4 bg-[#111] rounded-lg">
                             <p class="font-mono text-sm text-white">Argentyna</p>
                             <p class="font-mono text-xs text-gray-400 mt-1">Żwir ciężki</p>
                             <p class="font-mono text-xs text-[#8B0000] mt-2">3 Odcinki Specjalne</p>
                         </div>
-                        <div class="p-3 md:p-4 bg-[#111] rounded-lg">
+                        <div class="p-4 bg-[#111] rounded-lg">
                             <p class="font-mono text-sm text-white">Szwecja</p>
                             <p class="font-mono text-xs text-gray-400 mt-1">Śnieg</p>
                             <p class="font-mono text-xs text-[#8B0000] mt-2">3 Odcinki Specjalne</p>
@@ -848,19 +696,19 @@
                 </div>
 
                 <!-- Day 3 -->
-                <div class="technical-border rounded-xl bg-[#0E0E0E] p-4 md:p-6">
+                <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="w-3 h-3 bg-[#8B0000] rounded-sm"></div>
-                        <h3 class="font-mono text-lg md:text-xl font-bold">DZIEŃ 3</h3>
+                        <h3 class="font-mono text-xl font-bold">DZIEŃ 3</h3>
                         <span class="text-xs font-mono text-gray-400 ml-auto">01.01</span>
                     </div>
                     <div class="space-y-4">
-                        <div class="p-3 md:p-4 bg-[#111] rounded-lg">
+                        <div class="p-4 bg-[#111] rounded-lg">
                             <p class="font-mono text-sm text-white">Walia</p>
                             <p class="font-mono text-xs text-gray-400 mt-1">Żwir średni</p>
                             <p class="font-mono text-xs text-[#8B0000] mt-2">3 Odcinki Specjalne</p>
                         </div>
-                        <div class="p-3 md:p-4 bg-[#111] rounded-lg">
+                        <div class="p-4 bg-[#111] rounded-lg">
                             <p class="font-mono text-sm text-white">Nowa Zelandia</p>
                             <p class="font-mono text-xs text-gray-400 mt-1">Wszystkie rodzaje żwiru</p>
                             <p class="font-mono text-xs text-[#8B0000] mt-2">3 Odcinki Specjalne</p>
@@ -869,24 +717,24 @@
                 </div>
 
                 <!-- Day 4 -->
-                <div class="technical-border rounded-xl bg-[#0E0E0E] p-4 md:p-6">
+                <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="w-3 h-3 bg-[#8B0000] rounded-sm"></div>
-                        <h3 class="font-mono text-lg md:text-xl font-bold">DZIEŃ 4</h3>
+                        <h3 class="font-mono text-xl font-bold">DZIEŃ 4</h3>
                         <span class="text-xs font-mono text-gray-400 ml-auto">02.01</span>
                     </div>
                     <div class="space-y-4">
-                        <div class="p-3 md:p-4 bg-[#111] rounded-lg">
+                        <div class="p-4 bg-[#111] rounded-lg">
                             <p class="font-mono text-sm text-white">Niemcy</p>
                             <p class="font-mono text-xs text-gray-400 mt-1">Asfalt</p>
                             <p class="font-mono text-xs text-[#8B0000] mt-2">3 Odcinki Specjalne</p>
                         </div>
-                        <div class="p-3 md:p-4 bg-[#111] rounded-lg">
+                        <div class="p-4 bg-[#111] rounded-lg">
                             <p class="font-mono text-sm text-white">Polska</p>
                             <p class="font-mono text-xs text-gray-400 mt-1">Żwir średni</p>
                             <p class="font-mono text-xs text-[#8B0000] mt-2">3 Odcinki Specjalne</p>
                         </div>
-                        <div class="p-3 md:p-4 bg-[#111] rounded-lg border-l-4 border-yellow-500">
+                        <div class="p-4 bg-[#111] rounded-lg border-l-4 border-yellow-500">
                             <p class="font-mono text-sm text-white">Power Stage: USA</p>
                             <p class="font-mono text-xs text-gray-400 mt-1">Różne nawierzchnie</p>
                             <p class="font-mono text-xs text-yellow-500 mt-2">Dodatkowe punkty</p>
@@ -897,18 +745,18 @@
         </section>
 
         <!-- VIEW: RULES -->
-        <section id="view-rules" class="hidden fade-in max-w-7xl mx-auto px-4 py-8 md:py-12 container-padding">
-            <div class="mb-6 md:mb-8">
-                <h2 class="text-2xl md:text-3xl font-mono font-bold">ZASADY TURNIEJU</h2>
-                <p class="text-sm text-gray-400 font-mono mt-1">POTATO RALLY CHAMPIONSHIP</p>
+        <section id="view-rules" class="hidden fade-in max-w-7xl mx-auto px-4 py-12">
+            <div class="mb-8">
+                <h2 class="text-3xl font-mono font-bold">ZASADY TURNIEJU</h2>
+                <p class="text-sm text-gray-400 font-mono mt-1">WRC WINTER RALLY CUP 2025</p>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <!-- Left Column -->
                 <div class="space-y-6">
                     <!-- General Rules -->
-                    <div class="technical-border rounded-xl bg-[#0E0E0E] p-4 md:p-6">
-                        <h3 class="font-mono text-lg md:text-xl font-bold mb-4">📅 TERMINY I HARMONOGRAM</h3>
+                    <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
+                        <h3 class="font-mono text-xl font-bold mb-4">📅 TERMINY I HARMONOGRAM</h3>
                         <ul class="space-y-3 font-mono text-sm text-gray-300">
                             <li class="flex items-start">
                                 <span class="text-[#8B0000] mr-2">•</span>
@@ -920,7 +768,7 @@
                             </li>
                             <li class="flex items-start">
                                 <span class="text-[#8B0000] mr-2">•</span>
-                                Każdy kraj: <span class="text-[#8B0000]"> 3 odcinki specjalne</span>
+                                Każdy kraj: <span class="text-[#8B0000]">3 odcinki specjalne</span>
                             </li>
                             <li class="flex items-start">
                                 <span class="text-[#8B0000] mr-2">•</span>
@@ -930,8 +778,8 @@
                     </div>
 
                     <!-- Scoring System -->
-                    <div class="technical-border rounded-xl bg-[#0E0E0E] p-4 md:p-6">
-                        <h3 class="font-mono text-lg md:text-xl font-bold mb-4">🏁 PUNKTACJA</h3>
+                    <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
+                        <h3 class="font-mono text-xl font-bold mb-4">🏁 PUNKTACJA</h3>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left font-mono text-sm">
                                 <thead class="text-gray-400 border-b border-[#222]">
@@ -963,11 +811,10 @@
                         
                         <!-- New: Equalization Points -->
                         <div class="mt-4 p-3 bg-[#111] rounded-lg border-l-4 border-grey-600">
-                            <h4 class="font-mono text-sm font-bold text-white mb-2">🔄 Punkty Wyrównawcze (+5 PKT):</h4>
+                            <h4 class="font-mono text-sm font-bold text-white mb-2">🔄 Punkty Wyrównawcze (+4 PKT):</h4>
                             <ul class="font-mono text-xs text-gray-300 space-y-1">
                                 <li>• <strong>Przy 6 graczach:</strong> Jeśli w 2 pierwszych etapach miejsce poniżej 5. i w 3. etapie miejsce 3. lub wyższe</li>
                                 <li>• <strong>Przy 8 graczach:</strong> Jeśli w 2 pierwszych etapach miejsce poniżej 6. i w 3. etapie miejsce 4. lub wyższe</li>
-                                <li>• <strong>Przy 10 graczach:</strong> Jeśli w 2 pierwszych etapach miejsce poniżej 7. i w 3. etapie miejsce 5. lub wyższe</li>
                                 <li>• Punkty dodawane po podliczeniu punktów za etapy</li>
                             </ul>
                         </div>
@@ -977,8 +824,8 @@
                 <!-- Right Column -->
                 <div class="space-y-6">
                     <!-- Team Rules -->
-                    <div class="technical-border rounded-xl bg-[#0E0E0E] p-4 md:p-6">
-                        <h3 class="font-mono text-lg md:text-xl font-bold mb-4">👥 TEAMY I KONSTRUKTORZY</h3>
+                    <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
+                        <h3 class="font-mono text-xl font-bold mb-4">👥 TEAMY I KONSTRUKTORZY</h3>
                         <ul class="space-y-3 font-mono text-sm text-gray-300">
                             <li class="flex items-start">
                                 <span class="text-[#8B0000] mr-2">•</span>
@@ -1004,8 +851,8 @@
                     </div>
 
                     <!-- Safety Rules -->
-                    <div class="technical-border rounded-xl bg-[#0E0E0E] p-4 md:p-6 border-l-4 border-red-600">
-                        <h3 class="font-mono text-lg md:text-xl font-bold mb-4">⚠️ ZASADY BEZPIECZEŃSTWA I FAIR PLAY</h3>
+                    <div class="technical-border rounded-xl bg-[#0E0E0E] p-6 border-l-4 border-red-600">
+                        <h3 class="font-mono text-xl font-bold mb-4">⚠️ ZASADY BEZPIECZEŃSTWA I FAIR PLAY</h3>
                         <ul class="space-y-3 font-mono text-sm text-gray-300">
                             <li class="flex items-start">
                                 <span class="text-red-500 mr-2">❌</span>
@@ -1013,11 +860,11 @@
                             </li>
                             <li class="flex items-start">
                                 <span class="text-red-500 mr-2">❌</span>
-                                Zakaz restartowania OS-ów (nawiet po wypadku)
+                                Zakaz restartowania OS-ów (nawet po wypadku)
                             </li>
                             <li class="flex items-start">
                                 <span class="text-red-500 mr-2">❌</span>
-                                Używanie jakichkolwiek wspomagaczy z poza opcji gry jest surowo zabronione
+                                Świadome rozbijanie się surowo zabronione
                             </li>
                             <li class="flex items-start">
                                 <span class="text-red-500 mr-2">•</span>
@@ -1027,8 +874,8 @@
                     </div>
 
                     <!-- Car Rules -->
-                    <div class="technical-border rounded-xl bg-[#0E0E0E] p-4 md:p-6">
-                        <h3 class="font-mono text-lg md:text-xl font-bold mb-4">🚗 SAMOCHODY</h3>
+                    <div class="technical-border rounded-xl bg-[#0E0E0E] p-6">
+                        <h3 class="font-mono text-xl font-bold mb-4">🚗 SAMOCHODY</h3>
                         <ul class="space-y-3 font-mono text-sm text-gray-300">
                             <li class="flex items-start">
                                 <span class="text-[#8B0000] mr-2">•</span>
@@ -1053,13 +900,13 @@
         </section>
 
         <!-- VIEW: LOGIN -->
-        <section id="view-login" class="hidden fade-in min-h-[70vh] flex flex-col items-center justify-center px-4 container-padding">
-            <div class="w-full max-w-sm p-6 md:p-8 technical-border bg-[#0E0E0E] relative overflow-hidden rounded-xl">
+        <section id="view-login" class="hidden fade-in min-h-[70vh] flex flex-col items-center justify-center px-4">
+            <div class="w-full max-w-sm p-8 technical-border bg-[#0E0E0E] relative overflow-hidden rounded-xl">
                 <div class="absolute top-0 left-0 w-full h-1 bg-[#222]"></div>
                 <div class="absolute top-0 left-0 w-1/3 h-1 bg-[#8B0000]"></div>
                 
-                <div class="text-center mb-8 md:mb-10">
-                    <h2 class="text-xl md:text-2xl font-mono font-bold mb-2">ACCESS CONTROL</h2>
+                <div class="text-center mb-10">
+                    <h2 class="text-2xl font-mono font-bold mb-2">ACCESS CONTROL</h2>
                     <p class="text-sm text-gray-400 font-mono">AUTHORIZED PERSONNEL ONLY</p>
                 </div>
                 <form onsubmit="handleLogin(event)" class="space-y-6">
@@ -1069,23 +916,23 @@
                     </div>
                     <div>
                         <label class="block text-sm font-mono text-gray-400 mb-2">HASŁO DOSTĘPU</label>
-                        <input type="password" id="login-p" placeholder="Wprowadź hasło" class="input-dark bg-[#080808] border-[#333] focus:border-[#8B0000]">
+                        <input type="password" id="login-password" placeholder="Wprowadź hasło" class="input-dark bg-[#080808] border-[#333] focus:border-[#8B0000]">
                     </div>
                     <div id="login-error" class="hidden text-xs text-red-500 font-mono p-2 bg-red-900/20 border border-red-900/30 rounded-md">
                         Nieprawidłowy login lub hasło
                     </div>
-                    <button type="submit" class="btn-accent w-full mt-6 hover:brightness-110 btn-full-mobile">ZALOGUJ</button>
+                    <button type="submit" class="btn-accent w-full mt-6 hover:brightness-110">ZALOGUJ</button>
                 </form>
             </div>
         </section>
 
         <!-- VIEW: ADMIN DASHBOARD -->
-        <section id="view-admin" class="hidden fade-in max-w-7xl mx-auto px-4 py-6 md:py-8 container-padding">
-            <div class="flex flex-col lg:flex-row gap-6 md:gap-8">
+        <section id="view-admin" class="hidden fade-in max-w-7xl mx-auto px-4 py-8">
+            <div class="flex flex-col lg:flex-row gap-8">
                 <!-- Sidebar -->
                 <aside class="lg:w-64 flex-shrink-0">
-                    <div class="technical-border bg-[#0E0E0E] p-4 sticky top-24 rounded-xl mb-4 md:mb-0">
-                        <div class="mb-6 md:mb-8 pb-4 border-b border-[#222]">
+                    <div class="technical-border bg-[#0E0E0E] p-4 sticky top-24 rounded-xl">
+                        <div class="mb-8 pb-4 border-b border-[#222]">
                             <h3 class="font-mono font-bold text-lg">PANEL STEROWANIA</h3>
                             <p class="text-sm text-[#8B0000] font-mono mt-1">STATUS: <span id="cloud-status-admin">ONLINE</span></p>
                         </div>
@@ -1106,50 +953,50 @@
                     
                     <!-- MODULE: DASHBOARD -->
                     <div id="module-dashboard" class="space-y-6">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-[#222] pb-4 gap-4">
+                        <div class="flex justify-between items-center mb-6 border-b border-[#222] pb-4">
                             <h2 class="font-mono text-xl font-bold">DASHBOARD</h2>
-                            <div class="flex flex-wrap gap-2">
-                                <button onclick="refreshDashboard()" class="btn-primary text-sm btn-full-mobile md:btn-auto">ODŚWIEŻ</button>
-                                <button onclick="generateReport()" class="btn-primary text-sm border-green-500 text-green-500 hover:bg-green-500 hover:text-black btn-full-mobile md:btn-auto">RAPORT</button>
-                                <button onclick="manualSync()" class="btn-primary text-sm border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-black btn-full-mobile md:btn-auto">SYNCHRONIZUJ</button>
+                            <div class="flex gap-2">
+                                <button onclick="refreshDashboard()" class="btn-primary text-sm">ODŚWIEŻ</button>
+                                <button onclick="generateReport()" class="btn-primary text-sm border-green-500 text-green-500 hover:bg-green-500 hover:text-black">RAPORT</button>
+                                <button onclick="manualSync()" class="btn-primary text-sm border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-black">SYNCHRONIZUJ</button>
                             </div>
                         </div>
 
                         <!-- Statystyki w czasie rzeczywistym -->
-                        <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
-                            <div class="technical-border bg-[#0E0E0E] p-3 md:p-4 rounded-xl">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                            <div class="technical-border bg-[#0E0E0E] p-4 rounded-xl">
                                 <div class="flex items-center gap-3">
                                     <div class="w-3 h-3 bg-[#8B0000] rounded-sm"></div>
                                     <h4 class="font-mono text-sm text-gray-400">KIEROWCY</h4>
                                 </div>
-                                <p class="text-2xl md:text-3xl font-mono font-bold mt-2" id="stat-drivers">0</p>
+                                <p class="text-3xl font-mono font-bold mt-2" id="stat-drivers">0</p>
                                 <p class="text-xs text-gray-500 font-mono mt-1">Zarejestrowanych</p>
                             </div>
                             
-                            <div class="technical-border bg-[#0E0E0E] p-3 md:p-4 rounded-xl">
+                            <div class="technical-border bg-[#0E0E0E] p-4 rounded-xl">
                                 <div class="flex items-center gap-3">
                                     <div class="w-3 h-3 bg-blue-600 rounded-sm"></div>
                                     <h4 class="font-mono text-sm text-gray-400">ZESPOŁY</h4>
                                 </div>
-                                <p class="text-2xl md:text-3xl font-mono font-bold mt-2" id="stat-teams">0</p>
+                                <p class="text-3xl font-mono font-bold mt-2" id="stat-teams">0</p>
                                 <p class="text-xs text-gray-500 font-mono mt-1">Aktywnych</p>
                             </div>
                             
-                            <div class="technical-border bg-[#0E0E0E] p-3 md:p-4 rounded-xl">
+                            <div class="technical-border bg-[#0E0E0E] p-4 rounded-xl">
                                 <div class="flex items-center gap-3">
                                     <div class="w-3 h-3 bg-green-600 rounded-sm"></div>
                                     <h4 class="font-mono text-sm text-gray-400">OS-ÓW</h4>
                                 </div>
-                                <p class="text-2xl md:text-3xl font-mono font-bold mt-2" id="stat-stages">0</p>
+                                <p class="text-3xl font-mono font-bold mt-2" id="stat-stages">0</p>
                                 <p class="text-xs text-gray-500 font-mono mt-1">Rozegranych</p>
                             </div>
                             
-                            <div class="technical-border bg-[#0E0E0E] p-3 md:p-4 rounded-xl">
+                            <div class="technical-border bg-[#0E0E0E] p-4 rounded-xl">
                                 <div class="flex items-center gap-3">
                                     <div class="w-3 h-3 bg-yellow-600 rounded-sm"></div>
                                     <h4 class="font-mono text-sm text-gray-400">WYNIKI</h4>
                                 </div>
-                                <p class="text-2xl md:text-3xl font-mono font-bold mt-2" id="stat-results">0</p>
+                                <p class="text-3xl font-mono font-bold mt-2" id="stat-results">0</p>
                                 <p class="text-xs text-gray-500 font-mono mt-1">Wprowadzonych</p>
                             </div>
                         </div>
@@ -1157,9 +1004,17 @@
                         <!-- Szybkie podsumowanie i alerty -->
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <!-- Szybkie podsumowanie -->
-                            <div class="technical-border bg-[#0E0E0E] p-4 md:p-5 rounded-xl">
+                            <div class="technical-border bg-[#0E0E0E] p-5 rounded-xl">
                                 <h4 class="font-mono text-base font-bold mb-4 text-gray-300 border-b border-[#222] pb-2">PODSUMOWANIE TURNIEJU</h4>
                                 <div class="space-y-3">
+                                    <div class="flex justify-between items-center">
+                                        <span class="font-mono text-sm text-gray-400">Status turnieju:</span>
+                                        <span class="font-mono text-sm font-bold text-green-500" id="tournament-status">AKTYWNY</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="font-mono text-sm text-gray-400">Progres:</span>
+                                        <span class="font-mono text-sm" id="tournament-progress">0%</span>
+                                    </div>
                                     <div class="flex justify-between items-center">
                                         <span class="font-mono text-sm text-gray-400">Lider:</span>
                                         <span class="font-mono text-sm font-bold" id="tournament-leader">-</span>
@@ -1176,7 +1031,7 @@
                             </div>
 
                             <!-- Alerty o brakujących danych -->
-                            <div class="technical-border bg-[#0E0E0E] p-4 md:p-5 rounded-xl">
+                            <div class="technical-border bg-[#0E0E0E] p-5 rounded-xl">
                                 <h4 class="font-mono text-base font-bold mb-4 text-gray-300 border-b border-[#222] pb-2">ALERTY I BRAKUJĄCE DANE</h4>
                                 <div class="space-y-3 max-h-60 overflow-y-auto pr-2" id="data-alerts">
                                     <!-- Alerty zostaną dodane przez JavaScript -->
@@ -1184,39 +1039,48 @@
                             </div>
                         </div>
 
-                        <!-- Tester reguł punktacji (rozszerzony na całą szerokość) -->
-                        <div class="grid grid-cols-1 gap-6">
+                        <!-- Ostatnie zmiany i tester reguł -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Ostatnie zmiany -->
+                            <div class="technical-border bg-[#0E0E0E] p-5 rounded-xl">
+                                <div class="flex justify-between items-center mb-4 border-b border-[#222] pb-2">
+                                    <h4 class="font-mono text-base font-bold text-gray-300">OSTATNIE ZMIANY</h4>
+                                    <button onclick="clearLogs()" class="text-xs text-gray-500 hover:text-white">Wyczyść</button>
+                                </div>
+                                <div class="space-y-3 max-h-60 overflow-y-auto pr-2" id="change-logs">
+                                    <!-- Logi zostaną dodane przez JavaScript -->
+                                </div>
+                            </div>
+
                             <!-- Tester reguł -->
-                            <div class="technical-border bg-[#0E0E0E] p-4 md:p-5 rounded-xl">
+                            <div class="technical-border bg-[#0E0E0E] p-5 rounded-xl">
                                 <h4 class="font-mono text-base font-bold mb-4 text-gray-300 border-b border-[#222] pb-2">TESTER REGUŁ PUNKTACJI</h4>
                                 <div class="space-y-3">
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-                                        <div class="grid grid-cols-2 gap-2">
-                                            <div>
-                                                <label class="block text-xs font-mono text-gray-400 mb-1">Pozycja:</label>
-                                                <input type="number" min="1" max="20" value="1" id="test-position" class="input-dark text-sm">
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs font-mono text-gray-400 mb-1">Stan auta:</label>
-                                                <select id="test-condition" class="input-dark text-sm">
-                                                    <option value="2">Czysty</option>
-                                                    <option value="1">Lekkie uszk.</option>
-                                                    <option value="0">Uszkodzenia</option>
-                                                </select>
-                                            </div>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="block text-xs font-mono text-gray-400 mb-1">Pozycja:</label>
+                                            <input type="number" min="1" max="20" value="1" id="test-position" class="input-dark text-sm">
                                         </div>
-                                        <div class="grid grid-cols-2 gap-2">
-                                            <div>
-                                                <label class="block text-xs font-mono text-gray-400 mb-1">Wyniki 1-2 etapu:</label>
-                                                <input type="text" placeholder="np. 7,8" id="test-first-two" class="input-dark text-sm">
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs font-mono text-gray-400 mb-1">Wynik 3 etapu:</label>
-                                                <input type="number" min="1" max="20" value="3" id="test-third" class="input-dark text-sm">
-                                            </div>
+                                        <div>
+                                            <label class="block text-xs font-mono text-gray-400 mb-1">Stan auta:</label>
+                                            <select id="test-condition" class="input-dark text-sm">
+                                                <option value="2">Czysty</option>
+                                                <option value="1">Lekkie uszk.</option>
+                                                <option value="0">Uszkodzenia</option>
+                                            </select>
                                         </div>
                                     </div>
-                                    <button onclick="testScoringRules()" class="btn-primary w-full text-sm btn-full-mobile">TESTUJ REGUŁY</button>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="block text-xs font-mono text-gray-400 mb-1">Wyniki 1-2 etapu:</label>
+                                            <input type="text" placeholder="np. 7,8" id="test-first-two" class="input-dark text-sm">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-mono text-gray-400 mb-1">Wynik 3 etapu:</label>
+                                            <input type="number" min="1" max="20" value="3" id="test-third" class="input-dark text-sm">
+                                        </div>
+                                    </div>
+                                    <button onclick="testScoringRules()" class="btn-primary w-full text-sm">TESTUJ REGUŁY</button>
                                     <div id="test-result" class="hidden p-3 bg-[#111] rounded-md border-l-4 border-yellow-600">
                                         <p class="text-xs font-mono text-gray-300" id="test-result-text"></p>
                                     </div>
@@ -1225,7 +1089,7 @@
                         </div>
 
                         <!-- Zarządzanie odcinkami -->
-                        <div class="technical-border bg-[#0E0E0E] p-4 md:p-5 rounded-xl">
+                        <div class="technical-border bg-[#0E0E0E] p-5 rounded-xl">
                             <h4 class="font-mono text-base font-bold mb-4 text-gray-300 border-b border-[#222] pb-2">ZARZĄDZANIE ODCINKAMI</h4>
                             <div class="space-y-3">
                                 <div>
@@ -1237,28 +1101,28 @@
                                 <div id="stage-edit-container" class="space-y-2 max-h-40 overflow-y-auto pr-2">
                                     <!-- Lista odcinków do edycji -->
                                 </div>
-                                <button onclick="saveStageEdits()" class="btn-primary w-full mt-2 text-sm btn-full-mobile">ZAPISZ ZMIANY</button>
+                                <button onclick="saveStageEdits()" class="btn-primary w-full mt-2 text-sm">ZAPISZ ZMIANY</button>
                             </div>
                         </div>
                     </div>
 
                     <!-- MODULE: TABELE (NOWY) -->
                     <div id="module-tables" class="hidden space-y-6">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-[#222] pb-4 gap-4">
+                        <div class="flex justify-between items-center mb-6 border-b border-[#222] pb-4">
                             <div>
                                 <h2 class="font-mono text-xl font-bold">TABELE WYNIKÓW</h2>
-                                <p class="text-sm text-gray-400 font-mono mt-1 hidden-mobile">SZYBKIE WPROWADZANIE I EDYCJA WYNIKÓW</p>
+                                <p class="text-sm text-gray-400 font-mono mt-1">SZYBKIE WPROWADZANIE I EDYCJA WYNIKÓW</p>
                             </div>
-                            <div class="flex flex-wrap gap-2">
-                                <button onclick="saveAllTableResults()" class="btn-accent text-sm btn-full-mobile md:btn-auto">ZAPISZ WSZYSTKO</button>
-                                <button onclick="refreshTableResults()" class="btn-primary text-sm btn-full-mobile md:btn-auto">ODŚWIEŻ</button>
+                            <div class="flex gap-2">
+                                <button onclick="saveAllTableResults()" class="btn-accent text-sm">ZAPISZ WSZYSTKO</button>
+                                <button onclick="refreshTableResults()" class="btn-primary text-sm">ODŚWIEŻ</button>
                             </div>
                         </div>
 
                         <!-- Wybór etapu -->
-                        <div class="technical-border bg-[#0E0E0E] p-4 md:p-5 rounded-xl mb-6">
+                        <div class="technical-border bg-[#0E0E0E] p-5 rounded-xl mb-6">
                             <h4 class="font-mono text-base font-bold mb-4 text-gray-300 border-b border-[#222] pb-2">WYBIERZ ETAP I ODCINEK</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-xs font-mono text-gray-400 mb-1">Rajd:</label>
                                     <select id="table-round-select" class="input-dark text-sm" onchange="loadTableStages()">
@@ -1272,33 +1136,33 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="mt-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                            <div class="mt-4 flex items-center justify-between">
                                 <div class="text-sm font-mono text-gray-400" id="table-info">
                                     Wybierz rajd i odcinek
                                 </div>
-                                <div class="flex flex-wrap gap-2">
-                                    <button onclick="addMissingDriversToTable()" class="btn-primary text-xs btn-full-mobile md:btn-auto">DODAJ BRAKUJĄCYCH</button>
-                                    <button onclick="clearTableResults()" class="btn-primary text-xs border-red-500 text-red-500 hover:bg-red-500 hover:text-black btn-full-mobile md:btn-auto">WYCZYŚĆ</button>
+                                <div class="flex gap-2">
+                                    <button onclick="addMissingDriversToTable()" class="btn-primary text-xs">DODAJ BRAKUJĄCYCH</button>
+                                    <button onclick="clearTableResults()" class="btn-primary text-xs border-red-500 text-red-500 hover:bg-red-500 hover:text-black">WYCZYŚĆ</button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Tabela do wprowadzania wyników -->
                         <div class="technical-border bg-[#0F0F0F] rounded-xl overflow-hidden">
-                            <div class="p-3 border-b border-[#222] bg-[#151515] flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+                            <div class="p-3 border-b border-[#222] bg-[#151515] flex justify-between items-center">
                                 <h4 class="font-mono text-sm font-bold text-gray-400 uppercase">WPROWADŹ WYNIKI DLA ODCINKA</h4>
                                 <span class="text-xs font-mono text-[#8B0000]" id="table-stage-name">BRAK WYBORU</span>
                             </div>
                             <div class="overflow-x-auto">
-                                <table class="w-full text-left min-w-[600px] md:min-w-[800px]">
+                                <table class="w-full text-left min-w-[800px]">
                                     <thead class="font-mono text-xs text-gray-400 border-b border-[#222] bg-[#1a1a1a]">
                                         <tr>
-                                            <th class="p-2 md:p-3 w-12 md:w-16">#</th>
-                                            <th class="p-2 md:p-3">KIEROWCA</th>
-                                            <th class="p-2 md:p-3 hidden md:table-cell">ZESPÓŁ</th>
-                                            <th class="p-2 md:p-3 text-center" style="width: 120px md:150px;">CZAS (MM:SS.ms)</th>
-                                            <th class="p-2 md:p-3 text-center" style="width: 100px md:120px;">STAN AUTA</th>
-                                            <th class="p-2 md:p-3 text-center" style="width: 60px md:80px;">AKCJE</th>
+                                            <th class="p-3 w-16">#</th>
+                                            <th class="p-3">KIEROWCA</th>
+                                            <th class="p-3">ZESPÓŁ</th>
+                                            <th class="p-3 text-center" style="width: 150px;">CZAS (MM:SS.ms)</th>
+                                            <th class="p-3 text-center" style="width: 120px;">STAN AUTA</th>
+                                            <th class="p-3 text-center" style="width: 80px;">AKCJE</th>
                                         </tr>
                                     </thead>
                                     <tbody id="table-results-body" class="font-mono text-sm">
@@ -1306,16 +1170,16 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="p-3 md:p-4 border-t border-[#222] bg-[#151515]">
-                                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                            <div class="p-4 border-t border-[#222] bg-[#151515]">
+                                <div class="flex justify-between items-center">
                                     <div class="text-xs font-mono text-gray-400">
                                         <span id="table-driver-count">0</span> kierowców w tabeli
                                     </div>
                                     <div class="flex gap-2">
-                                        <button onclick="saveTableResults()" class="btn-accent text-sm btn-full-mobile md:btn-auto">ZAPISZ WYNIKI</button>
+                                        <button onclick="saveTableResults()" class="btn-accent text-sm">ZAPISZ WYNIKI</button>
                                     </div>
                                 </div>
-                                <div class="mt-3 p-3 bg-[#111] border-l-4 border-yellow-600 rounded-md hidden-mobile">
+                                <div class="mt-3 p-3 bg-[#111] border-l-4 border-yellow-600 rounded-md">
                                     <p class="text-xs font-mono text-gray-300">
                                         <strong>Instrukcja:</strong><br>
                                         1. Wpisz czas w formacie <strong>MM:SS.ms</strong> (np. 03:42.122)<br>
@@ -1328,28 +1192,28 @@
                         </div>
 
                         <!-- Szybkie narzędzia -->
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 mt-6">
-                            <div class="technical-border bg-[#0E0E0E] p-3 md:p-4 rounded-xl">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                            <div class="technical-border bg-[#0E0E0E] p-4 rounded-xl">
                                 <h4 class="font-mono text-sm font-bold mb-3 text-gray-300">KOPIUJ CZASY</h4>
                                 <div class="space-y-2">
-                                    <button onclick="copyTimesFromPreviousStage()" class="btn-primary w-full text-xs btn-full-mobile">KOPIUJ Z POPRZEDNIEGO OS</button>
-                                    <button onclick="applySameTimeToAll()" class="btn-primary w-full text-xs btn-full-mobile">USTAW TEN SAM CZAS DLA WSZYSTKICH</button>
+                                    <button onclick="copyTimesFromPreviousStage()" class="btn-primary w-full text-xs">KOPIUJ Z POPRZEDNIEGO OS</button>
+                                    <button onclick="applySameTimeToAll()" class="btn-primary w-full text-xs">USTAW TEN SAM CZAS DLA WSZYSTKICH</button>
                                 </div>
                             </div>
                             
-                            <div class="technical-border bg-[#0E0E0E] p-3 md:p-4 rounded-xl">
+                            <div class="technical-border bg-[#0E0E0E] p-4 rounded-xl">
                                 <h4 class="font-mono text-sm font-bold mb-3 text-gray-300">MASOWE AKCJE</h4>
                                 <div class="space-y-2">
-                                    <button onclick="setAllCarsClean()" class="btn-primary w-full text-xs btn-full-mobile">WSZYSTKIE AUTO CZYSTE</button>
-                                    <button onclick="setAllTimesDNF()" class="btn-primary w-full text-xs border-red-500 text-red-500 hover:bg-red-500 hover:text-black btn-full-mobile">WSZYSTKIE DNF</button>
+                                    <button onclick="setAllCarsClean()" class="btn-primary w-full text-xs">WSZYSTKIE AUTO CZYSTE</button>
+                                    <button onclick="setAllTimesDNF()" class="btn-primary w-full text-xs border-red-500 text-red-500 hover:bg-red-500 hover:text-black">WSZYSTKIE DNF</button>
                                 </div>
                             </div>
                             
-                            <div class="technical-border bg-[#0E0E0E] p-3 md:p-4 rounded-xl">
+                            <div class="technical-border bg-[#0E0E0E] p-4 rounded-xl">
                                 <h4 class="font-mono text-sm font-bold mb-3 text-gray-300">PODGLĄD</h4>
                                 <div class="space-y-2">
-                                    <button onclick="previewStageResults()" class="btn-primary w-full text-xs btn-full-mobile">PODGLĄD WYNIKÓW</button>
-                                    <button onclick="calculateStageRanking()" class="btn-primary w-full text-xs btn-full-mobile">OBLICZ KLASYFIKACJĘ</button>
+                                    <button onclick="previewStageResults()" class="btn-primary w-full text-xs">PODGLĄD WYNIKÓW</button>
+                                    <button onclick="calculateStageRanking()" class="btn-primary w-full text-xs">OBLICZ KLASYFIKACJĘ</button>
                                 </div>
                             </div>
                         </div>
@@ -1357,15 +1221,15 @@
 
                     <!-- MODULE: DRIVERS -->
                     <div id="module-drivers" class="hidden space-y-6">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-[#222] pb-4 gap-4">
+                        <div class="flex justify-between items-center mb-6 border-b border-[#222] pb-4">
                             <h2 class="font-mono text-xl font-bold">BAZA KIEROWCÓW</h2>
-                            <button onclick="toggleDriverForm()" class="btn-primary text-sm btn-full-mobile md:btn-auto">+ DODAJ NOWEGO</button>
+                            <button onclick="toggleDriverForm()" class="btn-primary text-sm">+ DODAJ NOWEGO</button>
                         </div>
 
                         <!-- Add Driver Form -->
-                        <div id="driver-form" class="hidden technical-border p-4 md:p-6 bg-[#111] mb-6 border-l-4 border-l-[#8B0000] rounded-xl">
+                        <div id="driver-form" class="hidden technical-border p-6 bg-[#111] mb-6 border-l-4 border-l-[#8B0000] rounded-xl">
                             <h4 class="font-mono text-sm font-bold text-gray-400 mb-4 uppercase">Nowy Kierowca</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 mb-6">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                                 <input type="text" placeholder="Imię i Nazwisko" id="new-driver-name" class="input-dark">
                                 <select id="new-driver-team" class="input-dark">
                                     <option value="">Wybierz zespół...</option>
@@ -1386,25 +1250,25 @@
                                     <option value="Citroën C3 R5">Citroën C3 R5</option>
                                 </select>
                             </div>
-                            <div class="flex flex-col sm:flex-row justify-end gap-3">
-                                <button onclick="toggleDriverForm()" class="text-sm font-mono text-gray-400 px-4 py-2 hover:text-white order-2 sm:order-1">ANULUJ</button>
-                                <button onclick="addDriver()" class="btn-accent text-sm order-1 sm:order-2">ZAPISZ DANE</button>
+                            <div class="flex justify-end gap-3">
+                                <button onclick="toggleDriverForm()" class="text-sm font-mono text-gray-400 px-4 py-2 hover:text-white">ANULUJ</button>
+                                <button onclick="addDriver()" class="btn-accent text-sm">ZAPISZ DANE</button>
                             </div>
                         </div>
 
                         <!-- Drivers List -->
                         <div class="technical-border bg-[#0F0F0F] overflow-x-auto rounded-xl">
-                            <table class="w-full text-left min-w-[600px]">
+                            <table class="w-full text-left">
                                 <thead class="bg-[#151515] font-mono text-sm text-gray-400">
                                     <tr>
-                                        <th class="p-3 md:p-4">ID</th>
-                                        <th class="p-3 md:p-4">NAZWISKO</th>
-                                        <th class="p-3 md:p-4 hidden md:table-cell">ZESPÓŁ</th>
-                                        <th class="p-3 md:p-4 hidden md:table-cell">SAMOCHÓD</th>
-                                        <th class="p-3 md:p-4 text-right">AKCJE</th>
+                                        <th class="p-4">ID</th>
+                                        <th class="p-4">NAZWISKO</th>
+                                        <th class="p-4">ZESPÓŁ</th>
+                                        <th class="p-4">SAMOCHÓD</th>
+                                        <th class="p-4 text-right">AKCJE</th>
                                     </tr>
                                 </thead>
-                                <tbody id="admin-drivers-list" class="font-mono text-sm md:text-base divide-y divide-[#222]">
+                                <tbody id="admin-drivers-list" class="font-mono text-base divide-y divide-[#222]">
                                     <!-- JS Generated -->
                                 </tbody>
                             </table>
@@ -1415,19 +1279,19 @@
                     <div id="module-stages" class="hidden space-y-8">
                         
                         <!-- Top: Management (Add Rally/Stage) -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                            <div class="technical-border p-4 md:p-5 bg-[#111] rounded-xl">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="technical-border p-5 bg-[#111] rounded-xl">
                                 <h4 class="font-mono text-sm font-bold text-gray-400 mb-3 uppercase border-b border-[#222] pb-2">NOWY RAJD</h4>
                                 <div class="flex gap-2">
-                                    <input id="new-rally-name" type="text" placeholder="Np. Monako" class="input-dark text-sm">
-                                    <button onclick="addRally()" class="btn-primary px-3 btn-full-mobile">+</button>
+                                    <input id="new-rally-name" type="text" placeholder="Np. Monte Carlo" class="input-dark text-sm">
+                                    <button onclick="addRally()" class="btn-primary px-3">+</button>
                                 </div>
                             </div>
-                            <div class="technical-border p-4 md:p-5 bg-[#111] rounded-xl">
+                            <div class="technical-border p-5 bg-[#111] rounded-xl">
                                 <h4 class="font-mono text-sm font-bold text-gray-400 mb-3 uppercase border-b border-[#222] pb-2">NOWY OS (DO WYBRANEGO RAJDU)</h4>
                                 <div class="flex gap-2">
                                     <input id="new-stage-name" type="text" placeholder="Np. Turini" class="input-dark text-sm">
-                                    <button onclick="addStage()" class="btn-primary px-3 btn-full-mobile">+</button>
+                                    <button onclick="addStage()" class="btn-primary px-3">+</button>
                                 </div>
                             </div>
                         </div>
@@ -1438,9 +1302,9 @@
                                 <h2 class="font-mono text-lg font-bold">EDYCJA I WPROWADZANIE WYNIKÓW</h2>
                             </div>
                             
-                            <div class="p-4 md:p-6">
+                            <div class="p-6">
                                 <!-- Select Context -->
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                     <div>
                                         <label class="block text-sm font-mono text-gray-400 mb-2">WYBIERZ RAJD</label>
                                         <select id="admin-stage-round" class="input-dark cursor-pointer"></select>
@@ -1452,7 +1316,7 @@
                                 </div>
 
                                 <!-- Input Data -->
-                                <div class="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4 items-end border-t border-[#222] pt-4 md:pt-6">
+                                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end border-t border-[#222] pt-6">
                                     <div class="md:col-span-4">
                                         <label class="block text-sm font-mono text-gray-400 mb-2">KIEROWCA</label>
                                         <select id="stage-driver-select" class="input-dark cursor-pointer">
@@ -1467,7 +1331,7 @@
                                     <!-- Condition Radios -->
                                     <div class="md:col-span-5 flex flex-col justify-end h-full pb-1">
                                         <label class="block text-sm font-mono text-gray-400 mb-2">PUNKTY BONUSOWE</label>
-                                        <div class="flex gap-1 md:gap-2">
+                                        <div class="flex gap-2">
                                             <label class="cursor-pointer flex-1">
                                                 <input type="radio" name="run_condition" value="0" id="radio-0" class="hidden peer">
                                                 <div class="border border-[#333] bg-[#111] text-gray-400 text-xs font-mono py-2 text-center peer-checked:bg-red-900/30 peer-checked:border-red-500 peer-checked:text-red-500 hover:bg-[#1a1a1a] rounded-md transition-colors">
@@ -1489,12 +1353,12 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="flex flex-col md:flex-row items-center gap-3 md:gap-4 mt-4 md:mt-6">
-                                    <button onclick="submitAdminResult()" class="btn-accent flex-grow h-12 rounded-lg w-full md:w-auto">ZAPISZ / AKTUALIZUJ WYNIK</button>
+                                <div class="flex items-center gap-4 mt-6">
+                                    <button onclick="submitAdminResult()" class="btn-accent flex-grow h-12 rounded-lg">ZAPISZ / AKTUALIZUJ WYNIK</button>
                                     <span id="admin-status-msg" class="text-sm font-mono text-green-500 hidden fade-in">ZAPISANO POPRAWNIE</span>
                                     <span id="admin-error-msg" class="text-sm font-mono text-red-500 hidden fade-in"></span>
                                 </div>
-                                <div class="mt-4 p-3 bg-[#111] border-l-4 border-yellow-600 rounded-md hidden-mobile">
+                                <div class="mt-4 p-3 bg-[#111] border-l-4 border-yellow-600 rounded-md">
                                     <p class="text-xs font-mono text-gray-300">
                                         <strong>Uwaga:</strong> Możesz wpisać specjalne oznaczenia:<br>
                                         • <span class="text-red-400">DSQ</span> - dyskwalifikacja z całego etapu (kraju)<br>
@@ -1506,25 +1370,23 @@
 
                         <!-- Current Results Table -->
                         <div class="technical-border bg-[#0F0F0F] rounded-xl overflow-hidden">
-                            <div class="p-3 border-b border-[#222] bg-[#151515] flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+                            <div class="p-3 border-b border-[#222] bg-[#151515] flex justify-between items-center">
                                 <h4 class="font-mono text-sm font-bold text-gray-400 uppercase">Aktualne wyniki dla wybranego odcinka</h4>
                                 <span class="text-xs font-mono text-[#8B0000]" id="admin-table-info"></span>
                             </div>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left min-w-[600px]">
-                                    <thead class="font-mono text-xs text-gray-400 border-b border-[#222]">
-                                        <tr>
-                                            <th class="p-3">KIEROWCA</th>
-                                            <th class="p-3 text-right">CZAS</th>
-                                            <th class="p-3 text-right">BONUS</th>
-                                            <th class="p-3 text-right">AKCJE</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="admin-stage-results-body" class="font-mono text-sm md:text-base divide-y divide-[#222]">
-                                        <!-- JS Generated -->
-                                    </tbody>
-                                </table>
-                            </div>
+                            <table class="w-full text-left">
+                                <thead class="font-mono text-xs text-gray-400 border-b border-[#222]">
+                                    <tr>
+                                        <th class="p-3">KIEROWCA</th>
+                                        <th class="p-3 text-right">CZAS</th>
+                                        <th class="p-3 text-right">BONUS</th>
+                                        <th class="p-3 text-right">AKCJE</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-stage-results-body" class="font-mono text-base divide-y divide-[#222]">
+                                    <!-- JS Generated -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
@@ -1535,15 +1397,15 @@
                             <strong class="text-white">SYSTEM PUNKTACJI:</strong><br>
                             1. Miejsca w rajdzie: 15-12-10-8-6-4-2-1<br>
                             2. Punkty za stan pojazdu: Czysty (+2), Lekkie uszk. (+1)<br>
-                            3. Punkty wyrównawcze: +5 po 3 etapach w określonych warunkach<br>
+                            3. Punkty wyrównawcze: +4 po 3 etapach w określonych warunkach<br>
                             4. DSQ - dyskwalifikacja z całego kraju, DNF - +20s do najgorszego czasu
                         </div>
-                        <div class="technical-border bg-[#0F0F0F] p-4 md:p-6 rounded-xl">
-                            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-4 gap-2">
+                        <div class="technical-border bg-[#0F0F0F] p-6 rounded-xl">
+                            <div class="flex justify-between items-end mb-4">
                                 <h4 class="font-mono text-base text-gray-400">PODGLĄD PUNKTACJI (TOP 5)</h4>
                                 <span class="text-sm font-mono text-gray-500">LIVE PREVIEW</span>
                             </div>
-                             <table class="w-full text-left font-mono text-sm md:text-base mb-6 border border-[#222]">
+                             <table class="w-full text-left font-mono text-base mb-6 border border-[#222]">
                                 <thead class="bg-[#151515] text-sm text-gray-400">
                                     <tr>
                                         <th class="p-2">POZ</th>
@@ -1556,14 +1418,14 @@
                                 </tbody>
                             </table>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                <button onclick="recalculateAllPoints()" class="btn-primary border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-black rounded-lg btn-full-mobile">PRZELICZ PUNKTY</button>
-                                <button onclick="exportData()" class="btn-primary border-green-500 text-green-500 hover:bg-green-500 hover:text-black rounded-lg btn-full-mobile">EKSPORTUJ DANE</button>
+                                <button onclick="recalculateAllPoints()" class="btn-primary border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-black rounded-lg">PRZELICZ PUNKTY</button>
+                                <button onclick="exportData()" class="btn-primary border-green-500 text-green-500 hover:bg-green-500 hover:text-black rounded-lg">EKSPORTUJ DANE</button>
                             </div>
                             <div class="mt-2">
-                                <button onclick="importData()" class="btn-primary w-full border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-black rounded-lg btn-full-mobile">IMPORTUJ DANE</button>
+                                <button onclick="importData()" class="btn-primary w-full border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-black rounded-lg">IMPORTUJ DANE</button>
                             </div>
                             <div class="mt-4">
-                                <button onclick="resetToDefaults()" class="btn-primary w-full border-red-500 text-red-500 hover:bg-red-500 hover:text-black rounded-lg btn-full-mobile">RESETUJ DO DANYCH DOMYŚLNYCH</button>
+                                <button onclick="resetToDefaults()" class="btn-primary w-full border-red-500 text-red-500 hover:bg-red-500 hover:text-black rounded-lg">RESETUJ DO DANYCH DOMYŚLNYCH</button>
                             </div>
                         </div>
                      </div>
@@ -1574,23 +1436,33 @@
 
     </main>
 
-    <footer class="mt-8 md:mt-12 border-t border-[#222] py-6 md:py-8 bg-[#050505] relative z-10">
+    <footer class="mt-12 border-t border-[#222] py-8 bg-[#050505] relative z-10">
         <div class="max-w-7xl mx-auto px-4 text-center">
-            <p class="font-mono text-xs text-gray-500 uppercase tracking-widest">POTATO RALLY CHAMPIONSHIP // OFFICIAL TOURNAMENT SYSTEM // CLOUD SYNC</p>
+            <p class="font-mono text-xs text-gray-500 uppercase tracking-widest">WRC WINTER RALLY CUP 2025 // OFFICIAL TOURNAMENT SYSTEM // CLOUD SYNC</p>
         </div>
     </footer>
 
     <!-- JavaScript Logic -->
     <script>
         // --- CLOUD CONFIGURATION ---
+        // Użyj JSONBin.io jako darmowej bazy danych w chmurze
+        // Musisz stworzyć własny bin na https://jsonbin.io/ i wstawić poniższe dane
+        
         const CLOUD_CONFIG = {
-            BIN_ID: '6949d4fcd0ea881f403a8769',
-            API_KEY: '$2a$10$VsoQROU7MdLnmfsQggP/Kuq5jIrZzxTRB./nHz5Bbj2DfzuV8Yfey',
+            // Twój bin ID z JSONBin.io
+            BIN_ID: '6949d4fcd0ea881f403a8769', // Przykładowy ID - ZASTĄP SWOIM!
+            
+            // Twój X-Master-Key z JSONBin.io
+            API_KEY: '$2a$10$VsoQROU7MdLnmfsQggP/Kuq5jIrZzxTRB./nHz5Bbj2DfzuV8Yfey', // Przykładowy klucz - ZASTĄP SWOIM!
+            
+            // URL endpointów
             BASE_URL: 'https://api.jsonbin.io/v3/b',
-            DATA_VERSION: '3.0' // Updated version for cache system
+            
+            // Wersja danych
+            DATA_VERSION: '2.0'
         };
 
-        // --- OPTIMIZED DATA STORE WITH CACHE ---
+        // --- DATA STORE ---
         const state = {
             view: 'home',
             isLoggedIn: false,
@@ -1599,33 +1471,16 @@
             rounds: [],
             drivers: [],
             results: [],
+            changeLogs: [],
             cloudStatus: 'offline',
             lastSync: null,
-            pendingChanges: false,
-            // OPTIMIZATION: Cache system
-            dataVersion: 0,
-            cache: {},
-            isCalculating: false,
-            needsRecalculation: false
-        };
-
-        // OPTIMIZATION: Debounce timer for cloud saves
-        let saveDebounceTimer = null;
-        const SAVE_DEBOUNCE_DELAY = 2000; // 2 seconds
-
-        // OPTIMIZATION: Cache keys
-        const CACHE_KEYS = {
-            DRIVER_STATS: 'driverStats',
-            CONSTRUCTOR_STATS: 'constructorStats',
-            DRIVER_LEADER: 'driverLeader',
-            CONSTRUCTOR_LEADER: 'constructorLeader',
-            ROUND_STANDINGS: 'roundStandings'
+            pendingChanges: false
         };
 
         // PUSTE dane początkowe
         const DEFAULT_DATA = {
             rounds: [
-                { id: 1, name: "Monako", stages: ["OS1: Col de Turini", "OS2: La Bollène", "OS3: Pra d'Alart"] },
+                { id: 1, name: "Monte Carlo", stages: ["OS1: Col de Turini", "OS2: La Bollène", "OS3: Pra d'Alart"] },
                 { id: 2, name: "Szkocja", stages: ["OS1: Glencoe", "OS2: Kielder", "OS3: Glendevon"] },
                 { id: 3, name: "Argentyna", stages: ["OS1: El Condor", "OS2: Mina Clavero", "OS3: Giulio Cesare"] },
                 { id: 4, name: "Szwecja", stages: ["OS1: Vargåsen", "OS2: Colin's Crest", "OS3: Torsby"] },
@@ -1637,28 +1492,11 @@
             ],
             drivers: [],
             results: [],
+            changeLogs: [],
             version: CLOUD_CONFIG.DATA_VERSION
         };
 
-        // --- OPTIMIZED CACHE FUNCTIONS ---
-        function invalidateCache() {
-            state.dataVersion++;
-            state.cache = {};
-            state.needsRecalculation = true;
-        }
-
-        function getCached(key) {
-            const cacheKey = `${key}_${state.dataVersion}`;
-            return state.cache[cacheKey];
-        }
-
-        function setCached(key, value) {
-            const cacheKey = `${key}_${state.dataVersion}`;
-            state.cache[cacheKey] = value;
-            return value;
-        }
-
-        // --- OPTIMIZED CLOUD SYNC WITH DEBOUNCE ---
+        // --- CLOUD SYNC FUNCTIONS ---
         function updateCloudStatus(status, message = '') {
             state.cloudStatus = status;
             const statusEl = document.getElementById('cloud-status');
@@ -1697,6 +1535,7 @@
                 rounds: state.rounds,
                 drivers: state.drivers,
                 results: state.results,
+                changeLogs: state.changeLogs,
                 version: CLOUD_CONFIG.DATA_VERSION,
                 lastUpdated: new Date().toISOString()
             };
@@ -1707,7 +1546,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                         'X-Master-Key': CLOUD_CONFIG.API_KEY,
-                        'X-Bin-Name': 'POTATO RALLY CHAMPIONSHIP Data'
+                        'X-Bin-Name': 'WRC Winter Rally Cup 2025 Data'
                     },
                     body: JSON.stringify(dataToSave)
                 });
@@ -1729,10 +1568,7 @@
                 
                 // Aktualizuj timestamp na dashboardzie
                 if (state.view === 'admin') {
-                    const syncEl = document.getElementById('last-cloud-sync');
-                    if (syncEl) {
-                        syncEl.textContent = state.lastSync.toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'});
-                    }
+                    document.getElementById('last-cloud-sync').textContent = state.lastSync.toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'});
                 }
                 
                 return true;
@@ -1747,18 +1583,6 @@
                 
                 return false;
             }
-        }
-
-        // OPTIMIZATION: Debounced save function
-        function debouncedSaveToCloud() {
-            if (saveDebounceTimer) {
-                clearTimeout(saveDebounceTimer);
-            }
-            
-            saveDebounceTimer = setTimeout(async () => {
-                await saveToCloud();
-                saveDebounceTimer = null;
-            }, SAVE_DEBOUNCE_DELAY);
         }
 
         async function loadFromCloud() {
@@ -1785,14 +1609,12 @@
                     state.rounds = cloudData.rounds || DEFAULT_DATA.rounds;
                     state.drivers = cloudData.drivers || DEFAULT_DATA.drivers;
                     state.results = cloudData.results || DEFAULT_DATA.results;
+                    state.changeLogs = cloudData.changeLogs || [];
                     
                     // Upewnij się, że każdy kierowca ma equalizationPoints
                     state.drivers.forEach(driver => {
                         if (driver.equalizationPoints === undefined) {
                             driver.equalizationPoints = 0;
-                        }
-                        if (!driver.points) {
-                            driver.points = new Array(state.rounds.length).fill(0);
                         }
                     });
                     
@@ -1805,7 +1627,6 @@
                     showCloudSpinner(false);
                     
                     console.log('Dane załadowane z chmury');
-                    invalidateCache(); // Invalidate cache after loading
                     return true;
                 } else {
                     throw new Error('Nieprawidłowy format danych z chmury');
@@ -1821,13 +1642,11 @@
                         state.rounds = parsed.rounds || DEFAULT_DATA.rounds;
                         state.drivers = parsed.drivers || DEFAULT_DATA.drivers;
                         state.results = parsed.results || DEFAULT_DATA.results;
+                        state.changeLogs = parsed.changeLogs || [];
                         
                         state.drivers.forEach(driver => {
                             if (driver.equalizationPoints === undefined) {
                                 driver.equalizationPoints = 0;
-                            }
-                            if (!driver.points) {
-                                driver.points = new Array(state.rounds.length).fill(0);
                             }
                         });
                         
@@ -1841,7 +1660,6 @@
                         }
                         
                         console.log('Dane załadowane z localStorage');
-                        invalidateCache(); // Invalidate cache after loading
                         return true;
                     } catch (e) {
                         console.error("Błąd podczas wczytywania danych z localStorage:", e);
@@ -1862,6 +1680,7 @@
             const success = await saveToCloud();
             if (success) {
                 showAdminStatus("Synchronizacja zakończona sukcesem");
+                addLog("Ręczna synchronizacja z chmurą", "system");
             } else {
                 showAdminStatus("Błąd synchronizacji", true);
             }
@@ -1871,21 +1690,23 @@
             state.rounds = JSON.parse(JSON.stringify(DEFAULT_DATA.rounds));
             state.drivers = JSON.parse(JSON.stringify(DEFAULT_DATA.drivers));
             state.results = JSON.parse(JSON.stringify(DEFAULT_DATA.results));
+            state.changeLogs = [];
             state.pendingChanges = false;
-            invalidateCache();
         }
 
         function resetToDefaults() {
             if (confirm("Czy na pewno chcesz zresetować wszystkie dane do ustawień domyślnych? Ta operacja jest nieodwracalna i usunie wszystkich kierowców i wyniki.")) {
                 loadDefaultData();
                 saveToCloud();
-                refreshVisibleView();
+                refreshAllViews();
                 showAdminStatus("Dane zresetowane do pustych domyślnych");
+                addLog("Reset danych do domyślnych", "system");
             }
         }
 
-        // OPTIMIZATION: Intelligent save function
-        async function saveData() {
+        // --- ZMIENIONA FUNKCJA saveToLocalStorage ---
+        // Teraz zapisuje do chmury zamiast localStorage
+        async function saveToLocalStorage() {
             state.pendingChanges = true;
             
             // Zapisz lokalnie jako backup
@@ -1893,22 +1714,58 @@
                 rounds: state.rounds,
                 drivers: state.drivers,
                 results: state.results,
+                changeLogs: state.changeLogs,
                 version: CLOUD_CONFIG.DATA_VERSION
             };
             
             localStorage.setItem('wrc_winter_cup_data', JSON.stringify(dataToSave));
             localStorage.setItem('wrc_pending_changes', 'true');
             
-            // Spróbuj zsynchronizować z chmurą z debouncing
-            debouncedSaveToCloud();
+            // Spróbuj zsynchronizować z chmurą
+            await saveToCloud();
         }
 
-        // --- OPTIMIZED DASHBOARD FUNCTIONS ---
+        // --- DASHBOARD FUNCTIONS ---
+        function addLog(action, type = "user") {
+            const timestamp = new Date().toLocaleString('pl-PL');
+            const log = {
+                id: Date.now(),
+                timestamp: timestamp,
+                action: action,
+                type: type
+            };
+            
+            state.changeLogs.unshift(log);
+            
+            // Ogranicz do 50 ostatnich logów
+            if (state.changeLogs.length > 50) {
+                state.changeLogs = state.changeLogs.slice(0, 50);
+            }
+            
+            saveToLocalStorage();
+            
+            // Aktualizuj dashboard jeśli jest widoczny
+            if (state.view === 'admin' && document.getElementById('module-dashboard') && !document.getElementById('module-dashboard').classList.contains('hidden')) {
+                renderChangeLogs();
+            }
+        }
+
+        function clearLogs() {
+            if (confirm("Czy na pewno wyczyścić wszystkie logi?")) {
+                state.changeLogs = [];
+                saveToLocalStorage();
+                renderChangeLogs();
+                addLog("Wyczyszczono logi zmian", "system");
+            }
+        }
+
         function refreshDashboard() {
             updateStats();
+            renderChangeLogs();
             renderDataAlerts();
             updateTournamentSummary();
             loadRoundsForEdit();
+            addLog("Odświeżono dashboard", "system");
             showAdminStatus("Dashboard odświeżony");
         }
 
@@ -1927,7 +1784,7 @@
             };
             
             const reportText = `
-RAPORT TURNIEJU POTATO RALLY CHAMPIONSHIP
+RAPORT TURNIEJU WRC WINTER RALLY CUP 2025
 =========================================
 Wygenerowano: ${reportData.generated}
 
@@ -1957,6 +1814,7 @@ Aktualny lider: ${reportData.leader}
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
             
+            addLog("Wygenerowano raport", "system");
             showAdminStatus("Raport wygenerowany");
         }
 
@@ -1970,6 +1828,43 @@ Aktualny lider: ${reportData.leader}
             document.getElementById('stat-stages').textContent = totalStages;
             
             document.getElementById('stat-results').textContent = state.results.length;
+        }
+
+        function renderChangeLogs() {
+            const logsContainer = document.getElementById('change-logs');
+            if (!logsContainer) return;
+            
+            logsContainer.innerHTML = '';
+            
+            if (state.changeLogs.length === 0) {
+                logsContainer.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">Brak logów zmian</p>';
+                return;
+            }
+            
+            state.changeLogs.slice(0, 10).forEach(log => {
+                const logElement = document.createElement('div');
+                logElement.className = "flex items-start gap-2 p-2 hover:bg-[#1a1a1a] rounded";
+                
+                const icon = document.createElement('div');
+                icon.className = `w-2 h-2 rounded-full mt-1.5 ${log.type === 'system' ? 'bg-yellow-500' : 'bg-[#8B0000]'}`;
+                
+                const content = document.createElement('div');
+                content.className = "flex-1";
+                
+                const action = document.createElement('p');
+                action.className = "text-xs text-gray-300 font-mono";
+                action.textContent = log.action;
+                
+                const timestamp = document.createElement('p');
+                timestamp.className = "text-xs text-gray-500 font-mono";
+                timestamp.textContent = log.timestamp;
+                
+                content.appendChild(action);
+                content.appendChild(timestamp);
+                logElement.appendChild(icon);
+                logElement.appendChild(content);
+                logsContainer.appendChild(logElement);
+            });
         }
 
         function renderDataAlerts() {
@@ -2101,7 +1996,17 @@ Aktualny lider: ${reportData.leader}
             
             document.getElementById('tournament-leader').textContent = driverLeader.name || "-";
             
-            // Aktualizuj timestamp
+            // Oblicz progres
+            const totalStages = state.rounds.reduce((sum, round) => sum + round.stages.length, 0);
+            const stagesWithResults = [...new Set(state.results.map(r => `${r.r}-${r.s}`))].length;
+            const progress = totalStages > 0 ? Math.round((stagesWithResults / totalStages) * 100) : 0;
+            
+            document.getElementById('tournament-progress').textContent = `${progress}%`;
+            document.getElementById('tournament-progress').className = `font-mono text-sm ${progress === 100 ? 'text-green-500' : progress > 50 ? 'text-yellow-500' : 'text-red-500'}`;
+            
+            document.getElementById('tournament-status').textContent = progress === 100 ? 'ZAKOŃCZONY' : 'AKTYWNY';
+            document.getElementById('tournament-status').className = `font-mono text-sm font-bold ${progress === 100 ? 'text-green-500' : 'text-yellow-500'}`;
+            
             document.getElementById('last-update').textContent = new Date().toLocaleString('pl-PL', {
                 hour: '2-digit',
                 minute: '2-digit'
@@ -2191,8 +2096,9 @@ Aktualny lider: ${reportData.leader}
                 state.rounds[roundIndex].stages.push(name);
                 input.value = '';
                 loadStagesForEdit();
-                saveData();
-                refreshVisibleView();
+                saveToLocalStorage();
+                refreshAllViews();
+                addLog(`Dodano odcinek: ${name} do ${state.rounds[roundIndex].name}`, "system");
                 showAdminStatus("Odcinek dodany");
             }
         }
@@ -2214,11 +2120,10 @@ Aktualny lider: ${reportData.leader}
                     }
                 });
                 
-                // Przelicz punkty
-                calculateAllRoundPoints();
                 loadStagesForEdit();
-                saveData();
-                refreshVisibleView();
+                saveToLocalStorage();
+                refreshAllViews();
+                addLog(`Usunięto odcinek: ${stageName} z ${state.rounds[roundIndex].name}`, "system");
                 showAdminStatus("Odcinek usunięty");
             }
         }
@@ -2243,12 +2148,13 @@ Aktualny lider: ${reportData.leader}
                     const oldName = state.rounds[roundIndex].stages[stageIndex];
                     state.rounds[roundIndex].stages[stageIndex] = newName;
                     hasChanges = true;
+                    addLog(`Zmieniono nazwę odcinka: ${oldName} → ${newName}`, "system");
                 }
             });
             
             if (hasChanges) {
-                saveData();
-                refreshVisibleView();
+                saveToLocalStorage();
+                refreshAllViews();
                 showAdminStatus("Zmiany zapisane");
             } else {
                 showAdminStatus("Brak zmian do zapisania");
@@ -2276,32 +2182,17 @@ Aktualny lider: ${reportData.leader}
                 const positions = firstTwoInput.split(',').map(p => parseInt(p.trim()));
                 if (positions.length === 2) {
                     const [pos1, pos2] = positions;
+                    const avgPosition = (pos1 + pos2) / 2;
                     
-                    // Warunki zgodnie z zasadami
-                    const totalDrivers = Math.max(pos1, pos2, thirdPosition) + 3; // Estymacja liczby graczy
-                    
-                    if (totalDrivers === 6) {
-                        // Przy 6 graczach: Jeśli w 2 pierwszych etapach miejsce poniżej 5. i w 3. etapie miejsce 3. lub wyższe
-                        if (pos1 >= 6 && pos2 >= 6 && thirdPosition <= 3) {
-                            equalizationPoints = 5;
-                            equalizationLogic = `Pozycje w 1-2 etapach: ${pos1}, ${pos2} (≥6) i 3. etap: ${thirdPosition} (≤3) = +5 PKT`;
-                        }
-                    } else if (totalDrivers === 8) {
-                        // Przy 8 graczach: Jeśli w 2 pierwszych etapach miejsce poniżej 6. i w 3. etapie miejsce 4. lub wyższe
-                        if (pos1 >= 7 && pos2 >= 7 && thirdPosition <= 4) {
-                            equalizationPoints = 5;
-                            equalizationLogic = `Pozycje w 1-2 etapach: ${pos1}, ${pos2} (≥7) i 3. etap: ${thirdPosition} (≤4) = +5 PKT`;
-                        }
-                    } else if (totalDrivers >= 10) {
-                        // Przy 10 graczach: Jeśli w 2 pierwszych etapach miejsce poniżej 7. i w 3. etapie miejsce 5. lub wyższe
-                        if (pos1 >= 8 && pos2 >= 8 && thirdPosition <= 5) {
-                            equalizationPoints = 5;
-                            equalizationLogic = `Pozycje w 1-2 etapach: ${pos1}, ${pos2} (≥8) i 3. etap: ${thirdPosition} (≤5) = +5 PKT`;
-                        }
-                    }
-                    
-                    if (!equalizationPoints) {
-                        equalizationLogic = `Pozycje w 1-2 etapach: ${pos1}, ${pos2}, 3. etap: ${thirdPosition} = 0 PKT wyrównawczych`;
+                    // Symulacja dla 6 i 8 graczy
+                    if (avgPosition > 5 && thirdPosition <= 3) {
+                        equalizationPoints = 4;
+                        equalizationLogic = `Średnia z pierwszych 2 etapów: ${avgPosition.toFixed(1)} (>5) i 3. etap: ${thirdPosition} (≤3) = +4 PKT`;
+                    } else if (avgPosition > 6 && thirdPosition <= 4) {
+                        equalizationPoints = 4;
+                        equalizationLogic = `Średnia z pierwszych 2 etapów: ${avgPosition.toFixed(1)} (>6) i 3. etap: ${thirdPosition} (≤4) = +4 PKT`;
+                    } else {
+                        equalizationLogic = `Średnia z pierwszych 2 etapów: ${avgPosition.toFixed(1)}, 3. etap: ${thirdPosition} = 0 PKT wyrównawczych`;
                     }
                 }
             }
@@ -2318,9 +2209,11 @@ Aktualny lider: ${reportData.leader}
             
             document.getElementById('test-result-text').textContent = resultText;
             document.getElementById('test-result').classList.remove('hidden');
+            
+            addLog("Przeprowadzono test reguł punktacji", "system");
         }
 
-        // --- OPTIMIZED TABLE MODULE FUNCTIONS ---
+        // --- NOWE FUNKCJE DLA MODUŁU TABELE ---
         
         function loadTableStages() {
             const roundSelect = document.getElementById('table-round-select');
@@ -2396,10 +2289,10 @@ Aktualny lider: ${reportData.leader}
                 tr.dataset.driverId = driver.id;
                 
                 tr.innerHTML = `
-                    <td class="p-2 md:p-3 text-gray-500 font-mono">${index + 1}</td>
-                    <td class="p-2 md:p-3 font-mono font-bold text-white">${driver.name}</td>
-                    <td class="p-2 md:p-3 font-mono text-gray-400 hidden md:table-cell">${driver.team}</td>
-                    <td class="p-2 md:p-3 text-center">
+                    <td class="p-3 text-gray-500 font-mono">${index + 1}</td>
+                    <td class="p-3 font-mono font-bold text-white">${driver.name}</td>
+                    <td class="p-3 font-mono text-gray-400">${driver.team}</td>
+                    <td class="p-3 text-center">
                         <input type="text" 
                                class="table-input time-input" 
                                value="${existingResult.time || ''}" 
@@ -2407,14 +2300,14 @@ Aktualny lider: ${reportData.leader}
                                data-driver-id="${driver.id}"
                                data-field="time">
                     </td>
-                    <td class="p-2 md:p-3 text-center">
+                    <td class="p-3 text-center">
                         <select class="table-select condition-select" data-driver-id="${driver.id}" data-field="condition">
                             <option value="2" ${existingResult.cp === 2 ? 'selected' : ''}>Czysty (+2)</option>
                             <option value="1" ${existingResult.cp === 1 ? 'selected' : ''}>Lekkie uszk. (+1)</option>
                             <option value="0" ${existingResult.cp === 0 || !existingResult.cp ? 'selected' : ''}>Uszkodzenia (0)</option>
                         </select>
                     </td>
-                    <td class="p-2 md:p-3 text-center">
+                    <td class="p-3 text-center">
                         <button onclick="saveSingleDriverResult(${driver.id})" class="btn-primary quick-save-btn">ZAPISZ</button>
                     </td>
                 `;
@@ -2485,11 +2378,13 @@ Aktualny lider: ${reportData.leader}
                 cp: finalConditionPoints
             });
             
-            // Przelicz punkty
-            calculateAllRoundPoints();
-            saveData();
-            refreshVisibleView();
+            saveToLocalStorage();
             showAdminStatus("Zapisano wynik kierowcy");
+            
+            const driver = state.drivers.find(d => d.id === driverId);
+            const roundName = state.rounds[roundIndex]?.name || `Rajd ${roundIndex+1}`;
+            const stageName = state.rounds[roundIndex]?.stages[stageIndex] || `OS ${stageIndex+1}`;
+            addLog(`Zapisano wynik: ${driver?.name || 'Nieznany'} - ${roundName} - ${stageName}: ${timeStr}`, "system");
         }
         
         function saveTableResults() {
@@ -2560,16 +2455,18 @@ Aktualny lider: ${reportData.leader}
                 savedCount++;
             }
             
-            // Przelicz punkty po zapisie wszystkich wyników
-            calculateAllRoundPoints();
-            saveData();
-            refreshVisibleView();
+            saveToLocalStorage();
+            refreshAllViews();
             
             if (errorCount > 0) {
                 showAdminStatus(`Zapisano ${savedCount} wyników, ${errorCount} błędów`, true);
             } else {
                 showAdminStatus(`Zapisano ${savedCount} wyników`);
             }
+            
+            const roundName = state.rounds[roundIndex]?.name || `Rajd ${roundIndex+1}`;
+            const stageName = state.rounds[roundIndex]?.stages[stageIndex] || `OS ${stageIndex+1}`;
+            addLog(`Zapisano wyniki dla: ${roundName} - ${stageName} (${savedCount} wyników)`, "system");
         }
         
         function saveAllTableResults() {
@@ -2601,12 +2498,14 @@ Aktualny lider: ${reportData.leader}
                 // Usuń wyniki dla tego odcinka
                 state.results = state.results.filter(res => !(res.r === roundIndex && res.s === stageIndex));
                 
-                // Przelicz punkty
-                calculateAllRoundPoints();
-                saveData();
+                saveToLocalStorage();
                 refreshTableResults();
-                refreshVisibleView();
+                refreshAllViews();
                 showAdminStatus("Wyniki wyczyszczone");
+                
+                const roundName = state.rounds[roundIndex]?.name || `Rajd ${roundIndex+1}`;
+                const stageName = state.rounds[roundIndex]?.stages[stageIndex] || `OS ${stageIndex+1}`;
+                addLog(`Wyczyszczono wyniki dla: ${roundName} - ${stageName}`, "system");
             }
         }
         
@@ -2655,6 +2554,7 @@ Aktualny lider: ${reportData.leader}
             });
             
             showAdminStatus("Skopiowano czasy z poprzedniego odcinka");
+            addLog(`Skopiowano czasy z poprzedniego odcinka`, "system");
         }
         
         function applySameTimeToAll() {
@@ -2776,7 +2676,7 @@ Aktualny lider: ${reportData.leader}
             }
         }
 
-        // --- OPTIMIZED HELPER FUNCTIONS ---
+        // --- HELPER FUNCTIONS ---
         function parseTime(timeStr) {
             if (timeStr.toUpperCase() === "DSQ" || timeStr.toUpperCase() === "DNF") {
                 return timeStr.toUpperCase();
@@ -2810,42 +2710,6 @@ Aktualny lider: ${reportData.leader}
             const milliseconds = ms % 1000;
             
             return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
-        }
-
-        // OPTIMIZATION: Memoized function for round standings
-        function getRoundStandings(roundIndex) {
-            const cacheKey = `${CACHE_KEYS.ROUND_STANDINGS}_${roundIndex}`;
-            const cached = getCached(cacheKey);
-            if (cached) return cached;
-            
-            const driverTimes = [];
-            
-            // Sprawdź, którzy kierowcy mają wyniki w tej rundzie
-            const driversInRound = [...new Set(state.results
-                .filter(res => res.r === roundIndex)
-                .map(res => res.d))];
-            
-            driversInRound.forEach(driverId => {
-                const totalTime = calculateTotalTimeForDriverInRound(driverId, roundIndex);
-                if (totalTime !== null) {
-                    driverTimes.push({
-                        driverId: driverId,
-                        totalMs: totalTime
-                    });
-                }
-            });
-            
-            // Sortuj od najszybszego do najwolniejszego
-            // DSQ zawsze na końcu
-            driverTimes.sort((a, b) => {
-                if (a.totalMs === "DSQ") return 1;
-                if (b.totalMs === "DSQ") return -1;
-                if (a.totalMs === "DNF") return 1;
-                if (b.totalMs === "DNF") return -1;
-                return a.totalMs - b.totalMs;
-            });
-            
-            return setCached(cacheKey, driverTimes);
         }
 
         function calculateTotalTimeForDriverInRound(driverId, roundIndex) {
@@ -2888,10 +2752,64 @@ Aktualny lider: ${reportData.leader}
             return totalMs;
         }
 
-        // --- POPRAWIONA FUNKCJA PUNKTÓW WYRÓWNAWCZYCH ---
-        function calculateEqualizationPoints() {
-            if (state.isCalculating) return;
+        function getRoundStandings(roundIndex) {
+            const driverTimes = [];
             
+            // Sprawdź, którzy kierowcy mają wyniki w tej rundzie
+            const driversInRound = [...new Set(state.results
+                .filter(res => res.r === roundIndex)
+                .map(res => res.d))];
+            
+            driversInRound.forEach(driverId => {
+                const totalTime = calculateTotalTimeForDriverInRound(driverId, roundIndex);
+                if (totalTime !== null) {
+                    driverTimes.push({
+                        driverId: driverId,
+                        totalMs: totalTime
+                    });
+                }
+            });
+            
+            // Sortuj od najszybszego do najwolniejszego
+            // DSQ zawsze na końcu
+            driverTimes.sort((a, b) => {
+                if (a.totalMs === "DSQ") return 1;
+                if (b.totalMs === "DSQ") return -1;
+                if (a.totalMs === "DNF") return 1;
+                if (b.totalMs === "DNF") return -1;
+                return a.totalMs - b.totalMs;
+            });
+            
+            return driverTimes;
+        }
+
+        function calculateRoundPoints(roundIndex) {
+            const standings = getRoundStandings(roundIndex);
+            const pointsSystem = [15, 12, 10, 8, 6, 4, 2, 1];
+            
+            // Resetuj punkty dla tej rundy
+            state.drivers.forEach(driver => {
+                driver.points[roundIndex] = 0;
+            });
+            
+            let position = 0;
+            standings.forEach((standing) => {
+                const driver = state.drivers.find(d => d.id === standing.driverId);
+                if (driver) {
+                    if (standing.totalMs === "DSQ") {
+                        driver.points[roundIndex] = 0;
+                    } else if (position < pointsSystem.length) {
+                        driver.points[roundIndex] = pointsSystem[position];
+                        position++;
+                    } else {
+                        driver.points[roundIndex] = 0;
+                    }
+                }
+            });
+        }
+
+        // --- FUNKCJA DO OBLICZANIA PUNKTÓW WYRÓWNAWCZYCH ---
+        function calculateEqualizationPoints() {
             // Resetuj punkty wyrównawcze
             state.drivers.forEach(driver => {
                 driver.equalizationPoints = 0;
@@ -2904,299 +2822,164 @@ Aktualny lider: ${reportData.leader}
                 return;
             }
             
-            // Obliczamy pozycje w każdej z pierwszych 3 rund
-            const round0Standings = getRoundStandings(0);
-            const round1Standings = getRoundStandings(1);
-            const round2Standings = getRoundStandings(2);
+            // Obliczamy pozycje w pierwszych 2 rundach
+            const firstTwoRoundsStandings = [];
             
-            // Tworzymy mapy driverId -> pozycja w każdej rundzie
-            const positionInRound0 = {};
-            const positionInRound1 = {};
-            const positionInRound2 = {};
-            
-            round0Standings.forEach((standing, index) => {
-                positionInRound0[standing.driverId] = index + 1;
-            });
-            
-            round1Standings.forEach((standing, index) => {
-                positionInRound1[standing.driverId] = index + 1;
-            });
-            
-            round2Standings.forEach((standing, index) => {
-                positionInRound2[standing.driverId] = index + 1;
-            });
-            
-            // Dla każdego kierowcy sprawdzamy warunki
             state.drivers.forEach(driver => {
-                const pos0 = positionInRound0[driver.id];
-                const pos1 = positionInRound1[driver.id];
-                const pos2 = positionInRound2[driver.id];
+                // Suma punktów z pierwszych 2 rund
+                const firstTwoRoundsPoints = (driver.points[0] || 0) + (driver.points[1] || 0);
+                firstTwoRoundsStandings.push({
+                    driverId: driver.id,
+                    points: firstTwoRoundsPoints
+                });
+            });
+            
+            // Sortujemy malejąco według punktów
+            firstTwoRoundsStandings.sort((a, b) => b.points - a.points);
+            
+            // Przypisujemy pozycje
+            const positions = {};
+            firstTwoRoundsStandings.forEach((standing, index) => {
+                positions[standing.driverId] = index + 1;
+            });
+            
+            // Obliczamy pozycję w 3. rundzie
+            const thirdRoundStandings = getRoundStandings(2);
+            
+            // Przypisujemy pozycje w 3. rundzie
+            const thirdRoundPositions = {};
+            thirdRoundStandings.forEach((standing, index) => {
+                thirdRoundPositions[standing.driverId] = index + 1;
+            });
+            
+            // Sprawdzamy warunki dla każdego kierowcy
+            state.drivers.forEach(driver => {
+                const positionInFirstTwo = positions[driver.id];
+                const positionInThird = thirdRoundPositions[driver.id];
                 
-                // Jeśli brakuje którejś pozycji, pomijamy
-                if (pos0 === undefined || pos1 === undefined || pos2 === undefined) {
+                if (!positionInFirstTwo || !positionInThird) {
                     return;
                 }
                 
-                // Warunki zgodnie z zasadami
                 if (totalDrivers === 6) {
-                    // Przy 6 graczach: Jeśli w 2 pierwszych etapach miejsce poniżej 5. i w 3. etapie miejsce 3. lub wyższe
-                    if (pos0 >= 6 && pos1 >= 6 && pos2 <= 3) {
-                        driver.equalizationPoints = 5;
+                    if (positionInFirstTwo > 5 && positionInThird <= 3) {
+                        driver.equalizationPoints = 4;
                     }
                 } else if (totalDrivers === 8) {
-                    // Przy 8 graczach: Jeśli w 2 pierwszych etapach miejsce poniżej 6. i w 3. etapie miejsce 4. lub wyższe
-                    if (pos0 >= 7 && pos1 >= 7 && pos2 <= 4) {
-                        driver.equalizationPoints = 5;
-                    }
-                } else if (totalDrivers >= 10) {
-                    // Przy 10 graczach: Jeśli w 2 pierwszych etapach miejsce poniżej 7. i w 3. etapie miejsce 5. lub wyższe
-                    if (pos0 >= 8 && pos1 >= 8 && pos2 <= 5) {
-                        driver.equalizationPoints = 5;
+                    if (positionInFirstTwo > 6 && positionInThird <= 4) {
+                        driver.equalizationPoints = 4;
                     }
                 }
             });
         }
 
         function calculateAllRoundPoints() {
-            if (state.isCalculating) {
-                state.needsRecalculation = true;
-                return;
+            // Resetuj wszystkie punkty
+            state.drivers.forEach(driver => {
+                driver.points = new Array(state.rounds.length).fill(0);
+            });
+            
+            // Dla każdej rundy oblicz punkty
+            for (let i = 0; i < state.rounds.length; i++) {
+                calculateRoundPoints(i);
             }
             
-            state.isCalculating = true;
+            // Oblicz punkty wyrównawcze
+            calculateEqualizationPoints();
             
-            try {
-                // Resetuj punkty kierowców
-                state.drivers.forEach(driver => {
-                    if (!driver.points) {
-                        driver.points = new Array(state.rounds.length).fill(0);
-                    } else {
-                        driver.points.fill(0);
-                    }
-                });
-                
-                // Dla każdej rundy oblicz punkty za miejsca
-                for (let roundIndex = 0; roundIndex < state.rounds.length; roundIndex++) {
-                    const standings = getRoundStandings(roundIndex);
-                    const pointsSystem = [15, 12, 10, 8, 6, 4, 2, 1];
-                    
-                    let position = 0;
-                    for (let i = 0; i < standings.length; i++) {
-                        const standing = standings[i];
-                        const driver = state.drivers.find(d => d.id === standing.driverId);
-                        
-                        if (driver && standing.totalMs !== "DSQ") {
-                            if (position < pointsSystem.length) {
-                                driver.points[roundIndex] = pointsSystem[position];
-                                position++;
-                            }
-                        }
-                    }
-                }
-                
-                // Oblicz punkty wyrównawcze
-                calculateEqualizationPoints();
-            } finally {
-                state.isCalculating = false;
-                
-                if (state.needsRecalculation) {
-                    state.needsRecalculation = false;
-                    setTimeout(calculateAllRoundPoints, 100);
-                }
-            }
+            // Zapisz do chmury
+            saveToLocalStorage();
         }
 
-        // OPTIMIZATION: Cached driver stats calculation
         function calculateDriverStats() {
-            const cached = getCached(CACHE_KEYS.DRIVER_STATS);
-            if (cached) return cached;
-            
             // Najpierw przelicz punkty za miejsca w rundach i wyrównawcze
             calculateAllRoundPoints();
             
-            // Przygotuj mapę bonusowych punktów
-            const bonusMap = {};
-            state.results.forEach(result => {
-                // DSQ i DNF nie dostają punktów bonusowych
-                if (result.time === "DSQ" || result.time === "DNF") {
-                    return;
-                }
-                if (!bonusMap[result.d]) {
-                    bonusMap[result.d] = 0;
-                }
-                bonusMap[result.d] += (result.cp || 0);
-            });
-            
-            const result = state.drivers.map(d => {
-                const basePoints = d.points ? d.points.reduce((a,b) => a + b, 0) : 0;
-                const bonus = bonusMap[d.id] || 0;
-                const equalization = d.equalizationPoints || 0;
+            return state.drivers.map(d => {
+                const basePoints = d.points.reduce((a,b)=>a+b, 0);
+                const bonusPoints = state.results.filter(r => r.d === d.id).reduce((a, b) => {
+                    // DSQ i DNF nie dostają punktów bonusowych
+                    if (b.time === "DSQ" || b.time === "DNF") {
+                        return a;
+                    }
+                    return a + (b.cp || 0);
+                }, 0);
+                const equalizationPoints = d.equalizationPoints || 0;
                 
                 return {
                     ...d,
-                    bonus: bonus,
-                    equalization: equalization,
-                    total: basePoints + bonus + equalization
+                    bonus: bonusPoints,
+                    equalization: equalizationPoints,
+                    total: basePoints + bonusPoints + equalizationPoints
                 };
             });
-            
-            return setCached(CACHE_KEYS.DRIVER_STATS, result);
         }
 
-        // OPTIMIZATION: Cached constructor stats calculation - POPRAWIONA
         function calculateConstructorStats() {
-            const cached = getCached(CACHE_KEYS.CONSTRUCTOR_STATS);
-            if (cached) return cached;
-            
             const teams = {};
             const teamDrivers = {};
             
-            const driverStats = calculateDriverStats();
-            
-            driverStats.forEach(d => {
-                if (!teams[d.team]) {
+            state.drivers.forEach(d => {
+                if(!teams[d.team]) {
                     teams[d.team] = 0;
                     teamDrivers[d.team] = [];
                 }
-                teams[d.team] += d.total;
+                const driverStats = calculateDriverStats().find(ds => ds.id === d.id);
+                teams[d.team] += driverStats ? driverStats.total : 0;
                 teamDrivers[d.team].push(d.name);
             });
 
-            const result = Object.entries(teams)
-                .sort((a,b) => b[1] - a[1])
-                .map(([team, points]) => ({
-                    team,
-                    points,
-                    drivers: teamDrivers[team] || []
-                }));
-            
-            return setCached(CACHE_KEYS.CONSTRUCTOR_STATS, result);
+            return Object.entries(teams).sort((a,b) => b[1] - a[1]).map(([team, points]) => ({
+                team,
+                points,
+                drivers: teamDrivers[team]
+            }));
         }
 
-        // OPTIMIZATION: Cached leader calculations
         function calculateDriverLeader() {
-            const cached = getCached(CACHE_KEYS.DRIVER_LEADER);
-            if (cached) return cached;
-            
             const driverStats = calculateDriverStats();
             driverStats.sort((a, b) => b.total - a.total);
-            const result = driverStats[0] || { name: "Brak danych", total: 0 };
-            
-            return setCached(CACHE_KEYS.DRIVER_LEADER, result);
+            return driverStats[0] || { name: "Brak danych", total: 0 };
         }
 
         function calculateConstructorLeader() {
-            const cached = getCached(CACHE_KEYS.CONSTRUCTOR_LEADER);
-            if (cached) return cached;
-            
             const constructorStats = calculateConstructorStats();
-            const result = constructorStats[0] || { team: "Brak danych", points: 0, drivers: [] };
-            
-            return setCached(CACHE_KEYS.CONSTRUCTOR_LEADER, result);
+            return constructorStats[0] || { team: "Brak danych", points: 0 };
         }
 
-        // --- POPRAWIONA FUNKCJA renderConstructorsTable ---
-        function renderConstructorsTable() {
-            const tbody = document.getElementById('constructors-ranking-body');
-            tbody.innerHTML = '';
+        // --- FUNKCJE DO AKTUALIZACJI WSZYSTKICH WIDOKÓW ---
+        function refreshAllViews() {
+            // Aktualizuj liderów na stronie głównej
+            updateLeaders();
             
-            const constructorStats = calculateConstructorStats();
-
-            constructorStats.forEach((constructor, index) => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-[#111] transition-colors";
-                
-                // Position
-                let td = document.createElement('td');
-                td.className = "py-3 md:py-4 px-2 md:px-4 text-gray-400 font-mono";
-                td.textContent = index + 1;
-                tr.appendChild(td);
-                
-                // Constructor Name
-                td = document.createElement('td');
-                td.className = "py-3 md:py-4 px-2 md:px-4 font-bold text-white";
-                td.textContent = constructor.team;
-                tr.appendChild(td);
-                
-                // Drivers - POPRAWIONE: wyświetlanie wszystkich kierowców
-                td = document.createElement('td');
-                td.className = "py-3 md:py-4 px-2 md:px-4 text-sm text-gray-400";
-                
-                if (constructor.drivers && constructor.drivers.length > 0) {
-                    // Sprawdź czy to tablica stringów czy obiektów
-                    if (typeof constructor.drivers[0] === 'string') {
-                        td.textContent = constructor.drivers.join(', ');
-                    } else if (typeof constructor.drivers[0] === 'object') {
-                        // Jeśli to obiekty, wyciągnij tylko nazwy
-                        td.textContent = constructor.drivers.map(d => d.name || d).join(', ');
-                    } else {
-                        td.textContent = constructor.drivers.join(', ');
-                    }
-                } else {
-                    td.textContent = "Brak kierowców";
-                }
-                tr.appendChild(td);
-                
-                // Total Points
-                td = document.createElement('td');
-                td.className = "py-3 md:py-4 px-2 md:px-4 text-right text-[#8B0000] font-bold text-lg";
-                td.textContent = constructor.points;
-                tr.appendChild(td);
-                
-                tbody.appendChild(tr);
-            });
+            // Aktualizuj tabele w widoku mistrzostw
+            renderDriversTable();
+            renderConstructorsTable();
             
-            // Jeśli nie ma konstruktorów, pokaż komunikat
-            if (constructorStats.length === 0) {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td colspan="4" class="py-8 text-center text-gray-500 font-mono text-sm">BRAK DANYCH. DODAJ KIEROWCÓW W PANELU ADMINA.</td>`;
-                tbody.appendChild(tr);
+            // Aktualizuj podgląd punktacji w panelu admina
+            if (state.view === 'admin') {
+                renderScoringPreview();
             }
-        }
-
-        // --- OPTIMIZED VIEW REFRESHING ---
-        function refreshVisibleView() {
-            invalidateCache(); // Invalidate cache when data changes
             
-            // Aktualizuj tylko widoczny widok
-            switch(state.view) {
-                case 'home':
-                    updateLeaders();
-                    break;
-                case 'championship':
-                    renderDriversTable();
-                    renderConstructorsTable(); // Używamy poprawionej funkcji
-                    break;
-                case 'results':
-                    renderStageResults();
-                    break;
-                case 'teams':
-                    updateTeamAssignments();
-                    break;
-                case 'admin':
-                    // W panelu admina odświeżamy aktualny moduł
-                    if (document.getElementById('module-dashboard') && !document.getElementById('module-dashboard').classList.contains('hidden')) {
-                        refreshDashboard();
-                    } else if (document.getElementById('module-tables') && !document.getElementById('module-tables').classList.contains('hidden')) {
-                        loadTableResults();
-                    } else if (document.getElementById('module-drivers') && !document.getElementById('module-drivers').classList.contains('hidden')) {
-                        renderAdminDrivers();
-                    } else if (document.getElementById('module-stages') && !document.getElementById('module-stages').classList.contains('hidden')) {
-                        renderAdminResultsTable();
-                    } else if (document.getElementById('module-scoring') && !document.getElementById('module-scoring').classList.contains('hidden')) {
-                        renderScoringPreview();
-                    }
-                    break;
-                default:
-                    break;
+            // Aktualizuj listę kierowców w panelu admina jeśli jest aktywny
+            if (state.view === 'admin' && document.getElementById('admin-drivers-list')) {
+                renderAdminDrivers();
             }
+            
+            // Aktualizuj widok wyników jeśli jest aktywny
+            if (state.view === 'results') {
+                renderStageResults();
+            }
+            
+            // Aktualizuj widok teamów
+            updateTeamAssignments();
         }
 
         function recalculateAllPoints() {
-            invalidateCache();
             calculateAllRoundPoints();
-            refreshVisibleView();
+            refreshAllViews();
             showAdminStatus("Punkty przeliczone pomyślnie");
+            addLog("Przeliczono wszystkie punkty", "system");
         }
 
         // --- DYNAMIC LEADERS ON HOME PAGE ---
@@ -3258,17 +3041,6 @@ Aktualny lider: ${reportData.leader}
             }, 5000);
         }
 
-        // --- MOBILE MENU FUNCTIONS ---
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('active');
-        }
-
-        function closeMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.remove('active');
-        }
-
         // --- CORE FUNCTIONS ---
 
         function router(viewName) {
@@ -3297,7 +3069,7 @@ Aktualny lider: ${reportData.leader}
             if(viewName === 'championship') {
                 document.getElementById('nav-champ')?.classList.add('text-[#8B0000]');
                 renderDriversTable();
-                renderConstructorsTable(); // Używamy poprawionej funkcji
+                renderConstructorsTable();
             }
             if(viewName === 'results') {
                 document.getElementById('nav-results')?.classList.add('text-[#8B0000]');
@@ -3315,7 +3087,6 @@ Aktualny lider: ${reportData.leader}
             }
 
             state.view = viewName;
-            closeMobileMenu();
             window.scrollTo(0,0);
         }
 
@@ -3323,13 +3094,13 @@ Aktualny lider: ${reportData.leader}
             if (tabName === 'drivers') {
                 document.getElementById('tab-drivers').classList.remove('hidden');
                 document.getElementById('tab-constructors').classList.add('hidden');
-                document.getElementById('btn-drivers').className = "text-sm font-mono px-4 py-2 bg-white text-black transition-all rounded-md btn-full-mobile";
-                document.getElementById('btn-constructors').className = "text-sm font-mono px-4 py-2 text-gray-400 hover:text-white transition-all rounded-md btn-full-mobile";
+                document.getElementById('btn-drivers').className = "text-sm font-mono px-4 py-2 bg-white text-black transition-all rounded-md";
+                document.getElementById('btn-constructors').className = "text-sm font-mono px-4 py-2 text-gray-400 hover:text-white transition-all rounded-md";
             } else {
                 document.getElementById('tab-drivers').classList.add('hidden');
                 document.getElementById('tab-constructors').classList.remove('hidden');
-                document.getElementById('btn-drivers').className = "text-sm font-mono px-4 py-2 text-gray-400 hover:text-white transition-all rounded-md btn-full-mobile";
-                document.getElementById('btn-constructors').className = "text-sm font-mono px-4 py-2 bg-white text-black transition-all rounded-md btn-full-mobile";
+                document.getElementById('btn-drivers').className = "text-sm font-mono px-4 py-2 text-gray-400 hover:text-white transition-all rounded-md";
+                document.getElementById('btn-constructors').className = "text-sm font-mono px-4 py-2 bg-white text-black transition-all rounded-md";
             }
         }
 
@@ -3609,18 +3380,18 @@ Aktualny lider: ${reportData.leader}
             
             headers.forEach((text, index) => {
                 const th = document.createElement('th');
-                th.className = "py-3 md:py-4 px-2 md:px-4 font-normal";
+                th.className = "py-4 px-4 font-normal";
                 
                 if (text === 'SUMA') {
                     th.classList.add('text-[#8B0000]');
                 }
                 
                 if (text === 'WYRÓW.') {
-                    th.classList.add('text-purple-400', 'font-bold');
+                    th.classList.add('text-grey-400', 'font-bold');
                 }
                 
                 if (text === 'BONUS') {
-                    th.classList.add('text-gray-400');
+                    th.classList.add('text-grey-400');
                 }
                 
                 if (index >= 3 && index < headers.length - 3) {
@@ -3646,46 +3417,46 @@ Aktualny lider: ${reportData.leader}
                 
                 // Position
                 let td = document.createElement('td');
-                td.className = `py-3 md:py-4 px-2 md:px-4 font-mono ${isLeader ? 'text-black font-bold' : 'text-gray-400'}`;
+                td.className = `py-4 px-4 font-mono ${isLeader ? 'text-black font-bold' : 'text-gray-400'}`;
                 td.textContent = index + 1;
                 tr.appendChild(td);
                 
                 // Driver Name
                 td = document.createElement('td');
-                td.className = `py-3 md:py-4 px-2 md:px-4 font-bold ${isLeader ? 'text-black' : 'text-white'}`;
+                td.className = `py-4 px-4 font-bold ${isLeader ? 'text-black' : 'text-white'}`;
                 td.textContent = driver.name;
                 tr.appendChild(td);
                 
                 // Team
                 td = document.createElement('td');
-                td.className = `py-3 md:py-4 px-2 md:px-4 text-sm ${isLeader ? 'text-gray-600' : 'text-gray-400'}`;
+                td.className = `py-4 px-4 text-sm ${isLeader ? 'text-gray-600' : 'text-gray-400'}`;
                 td.textContent = driver.team;
                 tr.appendChild(td);
                 
                 // Round points
                 for (let i = 0; i < state.rounds.length; i++) {
                     td = document.createElement('td');
-                    td.className = `py-3 md:py-4 px-2 md:px-4 text-right ${isLeader ? 'text-gray-800' : 'text-gray-500'}`;
+                    td.className = `py-4 px-4 text-right ${isLeader ? 'text-gray-800' : 'text-gray-500'}`;
                     td.textContent = driver.points[i] || '-';
                     tr.appendChild(td);
                 }
                 
                 // Bonus points
                 td = document.createElement('td');
-                td.className = `py-3 md:py-4 px-2 md:px-4 text-right font-mono ${isLeader ? 'text-gray-800' : 'text-gray-400'}`;
+                td.className = `py-4 px-4 text-right font-mono ${isLeader ? 'text-gray-800' : 'text-gray-400'}`;
                 td.textContent = `+${driver.bonus}`;
                 tr.appendChild(td);
                 
                 // Equalization points
                 td = document.createElement('td');
                 const hasEqualization = driver.equalization > 0;
-                td.className = `py-3 md:py-4 px-2 md:px-4 text-right font-mono ${hasEqualization ? 'text-purple-400 font-bold' : (isLeader ? 'text-gray-800' : 'text-gray-500')}`;
+                td.className = `py-4 px-4 text-right font-mono ${hasEqualization ? 'text-grey-400 font-bold' : (isLeader ? 'text-gray-800' : 'text-gray-500')}`;
                 td.textContent = hasEqualization ? `+${driver.equalization}` : '-';
                 tr.appendChild(td);
                 
                 // Total points
                 td = document.createElement('td');
-                td.className = "py-3 md:py-4 px-2 md:px-4 text-right font-bold text-lg text-[#8B0000]";
+                td.className = "py-4 px-4 text-right font-bold text-lg text-[#8B0000]";
                 td.textContent = driver.total;
                 tr.appendChild(td);
                 
@@ -3696,6 +3467,51 @@ Aktualny lider: ${reportData.leader}
             if (driverStats.length === 0) {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `<td colspan="${headers.length}" class="py-8 text-center text-gray-500 font-mono text-sm">BRAK DANYCH. DODAJ KIEROWCÓW W PANELU ADMINA.</td>`;
+                tbody.appendChild(tr);
+            }
+        }
+        
+        function renderConstructorsTable() {
+            const tbody = document.getElementById('constructors-ranking-body');
+            tbody.innerHTML = '';
+            
+            const constructorStats = calculateConstructorStats();
+
+            constructorStats.forEach((constructor, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-[#111] transition-colors";
+                
+                // Position
+                let td = document.createElement('td');
+                td.className = "py-4 px-4 text-gray-400 font-mono";
+                td.textContent = index + 1;
+                tr.appendChild(td);
+                
+                // Constructor Name
+                td = document.createElement('td');
+                td.className = "py-4 px-4 font-bold text-white";
+                td.textContent = constructor.team;
+                tr.appendChild(td);
+                
+                // Drivers
+                td = document.createElement('td');
+                td.className = "py-4 px-4 text-sm text-gray-400";
+                td.textContent = constructor.drivers.join(', ');
+                tr.appendChild(td);
+                
+                // Total Points
+                td = document.createElement('td');
+                td.className = "py-4 px-4 text-right text-[#8B0000] font-bold text-lg";
+                td.textContent = constructor.points;
+                tr.appendChild(td);
+                
+                tbody.appendChild(tr);
+            });
+            
+            // Jeśli nie ma konstruktorów, pokaż komunikat
+            if (constructorStats.length === 0) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td colspan="4" class="py-8 text-center text-gray-500 font-mono text-sm">BRAK DANYCH. DODAJ KIEROWCÓW W PANELU ADMINA.</td>`;
                 tbody.appendChild(tr);
             }
         }
@@ -3794,12 +3610,13 @@ Aktualny lider: ${reportData.leader}
                 const tr = document.createElement('tr');
                 tr.className = "group hover:bg-[#151515] transition-colors";
                 tr.innerHTML = `
-                    <td class="p-3 md:p-4 text-gray-500 font-mono text-sm">#${String(d.id).padStart(3, '0')}</td>
-                    <td class="p-3 md:p-4 text-white font-bold font-mono">${d.name}</td>
-                    <td class="p-3 md:p-4 text-gray-400 text-sm font-mono hidden md:table-cell">${d.team}</td>
-                    <td class="p-3 md:p-4 text-gray-500 text-sm font-mono hidden md:table-cell">${d.car}</td>
-                    <td class="p-3 md:p-4 text-right space-x-2">
-                        <button onclick="editDriverTeamAndCar(${d.id})" class="text-xs text-blue-500 border border-blue-900 px-3 py-1 hover:bg-blue-900/20 uppercase rounded-sm">Edytuj</button>
+                    <td class="p-4 text-gray-500 font-mono text-sm">#${String(d.id).padStart(3, '0')}</td>
+                    <td class="p-4 text-white font-bold font-mono">${d.name}</td>
+                    <td class="p-4 text-gray-400 text-sm font-mono">${d.team}</td>
+                    <td class="p-4 text-gray-500 text-sm font-mono">${d.car}</td>
+                    <td class="p-4 text-right space-x-2">
+                        <button onclick="editDriverTeamAndCar(${d.id})" class="text-xs text-blue-500 border border-blue-900 px-3 py-1 hover:bg-blue-900/20 uppercase rounded-sm">Edytuj zespół/auto</button>
+                        <button onclick="editDriverPoints(${d.id})" class="text-xs text-yellow-500 border border-yellow-900 px-3 py-1 hover:bg-yellow-900/20 uppercase rounded-sm">Edytuj punkty</button>
                         <button onclick="deleteDriver(${d.id})" class="text-xs text-red-500 border border-red-900 px-3 py-1 hover:bg-red-900/20 uppercase rounded-sm">Usuń</button>
                     </td>
                 `;
@@ -3847,9 +3664,9 @@ Aktualny lider: ${reportData.leader}
                             </div>
                         </div>
                         
-                        <div class="flex flex-col sm:flex-row justify-end gap-3">
-                            <button onclick="closeEditModal()" class="text-sm font-mono text-gray-400 px-4 py-2 hover:text-white rounded border border-gray-700 order-2 sm:order-1">ANULUJ</button>
-                            <button onclick="saveDriverTeamAndCar(${id})" class="btn-accent text-sm order-1 sm:order-2">ZAPISZ ZMIANY</button>
+                        <div class="flex justify-end gap-3">
+                            <button onclick="closeEditModal()" class="text-sm font-mono text-gray-400 px-4 py-2 hover:text-white rounded border border-gray-700">ANULUJ</button>
+                            <button onclick="saveDriverTeamAndCar(${id})" class="btn-accent text-sm">ZAPISZ ZMIANY</button>
                         </div>
                     </div>
                 </div>
@@ -3898,10 +3715,12 @@ Aktualny lider: ${reportData.leader}
                 
                 showAdminStatus("Dane kierowcy zaktualizowane");
                 renderAdminDrivers();
-                refreshVisibleView();
+                refreshAllViews();
                 updateTeamAssignments();
-                saveData();
+                saveToLocalStorage();
                 closeEditModal();
+                
+                addLog(`Zmieniono zespół/samochód kierowcy ${driver.name}: ${oldTeam} (${oldCar}) → ${driver.team} (${driver.car})`, "system");
             }
         }
 
@@ -4128,24 +3947,29 @@ Aktualny lider: ${reportData.leader}
             document.getElementById('admin-stage-time').value = '';
             document.getElementById('stage-driver-select').value = '';
             
-            // Przelicz punkty
-            calculateAllRoundPoints();
             renderAdminResultsTable();
             showAdminStatus("Zapisano poprawnie");
-            refreshVisibleView();
-            saveData();
+            refreshAllViews();
+            saveToLocalStorage();
+            
+            const driver = state.drivers.find(d => d.id === dId);
+            const roundName = state.rounds[rIdx]?.name || `Rajd ${rIdx+1}`;
+            const stageName = state.rounds[rIdx]?.stages[sIdx] || `OS ${sIdx+1}`;
+            addLog(`Dodano wynik: ${driver?.name || 'Nieznany'} - ${roundName} - ${stageName}: ${timeStr}`, "system");
         }
         
         function deleteResult(r, s, d) {
             if(confirm("Usunąć ten wynik?")) {
                 state.results = state.results.filter(res => !(res.r === r && res.s === s && res.d === d));
-                
-                // Przelicz punkty po usunięciu
-                calculateAllRoundPoints();
                 renderAdminResultsTable();
-                refreshVisibleView();
-                saveData();
+                refreshAllViews();
+                saveToLocalStorage();
                 showAdminStatus("Wynik usunięty");
+                
+                const driver = state.drivers.find(drv => drv.id === d);
+                const roundName = state.rounds[r]?.name || `Rajd ${r+1}`;
+                const stageName = state.rounds[r]?.stages[s] || `OS ${s+1}`;
+                addLog(`Usunięto wynik: ${driver?.name || 'Nieznany'} - ${roundName} - ${stageName}`, "system");
             }
         }
 
@@ -4164,8 +3988,9 @@ Aktualny lider: ${reportData.leader}
                 document.getElementById('admin-stage-round').value = state.rounds.length - 1;
                 document.getElementById('admin-stage-round').dispatchEvent(new Event('change'));
                 showAdminStatus("Rajd dodany");
-                refreshVisibleView();
-                saveData();
+                refreshAllViews();
+                saveToLocalStorage();
+                addLog(`Dodano rajd: ${name}`, "system");
             } else {
                 showAdminStatus("Wprowadź nazwę rajdu", true);
             }
@@ -4186,8 +4011,9 @@ Aktualny lider: ${reportData.leader}
                 document.getElementById('admin-stage-select').value = state.rounds[rIdx].stages.length - 1;
                 renderAdminResultsTable();
                 showAdminStatus("Odcinek dodany");
-                refreshVisibleView();
-                saveData();
+                refreshAllViews();
+                saveToLocalStorage();
+                addLog(`Dodano odcinek: ${name} do ${state.rounds[rIdx].name}`, "system");
             } else {
                 showAdminStatus("Wybierz rajd i wprowadź nazwę odcinka", true);
             }
@@ -4224,6 +4050,7 @@ Aktualny lider: ${reportData.leader}
                 rounds: state.rounds,
                 drivers: state.drivers,
                 results: state.results,
+                changeLogs: state.changeLogs,
                 exportDate: new Date().toISOString(),
                 version: CLOUD_CONFIG.DATA_VERSION
             };
@@ -4239,6 +4066,7 @@ Aktualny lider: ${reportData.leader}
             linkElement.click();
             
             showAdminStatus("Dane wyeksportowane");
+            addLog("Wyeksportowano wszystkie dane", "system");
         }
 
         function importData() {
@@ -4263,20 +4091,19 @@ Aktualny lider: ${reportData.leader}
                             state.rounds = importedData.rounds;
                             state.drivers = importedData.drivers;
                             state.results = importedData.results;
+                            state.changeLogs = importedData.changeLogs || [];
                             
                             // Upewnij się, że każdy kierowca ma equalizationPoints
                             state.drivers.forEach(driver => {
                                 if (driver.equalizationPoints === undefined) {
                                     driver.equalizationPoints = 0;
                                 }
-                                if (!driver.points) {
-                                    driver.points = new Array(state.rounds.length).fill(0);
-                                }
                             });
                             
-                            saveData();
-                            refreshVisibleView();
+                            saveToLocalStorage();
+                            refreshAllViews();
                             showAdminStatus("Dane zaimportowane pomyślnie");
+                            addLog("Zaimportowano dane z pliku", "system");
                         }
                     } catch (error) {
                         showAdminStatus("Błąd podczas importu danych: " + error.message, true);
@@ -4304,8 +4131,9 @@ Aktualny lider: ${reportData.leader}
                     
                     driver.points = pointsArray;
                     showAdminStatus("Punkty zaktualizowane");
-                    refreshVisibleView();
-                    saveData();
+                    refreshAllViews();
+                    saveToLocalStorage();
+                    addLog(`Edytowano punkty kierowcy: ${driver.name}`, "system");
                 } catch(e) {
                     showAdminStatus(e.message, true);
                 }
@@ -4314,11 +4142,11 @@ Aktualny lider: ${reportData.leader}
 
         function handleLogin(e) {
             e.preventDefault();
-            const us = document.getElementById('login-username').value;
-            const px = document.getElementById('login-p').value;
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
             const errorEl = document.getElementById('login-error');
             
-            if (us === "admin" && px === "prc3!") {
+            if (username === "admin" && password === "prc2025") {
                 state.isLoggedIn = true;
                 errorEl.classList.add('hidden');
                 router('admin');
@@ -4327,10 +4155,11 @@ Aktualny lider: ${reportData.leader}
                 renderScoringPreview();
                 refreshDashboard();
                 initTableModule();
+                addLog("Zalogowano do panelu admina", "system");
             } else {
                 errorEl.textContent = "Nieprawidłowy login lub hasło.";
                 errorEl.classList.remove('hidden');
-                document.getElementById('login-p').value = '';
+                document.getElementById('login-password').value = '';
             }
         }
 
@@ -4338,8 +4167,9 @@ Aktualny lider: ${reportData.leader}
             state.isLoggedIn = false;
             router('home');
             document.getElementById('login-username').value = '';
-            document.getElementById('login-p').value = '';
+            document.getElementById('login-password').value = '';
             document.getElementById('login-error').classList.add('hidden');
+            addLog("Wylogowano z panelu admina", "system");
         }
 
         function toggleDriverForm() {
@@ -4369,10 +4199,11 @@ Aktualny lider: ${reportData.leader}
                 toggleDriverForm();
                 
                 renderAdminDrivers();
-                refreshVisibleView();
+                refreshAllViews();
                 updateTeamAssignments();
-                saveData();
+                saveToLocalStorage();
                 showAdminStatus("Kierowca dodany");
+                addLog(`Dodano kierowcę: ${name} (${team})`, "system");
             } else {
                 showAdminStatus("Wypełnij wszystkie pola", true);
             }
@@ -4386,13 +4217,12 @@ Aktualny lider: ${reportData.leader}
                 state.drivers = state.drivers.filter(d => d.id !== id);
                 state.results = state.results.filter(r => r.d !== id);
                 
-                // Przelicz punkty
-                calculateAllRoundPoints();
                 renderAdminDrivers();
-                refreshVisibleView();
+                refreshAllViews();
                 updateTeamAssignments();
-                saveData();
+                saveToLocalStorage();
                 showAdminStatus("Kierowca usunięty");
+                addLog(`Usunięto kierowcę: ${driver.name}`, "system");
             }
         }
 
@@ -4409,28 +4239,13 @@ Aktualny lider: ${reportData.leader}
             
             // Renderuj widoki
             renderDriversTable();
-            renderConstructorsTable(); // Używamy poprawionej funkcji
+            renderConstructorsTable();
             updateLeaders();
             updateTeamAssignments();
             router('home');
             
             // Uruchom rotację liderów
             startLeaderRotation();
-            
-            // Mobile menu toggle
-            document.getElementById('mobile-menu-button').addEventListener('click', toggleMobileMenu);
-            
-            // Zamknij menu mobilne po kliknięciu poza nim
-            document.addEventListener('click', function(event) {
-                const menu = document.getElementById('mobile-menu');
-                const menuButton = document.getElementById('mobile-menu-button');
-                
-                if (menu && menu.classList.contains('active') && 
-                    !menu.contains(event.target) && 
-                    !menuButton.contains(event.target)) {
-                    menu.classList.remove('active');
-                }
-            });
             
             // Sprawdź status chmury co 30 sekund
             setInterval(async () => {
@@ -4443,3 +4258,4 @@ Aktualny lider: ${reportData.leader}
     </script>
 </body>
 </html>
+
