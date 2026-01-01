@@ -963,12 +963,12 @@
                         </div>
                         
                         <!-- New: Equalization Points -->
-                        <div class="mt-4 p-3 bg-[#111] rounded-lg border-l-4 border-purple-600">
+                        <div class="mt-4 p-3 bg-[#111] rounded-lg border-l-4 border-grey-600">
                             <h4 class="font-mono text-sm font-bold text-white mb-2">🔄 Punkty Wyrównawcze (+4 PKT):</h4>
                             <ul class="font-mono text-xs text-gray-300 space-y-1">
-                                <li>• <strong>Przy 6 graczach:</strong> Jeśli w 2 pierwszych etapach miejsce poniżej 5. i w 3. etapie miejsce 3. lub wyższe</li>
-                                <li>• <strong>Przy 8 graczach:</strong> Jeśli w 2 pierwszych etapach miejsce poniżej 6. i w 3. etapie miejsce 4. lub wyższe</li>
-                                <li>• Punkty dodawane po podliczeniu punktów za etapy</li>
+                                <li>• Przyznawane ręcznie przez administratora po dwóch nieudanych etapach</li>
+                                <li>• Możliwość ustawienia w Panelu Admina → Kierowcy</li>
+                                <li>• Punkty dodawane do sumy punktów kierowcy</li>
                             </ul>
                         </div>
                     </div>
@@ -1543,7 +1543,7 @@
                             <strong class="text-white">SYSTEM PUNKTACJI:</strong><br>
                             1. Miejsca w rajdzie: 15-12-10-8-6-4-2-1<br>
                             2. Punkty za stan pojazdu: Czysty (+2), Lekkie uszk. (+1)<br>
-                            3. Punkty wyrównawcze: +4 po 3 etapach w określonych warunkach<br>
+                            3. Punkty wyrównawcze: +4 po 2 nieudanych etapach (ręcznie w Panelu Kierowcy)<br>
                             4. DSQ - dyskwalifikacja z całego kraju, DNF - +20s do najgorszego czasu
                         </div>
                         <div class="technical-border bg-[#0F0F0F] p-4 md:p-6 rounded-xl">
@@ -1902,91 +1902,6 @@
             debouncedSaveToCloud();
         }
 
-        // --- NOWA FUNKCJA DO OBLICZANIA POZYCJI W RAJDZIE ---
-        function getRoundStandings(roundIndex) {
-            const roundResults = state.results.filter(res => res.r === roundIndex);
-            
-            if (roundResults.length === 0) {
-                return [];
-            }
-            
-            // Znajdź najgorszy normalny czas w każdym etapie dla kar DNF
-            const worstNormalTimesPerStage = {};
-            roundResults.forEach(result => {
-                if (result.time !== "DSQ" && result.time !== "DNF" && typeof result.ms === 'number') {
-                    const stageIdx = result.s;
-                    if (!worstNormalTimesPerStage[stageIdx] || result.ms > worstNormalTimesPerStage[stageIdx]) {
-                        worstNormalTimesPerStage[stageIdx] = result.ms;
-                    }
-                }
-            });
-            
-            // Grupuj wyniki przez kierowcę
-            const driverResults = {};
-            
-            roundResults.forEach(result => {
-                if (!driverResults[result.d]) {
-                    driverResults[result.d] = {
-                        times: [],
-                        totalTime: 0,
-                        hasDSQ: false,
-                        dnfStages: []
-                    };
-                }
-                
-                if (result.time === "DSQ") {
-                    driverResults[result.d].hasDSQ = true;
-                } else if (result.time === "DNF") {
-                    driverResults[result.d].dnfStages.push(result.s);
-                } else if (typeof result.ms === 'number') {
-                    driverResults[result.d].times.push({stage: result.s, time: result.ms});
-                    driverResults[result.d].totalTime += result.ms;
-                }
-            });
-            
-            // Oblicz czasy końcowe z karami
-            const driverTimes = [];
-            
-            Object.keys(driverResults).forEach(driverId => {
-                const driverResult = driverResults[driverId];
-                
-                if (driverResult.hasDSQ) {
-                    driverTimes.push({
-                        driverId: parseInt(driverId),
-                        totalMs: Infinity,
-                        isDSQ: true
-                    });
-                } else {
-                    let totalTime = driverResult.totalTime;
-                    
-                    // Dodaj kary DNF
-                    driverResult.dnfStages.forEach(stageIdx => {
-                        if (worstNormalTimesPerStage[stageIdx]) {
-                            totalTime += worstNormalTimesPerStage[stageIdx] + 20000;
-                        } else {
-                            totalTime += 300000;
-                        }
-                    });
-                    
-                    driverTimes.push({
-                        driverId: parseInt(driverId),
-                        totalMs: totalTime,
-                        isDSQ: false
-                    });
-                }
-            });
-            
-            // Sortuj według czasu
-            driverTimes.sort((a, b) => {
-                if (a.isDSQ && b.isDSQ) return 0;
-                if (a.isDSQ) return 1;
-                if (b.isDSQ) return -1;
-                return a.totalMs - b.totalMs;
-            });
-            
-            return driverTimes;
-        }
-
         // --- IMPROVED POINTS CALCULATION SYSTEM ---
         function calculateAllRoundPoints() {
             if (state.isCalculating) {
@@ -2000,7 +1915,8 @@
                 // Reset all points first
                 state.drivers.forEach(driver => {
                     driver.points = new Array(state.rounds.length).fill(0);
-                    driver.equalizationPoints = 0;
+                    // Punkty wyrównawcze nie są resetowane - ustawiane ręcznie
+                    driver.bonusPoints = 0;
                 });
                 
                 // Calculate points for each round
@@ -2010,9 +1926,6 @@
                 
                 // Calculate bonus points
                 calculateBonusPoints();
-                
-                // Calculate equalization points
-                calculateEqualizationPoints();
                 
                 // Invalidate cache
                 invalidateCache();
@@ -2025,76 +1938,6 @@
                     setTimeout(calculateAllRoundPoints, 100);
                 }
             }
-        }
-
-        // POPRAWIONA FUNKCJA DO OBLICZANIA PUNKTÓW WYRÓWNAWCZYCH
-        function calculateEqualizationPoints() {
-            const totalDrivers = state.drivers.length;
-            
-            // Punkty wyrównawcze dotyczą tylko pierwszych 3 rund
-            if (state.rounds.length < 3 || totalDrivers < 6) {
-                return;
-            }
-            
-            // Oblicz pozycje dla każdej z pierwszych 3 rund
-            const round1Standings = getRoundStandings(0);
-            const round2Standings = getRoundStandings(1);
-            const round3Standings = getRoundStandings(2);
-            
-            // Jeśli brakuje wyników w którejś rundzie, nie przyznawaj punktów wyrównawczych
-            if (round1Standings.length === 0 || round2Standings.length === 0 || round3Standings.length === 0) {
-                return;
-            }
-            
-            // Mapuj pozycje kierowców w każdej rundzie
-            const round1Positions = {};
-            round1Standings.forEach((standing, index) => {
-                round1Positions[standing.driverId] = index + 1;
-            });
-            
-            const round2Positions = {};
-            round2Standings.forEach((standing, index) => {
-                round2Positions[standing.driverId] = index + 1;
-            });
-            
-            const round3Positions = {};
-            round3Standings.forEach((standing, index) => {
-                round3Positions[standing.driverId] = index + 1;
-            });
-            
-            // Dla każdego kierowcy sprawdź warunki
-            state.drivers.forEach(driver => {
-                const pos1 = round1Positions[driver.id];
-                const pos2 = round2Positions[driver.id];
-                const pos3 = round3Positions[driver.id];
-                
-                // Jeśli kierowca nie ma pozycji w którejś rundzie, pomiń
-                if (!pos1 || !pos2 || !pos3) {
-                    driver.equalizationPoints = 0;
-                    return;
-                }
-                
-                if (totalDrivers === 6) {
-                    // Dla 6 graczy: jeśli w 2 pierwszych etapach miejsce poniżej 5. (czyli 6.)
-                    // i w 3. etapie miejsce 3. lub wyższe
-                    if (pos1 > 5 && pos2 > 5 && pos3 <= 3) {
-                        driver.equalizationPoints = 4;
-                    } else {
-                        driver.equalizationPoints = 0;
-                    }
-                } else if (totalDrivers >= 8) {
-                    // Dla 8 graczy: jeśli w 2 pierwszych etapach miejsce poniżej 6. (czyli 7. lub 8.)
-                    // i w 3. etapie miejsce 4. lub wyższe
-                    if (pos1 > 6 && pos2 > 6 && pos3 <= 4) {
-                        driver.equalizationPoints = 4;
-                    } else {
-                        driver.equalizationPoints = 0;
-                    }
-                } else {
-                    // Dla innej liczby graczy nie przyznajemy punktów wyrównawczych
-                    driver.equalizationPoints = 0;
-                }
-            });
         }
 
         function calculateRoundPoints(roundIndex) {
@@ -2526,6 +2369,7 @@
             }
         }
 
+        // --- PUBLIC FUNCTIONS ---
         function updateLeaders() {
             const driverLeader = calculateDriverLeader();
             const constructorLeader = calculateConstructorLeader();
@@ -3126,11 +2970,11 @@
                 }
                 
                 if (text === 'WYRÓW.') {
-                    th.classList.add('text-purple-400', 'font-bold');
+                    th.classList.add('text-grey-400', 'font-bold');
                 }
                 
                 if (text === 'BONUS') {
-                    th.classList.add('text-gray-400');
+                    th.classList.add('text-grey-400');
                 }
                 
                 if (index >= 3 && index < headers.length - 3) {
@@ -3182,7 +3026,7 @@
                 
                 td = document.createElement('td');
                 const hasEqualization = driver.equalization > 0;
-                td.className = `py-3 md:py-4 px-2 md:px-4 text-right font-mono ${hasEqualization ? 'text-purple-400 font-bold' : (isLeader ? 'text-gray-800' : 'text-gray-500')}`;
+                td.className = `py-3 md:py-4 px-2 md:px-4 text-right font-mono ${hasEqualization ? 'text-grey-400 font-bold' : (isLeader ? 'text-gray-800' : 'text-gray-500')}`;
                 td.textContent = hasEqualization ? `+${driver.equalization}` : '-';
                 tr.appendChild(td);
                 
@@ -3335,11 +3179,74 @@
                     <td class="p-3 md:p-4 text-gray-500 text-sm font-mono hidden md:table-cell">${d.car}</td>
                     <td class="p-3 md:p-4 text-right space-x-2">
                         <button onclick="editDriverTeamAndCar(${d.id})" class="text-xs text-blue-500 border border-blue-900 px-3 py-1 hover:bg-blue-900/20 uppercase rounded-sm">Edytuj</button>
+                        <button onclick="setEqualizationPoints(${d.id})" class="text-xs text-green-500 border border-green-900 px-3 py-1 hover:bg-green-900/20 uppercase rounded-sm">Wyrównawcze</button>
                         <button onclick="deleteDriver(${d.id})" class="text-xs text-red-500 border border-red-900 px-3 py-1 hover:bg-red-900/20 uppercase rounded-sm">Usuń</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
+        }
+
+        // Funkcja do ustawiania punktów wyrównawczych
+        function setEqualizationPoints(id) {
+            const driver = state.drivers.find(d => d.id === id);
+            if (!driver) return;
+            
+            const modalHtml = `
+                <div id="equalization-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+                    <div class="bg-[#0E0E0E] border border-[#222] rounded-xl w-full max-w-md p-6">
+                        <h3 class="font-mono text-xl font-bold mb-4 text-white">PUNKTY WYRÓWNAWCZE: ${driver.name}</h3>
+                        
+                        <div class="space-y-4 mb-6">
+                            <div>
+                                <label class="block text-sm font-mono text-gray-400 mb-2">Liczba punktów wyrównawczych</label>
+                                <input type="number" id="equalization-points-input" min="0" max="20" value="${driver.equalizationPoints || 0}" class="input-dark w-full">
+                            </div>
+                            <div class="text-xs text-gray-500 font-mono">
+                                Uwaga: Punkty wyrównawcze są dodawane do sumy punktów kierowcy po dwóch nieudanych etapach.
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row justify-end gap-3">
+                            <button onclick="closeEqualizationModal()" class="text-sm font-mono text-gray-400 px-4 py-2 hover:text-white rounded border border-gray-700 order-2 sm:order-1">ANULUJ</button>
+                            <button onclick="saveEqualizationPoints(${id})" class="btn-accent text-sm order-1 sm:order-2">ZAPISZ</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const existingModal = document.getElementById('equalization-modal');
+            if (existingModal) existingModal.remove();
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        function closeEqualizationModal() {
+            const modal = document.getElementById('equalization-modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        function saveEqualizationPoints(id) {
+            const driver = state.drivers.find(d => d.id === id);
+            if (!driver) return;
+            
+            const input = document.getElementById('equalization-points-input');
+            const points = parseInt(input.value);
+            
+            if (isNaN(points) || points < 0) {
+                showAdminStatus("Wprowadź poprawną liczbę punktów (minimum 0)", true);
+                return;
+            }
+            
+            driver.equalizationPoints = points;
+            
+            showAdminStatus("Punkty wyrównawcze zaktualizowane");
+            calculateAllRoundPoints(); // przelicz punkty (punkty wyrównawcze nie są resetowane)
+            saveData();
+            refreshVisibleView();
+            closeEqualizationModal();
         }
 
         function editDriverTeamAndCar(id) {
