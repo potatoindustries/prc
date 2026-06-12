@@ -1,0 +1,604 @@
+/* =========================
+   CALENDAR PAGE STYLES
+   ========================= */
+
+/* Sub-header filters */
+.calendar-filters {
+  width: 100%;
+  padding: 62px 40px 0;
+  display: flex;
+  justify-content: center;
+  background: var(--section-bg);
+}
+
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  background-image: url("../assets/rally.webp");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+.view-toggle-wrap {
+  width: 100%;
+  max-width: 1480px;          
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.view-toggle-left {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+}
+
+.view-toggle-label {
+  font-family: "WRCCleanBold", Arial, sans-serif;
+  font-size: 30px;                
+  font-weight: 700;
+  color: var(--text-dark);
+  line-height: 1;
+  margin-right: 32px;             
+}
+
+.view-sub-tabs {
+  display: flex;
+  align-items: center;
+  gap: 32px;                      
+}
+
+.view-sub-tab {
+  position: relative;
+  background: transparent;
+  border: none;
+  font-family: "Biotif", Arial, sans-serif;
+  font-size: 17px;                
+  font-weight: 500;
+  color: var(--text-muted);
+  padding: 6px 0 12px;
+  margin-right: 0;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.view-sub-tab::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 3px;
+  border-radius: 99px;
+  background: var(--orange);
+  transition: width 0.22s ease;
+}
+
+.view-sub-tab.active {
+  color: var(--text-dark);
+}
+
+.view-sub-tab.active::after,
+.view-sub-tab:hover::after {
+  width: 100%;
+}
+
+/* =========================
+   SEASON TABS (WRC 2026 etc)
+   ========================= */
+.season-tabs {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  background: var(--tab-bg);
+  border-radius: 24px;
+  padding: 0 62px;
+  gap: 40px;
+}
+
+/* Dodatkowy odstęp pod zakładkami sezonów */
+.tabs-section {
+  margin-bottom: 24px;           
+}
+
+/* =========================
+   GRID SECTION
+   ========================= */
+.calendar-grid-section {
+  width: 100%;
+  padding: 28px 40px 90px;
+  display: flex;
+  justify-content: center;
+  background: var(--section-bg);
+}
+
+.calendar-grid-wrap {
+  width: 100%;
+  max-width: 1480px;           
+  margin: 0 auto;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;                      
+}
+
+/* =========================
+   RALLY CARD
+   ========================= */
+.rally-card {
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow:
+    0 4px 16px rgba(18, 34, 56, 0.07),
+    0 1px 3px rgba(18, 34, 56, 0.04);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+}
+
+.rally-card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 12px 32px rgba(18, 34, 56, 0.11),
+    0 2px 6px rgba(18, 34, 56, 0.06);
+}
+
+.rally-card__photo {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 13;         
+  overflow: hidden;
+  background: #1a2635;
+  flex-shrink: 0;
+}
+
+.rally-card__photo img.rally-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.35s ease;
+}
+
+.rally-card:hover .rally-bg {
+  transform: scale(1.04);
+}
+
+.rally-card__photo-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(5, 12, 22, 0.12) 0%,
+    rgba(5, 12, 22, 0.22) 55%,
+    rgba(5, 12, 22, 0.52) 100%
+  );
+}
+
+.rally-card__logo-wrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.rally-card__logo {
+  max-width: 62%;
+  max-height: 58%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.32));
+}
+
+/* Placeholder photo backgrounds when no image */
+.rally-card__photo--kenya    { background: linear-gradient(135deg, #1a2e1a 0%, #2d4a1e 50%, #1c3518 100%); }
+.rally-card__photo--croatia  { background: linear-gradient(135deg, #1a2035 0%, #243050 50%, #1e2840 100%); }
+.rally-card__photo--canarias { background: linear-gradient(135deg, #2d1a10 0%, #4a2e18 50%, #3a2010 100%); }
+.rally-card__photo--portugal { background: linear-gradient(135deg, #1c2c1a 0%, #1a3520 50%, #152810 100%); }
+.rally-card__photo--japan    { background: linear-gradient(135deg, #1a1a2e 0%, #2a1a3a 50%, #1a1030 100%); }
+.rally-card__photo--greece   { background: linear-gradient(135deg, #1a1e2e 0%, #1e2840 50%, #141828 100%); }
+.rally-card__photo--estonia  { background: linear-gradient(135deg, #1c2820 0%, #243022 50%, #182415 100%); }
+.rally-card__photo--finland  { background: linear-gradient(135deg, #1a2818 0%, #203020 50%, #141e12 100%); }
+.rally-card__photo--chile    { background: linear-gradient(135deg, #201818 0%, #342020 50%, #281414 100%); }
+.rally-card__photo--central  { background: linear-gradient(135deg, #1e1c28 0%, #2a2030 50%, #181420 100%); }
+.rally-card__photo--australia{ background: linear-gradient(135deg, #2a2010 0%, #3c2e14 50%, #241c0c 100%); }
+.rally-card__photo--monaco   { background: linear-gradient(135deg, #0e1830 0%, #1a2848 50%, #0a1228 100%); }
+.rally-card__photo--sweden   { background: linear-gradient(135deg, #181e2e 0%, #20283e 50%, #141828 100%); }
+
+/* =========================
+   CARD INFO
+   ========================= */
+.rally-card__info {
+  padding: 20px 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex: 1;
+}
+
+.rally-card__name {
+  font-family: "Biotif", Arial, sans-serif;
+  font-size: 17px;              
+  font-weight: 500;
+  color: #1a2635;
+  line-height: 1.35;
+  margin: 0 0 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rally-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rally-card__status-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(160, 170, 180, 0.6);
+  margin: 4px 0 8px;
+  flex-shrink: 0;
+}
+
+.rally-card__date,
+.rally-card__status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "SebinoSoft", Arial, sans-serif;
+  font-size: 14px;              
+  color: #3a4a5a;
+  line-height: 1.2;
+}
+
+.rally-card__country {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "SebinoSoft", Arial, sans-serif;
+  font-size: 14px;              
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+
+.rally-card__date svg,
+.rally-card__status svg {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  opacity: 0.7;
+}
+
+.rally-card__country .fi {
+  font-size: 12px;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(16, 30, 50, 0.08);
+  flex-shrink: 0;
+}
+
+/* =========================
+   LIST VIEW - POPRAWIONE WYRÓWNANIE
+   ========================= */
+.calendar-list {
+  display: none;
+}
+
+.calendar-list.active {
+  display: block;
+}
+
+/* NAGŁÓWKI LISTY */
+.cal-list-head {
+  display: grid;
+  grid-template-columns: 56px 2fr 1.4fr 1fr 1.2fr 0.9fr;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  background: #f2f3f3;
+  color: #67727f;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  font-family: "SebinoSoft", Arial, sans-serif;
+}
+
+.cal-list-head > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 5px;
+}
+
+/* WIERSZE LISTY */
+.cal-list-row {
+  display: grid;
+  grid-template-columns: 56px 2fr 1.4fr 1fr 1.2fr 0.9fr;
+  align-items: center;
+  min-height: 64px;
+  padding: 0 14px;
+  background: #ffffff;
+  position: relative;
+  transition: background 0.18s ease;
+  cursor: pointer;
+}
+
+.cal-list-row > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 5px;
+}
+
+/* LINIE ODDZIELAJĄCE */
+.cal-list-row::after {
+  content: "";
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 0;
+  height: 1px;
+  background: rgba(225, 231, 238, 0.6);
+}
+
+.cal-list-row:last-child::after {
+  display: none;
+}
+
+.cal-list-row:hover {
+  background: #fcfdff;
+}
+
+/* SPECJALNE WYRÓWNANIA */
+.cal-list-row .col-rally {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-start !important;
+  padding-left: 10px !important;
+}
+
+.cal-list-row .col-round {
+  font-family: "SebinoSoft", Arial, sans-serif;
+  font-size: 13px;
+  color: #314256;
+  justify-content: center;
+}
+
+.cal-list-head .col-round {
+  font-family: "SebinoSoft", Arial, sans-serif;
+  font-size: 13px;
+  color: #314256;
+  justify-content: center;
+}
+
+.cal-list-row .col-date,
+.cal-list-row .col-status {
+  font-family: "SebinoSoft", Arial, sans-serif;
+  font-size: 13px;
+  color: #314256;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: "SebinoSoft", Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.status-badge--happening { color: var(--orange); }
+.status-badge--upcoming  { color: var(--text-muted); }
+.status-badge--completed { color: #3a4a5a; }
+
+.cal-list-row .col-results a {
+  color: #314256;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-family: "SebinoSoft", Arial, sans-serif;
+}
+
+/* Panel visibility */
+.cal-panel {
+  display: none;
+}
+
+.cal-panel.active {
+  display: block;
+}
+
+/* Upcoming/Past panel sub-sections */
+.cal-sub-panel {
+  display: none;
+}
+
+.cal-sub-panel.active {
+  display: block;
+}
+
+/* =========================
+   JUNIOR WRC / SEASON ARCHIVE placeholders
+   ========================= */
+.placeholder-cal {
+  min-height: 380px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #607286;
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 500;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow:
+    0 4px 14px rgba(18, 34, 56, 0.04),
+    0 1px 3px rgba(18, 34, 56, 0.02);
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+@media (max-width: 1280px) {
+  .calendar-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .calendar-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .calendar-grid-section,
+  .calendar-filters {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+@media (max-width: 560px) {
+  .calendar-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .view-toggle-label {
+    font-size: 24px;
+    margin-right: 20px;
+  }
+
+  .view-sub-tab {
+    font-size: 15px;
+  }
+
+  .calendar-grid-section,
+  .calendar-filters {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+/* =========================
+   DARK MODE — KALENDARZ
+   ========================= */
+
+/* Section backgrounds */
+body.dark .calendar-filters,
+body.dark .calendar-grid-section {
+  background: #1a1a1a;
+}
+
+body.dark .calendar-filters {
+  background: #181a1b;
+}
+
+/* Sub-tab labels */
+body.dark .view-toggle-label {
+  color: #f3f3f3;
+}
+
+/* Season tabs */
+body.dark .season-tabs {
+  background: #2a2a2a;
+}
+
+/* Rally cards */
+body.dark .rally-card {
+  background: #242424;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.28), 0 1px 3px rgba(0,0,0,0.18);
+}
+
+body.dark .rally-card:hover {
+  box-shadow: 0 12px 32px rgba(0,0,0,0.38), 0 2px 6px rgba(0,0,0,0.22);
+}
+
+body.dark .rally-card__name {
+  color: #f3f3f3;
+}
+
+body.dark .rally-card__date,
+body.dark .rally-card__status {
+  color: #b8ad9e;
+}
+
+body.dark .rally-card__country {
+  color: #9a9088;
+}
+
+body.dark .rally-card__status-divider {
+  background: rgba(60, 72, 88, 0.55);
+}
+
+/* List view */
+body.dark .cal-list-head {
+  background: #2e2e2e;
+  color: #9a9088;
+}
+
+body.dark .cal-list-row {
+  background: #1e1e1e;
+}
+
+body.dark .cal-list-row:hover {
+  background: #252525;
+}
+
+body.dark .cal-list-row::after {
+  background: rgba(60, 72, 88, 0.5);
+}
+
+body.dark .cal-list-row .col-round,
+body.dark .cal-list-row .col-date,
+body.dark .cal-list-row .col-status {
+  color: #c0c0c0;
+}
+
+body.dark .cal-list-row .col-results a {
+  color: #c0c0c0;
+}
+
+body.dark .status-badge--upcoming {
+  color: #9a9088;
+}
+
+body.dark .status-badge--completed {
+  color: #b8ad9e;
+}
+
+/* Placeholder */
+body.dark .placeholder-cal {
+  background: #242424;
+  color: #8a7f72;
+}
+
+/* theme-animating targets for kalendarz */
+body.theme-animating .calendar-filters,
+body.theme-animating .calendar-grid-section,
+body.theme-animating .tabs-section,
+body.theme-animating .rally-card,
+body.theme-animating .rally-card__info,
+body.theme-animating .rally-card__name,
+body.theme-animating .rally-card__status-divider,
+body.theme-animating .cal-list-head,
+body.theme-animating .cal-list-row,
+body.theme-animating .placeholder-cal,
+body.theme-animating .season-tabs {
+  transition:
+    background-color 0.38s ease,
+    color 0.28s ease,
+    border-color 0.28s ease,
+    box-shadow 0.32s ease;
+}

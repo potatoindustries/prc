@@ -1,0 +1,542 @@
+/* =========================
+   TEAMS PAGE – teamy.css
+   ========================= */
+
+.hero__bg--teams {
+  background-image: url("../assets/rally4.webp");
+  background-position: center center;
+}
+
+/* =========================
+   MAIN
+   ========================= */
+.teams-main {
+  background: var(--section-bg);
+  padding-top: 0;
+  padding-bottom: 80px;
+  min-height: 70vh;
+}
+
+.teams-panel { display: none; }
+.teams-panel.active { display: block; }
+
+/* =========================
+   STAGE
+   ========================= */
+.team-stage {
+  width: 100%;
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 32px 40px 0;
+  display: grid;
+  grid-template-columns: 58% 42%;
+  gap: 64px;
+  align-items: center;
+}
+
+/* =========================
+   LEFT: CAR BLOCK
+   ========================= */
+.team-car-block {
+  position: relative;
+  border-radius: 10px;
+  background: transparent;
+}
+
+.team-slides-clip {
+  position: relative;
+  overflow: hidden;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow:
+    0 6px 28px rgba(18, 34, 56, 0.07),
+    0 1px 4px rgba(18, 34, 56, 0.04);
+}
+
+/* CAR SLIDES */
+.team-slide {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform: translateX(100%);
+  transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+.team-slide:first-child {
+  position: relative;
+}
+.team-slide.is-active {
+  pointer-events: auto;
+  transform: translateX(0);
+}
+.team-slide.enter-from-right { transform: translateX(100%);  }
+.team-slide.enter-from-left  { transform: translateX(-100%); }
+.team-slide.exit-to-left     { transform: translateX(-100%); }
+.team-slide.exit-to-right    { transform: translateX(100%);  }
+
+/* CAR INNER */
+.team-car-inner {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.team-car--hyundai { background: radial-gradient(ellipse at 60% 60%, rgba(20, 100, 200, 0.09) 0%, #e8eaee 70%); }
+.team-car--toyota  { background: radial-gradient(ellipse at 60% 60%, rgba(200, 30, 30, 0.08)  0%, #e8eaee 70%); }
+.team-car--msport  { background: radial-gradient(ellipse at 60% 60%, rgba(0, 50, 140, 0.09)   0%, #e8eaee 70%); }
+
+.team-car-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+}
+
+/* =========================
+   PRZYCISKI NA ZDJĘCIU
+   ========================= */
+.team-car-actions {
+  position: absolute;
+  bottom: 36px;  /* Przesunięte 20px w górę (było 16px) */
+  right: 16px;
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  border-radius: 40px;
+  padding: 4px;
+  opacity: 0.6;
+  border: 1px solid rgba(255, 255, 255, 0.499);
+}
+
+.car-action-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  opacity: 1;
+}
+
+.car-action-btn:hover {
+  background: rgba(80, 80, 80, 0.9);  /* Ciemnoszary zamiast pomarańczowego */
+  opacity: 1;
+  /* transform: scale(1.05);  - usunięte, aby nie powiększał się po najechaniu */
+}
+
+/* =========================
+   RIGHT: INFO COLUMN
+   ========================= */
+.team-info-col {
+  display: flex;
+  flex-direction: column;
+  gap: 44px;
+}
+
+.team-info-wrap {
+  position: relative;
+  min-height: 180px;
+}
+
+.team-info-slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(50px);
+  transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+}
+.team-info-slide:first-child {
+  position: relative;
+}
+.team-info-slide.is-active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+.team-info-slide.enter-from-right { transform: translateX(50px);  opacity: 0; }
+.team-info-slide.enter-from-left  { transform: translateX(-50px); opacity: 0; }
+.team-info-slide.exit-to-left     { transform: translateX(-50px); opacity: 0; }
+.team-info-slide.exit-to-right    { transform: translateX(50px);  opacity: 0; }
+
+/* INFO CONTENT */
+.team-info__category {
+  font-family: "SebinoSoft", Arial, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  line-height: 1;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.team-info__name {
+  font-family: "WRCCleanBold", Arial, sans-serif;
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--text-dark);
+  line-height: 1.08;
+  margin: 0 0 22px;
+  letter-spacing: -0.01em;
+}
+
+.team-info__principal {
+  font-family: "Biotif", Arial, sans-serif;
+  font-size: 14.5px;
+  font-weight: 300;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.team-info__principal strong {
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+/* PROGRESS BARS */
+.team-progress {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 12px 18px 4px;
+}
+
+.team-progress__bar {
+  height: 4px;
+  border-radius: 99px;
+  background: rgba(26, 38, 53, 0.14);
+  flex: 1;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.18s ease;
+}
+
+.team-progress__bar:hover {
+  background: rgba(26, 38, 53, 0.28);
+}
+
+.team-progress__fill {
+  position: absolute;
+  top: 0; left: 0;
+  height: 100%;
+  width: 0%;
+  background: var(--orange);
+  border-radius: 99px;
+}
+
+.team-progress__bar.is-active .team-progress__fill {
+  animation: progressFill 6s linear forwards;
+}
+
+.team-progress__bar.is-done .team-progress__fill {
+  width: 100%;
+  animation: none;
+}
+
+@keyframes progressFill {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+
+/* TEAM STATS */
+.team-info__stats {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-top: 24px;
+}
+
+.team-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 0 24px 0 0;
+}
+
+.team-stat:first-child {
+  padding-left: 0;
+}
+
+.team-stat__label {
+  font-family: "SebinoSoft", Arial, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+.team-stat__value {
+  font-family: "WRCCleanBold", Arial, sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-dark);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.team-stat__divider {
+  width: 1px;
+  height: 40px;
+  background: rgba(26, 38, 53, 0.12);
+  margin: 0 24px 0 0;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+/* =========================
+   DRIVERS SECTION
+   ========================= */
+.drivers-section {
+  width: 100%;
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 40px 40px 0;
+}
+
+.drivers-panel {
+  display: none;
+}
+.drivers-panel.active {
+  display: block;
+  animation: driversIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes driversIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.drivers-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.driver-card {
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: stretch;
+  box-shadow:
+    0 4px 14px rgba(18, 34, 56, 0.06),
+    0 1px 3px rgba(18, 34, 56, 0.03);
+  min-height: 148px;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  cursor: default;
+}
+
+.driver-card:hover {
+  box-shadow:
+    0 8px 24px rgba(18, 34, 56, 0.10),
+    0 2px 5px rgba(18, 34, 56, 0.05);
+  transform: translateY(-2px);
+}
+
+.driver-card__info {
+  padding: 20px 20px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.driver-card__role {
+  display: inline-block;
+  font-family: "SebinoSoft", Arial, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  background: var(--section-bg);
+  border-radius: 20px;
+  padding: 4px 10px;
+  line-height: 1;
+  align-self: flex-start;
+  margin-bottom: auto;
+}
+
+.driver-card__name {
+  font-family: "WRCCleanBold", Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0;
+  line-height: 1.1;
+}
+
+.driver-card__country {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: "SebinoSoft", Arial, sans-serif;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1;
+}
+
+.driver-card__country .fi {
+  font-size: 12px;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(16, 30, 50, 0.08);
+  flex-shrink: 0;
+}
+
+.driver-card__photo {
+  width: 148px;
+  height: 100%;
+  flex-shrink: 0;
+  background: #d8dde3;
+  overflow: hidden;
+  position: relative;
+}
+
+.driver-card__photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+@media (max-width: 1100px) {
+  .team-stage {
+    grid-template-columns: 52% 48%;
+    gap: 40px;
+    padding: 40px 24px 0;
+  }
+  .team-info__name { font-size: 32px; }
+}
+
+@media (max-width: 860px) {
+  .team-stage {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 32px 16px 0;
+  }
+  .team-car-inner  { aspect-ratio: 16 / 6; }
+  .team-info__name { font-size: 28px; }
+  .team-info-wrap  { min-height: 160px; }
+  .drivers-section { padding: 32px 16px 0; }
+  .driver-card__photo { width: 110px; }
+  .driver-card__name  { font-size: 17px; }
+}
+
+@media (max-width: 560px) {
+  .team-info__name { font-size: 24px; }
+  .team-info-wrap  { min-height: 140px; }
+  .team-car-actions { bottom: 30px; } /* Mniejsze przesunięcie na telefonie */
+  .car-action-btn { width: 32px; height: 32px; }
+  .drivers-grid { grid-template-columns: 1fr; }
+  .driver-card__photo { width: 120px; }
+}
+/* =========================
+   DARK MODE — TEAMY
+   ========================= */
+
+body.dark .teams-main {
+  background: #1a1a1a;
+}
+
+/* Team stage / car block */
+body.dark .team-slides-clip {
+  background: #242424;
+  box-shadow: 0 6px 28px rgba(0,0,0,0.3), 0 1px 4px rgba(0,0,0,0.2);
+}
+
+body.dark .team-car--hyundai {
+  background: radial-gradient(ellipse at 60% 60%, rgba(20, 100, 200, 0.14) 0%, #242424 70%);
+}
+body.dark .team-car--toyota {
+  background: radial-gradient(ellipse at 60% 60%, rgba(200, 30, 30, 0.12) 0%, #242424 70%);
+}
+body.dark .team-car--msport {
+  background: radial-gradient(ellipse at 60% 60%, rgba(0, 50, 140, 0.14) 0%, #242424 70%);
+}
+
+/* Info text */
+body.dark .team-info__category {
+  color: #9a9088;
+}
+
+body.dark .team-info__name {
+  color: #f3f3f3;
+}
+
+body.dark .team-info__principal {
+  color: #9a9088;
+}
+
+body.dark .team-info__principal strong {
+  color: #d0c8bc;
+}
+
+/* Stats */
+body.dark .team-stat__label {
+  color: #9a9088;
+}
+
+body.dark .team-stat__value {
+  color: #f3f3f3;
+}
+
+body.dark .team-stat__divider {
+  background: rgba(255,255,255,0.1);
+}
+
+/* Progress bar */
+body.dark .team-progress__bar {
+  background: rgba(255,255,255,0.1);
+}
+
+body.dark .team-progress__bar:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* Driver cards */
+body.dark .driver-card {
+  background: #242424;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.28), 0 1px 3px rgba(0,0,0,0.18);
+}
+
+body.dark .driver-card__role {
+  background: #242424;
+  color: #9a9088;
+}
+
+body.dark .driver-card__name {
+  color: #f3f3f3;
+}
+
+body.dark .driver-card__country {
+  color: #9a9088;
+}
+
+body.dark .driver-card__photo {
+  background: #333;
+}

@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wyniki i Klasyfikacja</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/kalendarz.css" />
+  </head>
+  <body>
+    <!-- Floating logo z ikoną strony -->
+    <a href="#" class="floating-logo" aria-label="Home">
+      <img src="assets/logo.png" alt="Logo" class="floating-logo__img" />
+    </a>
+
+    <div class="page">
+      <header class="hero">
+        <div class="hero__bg"></div>
+        <div class="hero__overlay"></div>
+
+        <div class="hero__content">
+          <nav class="topbar">
+            <div class="topbar__left"></div>
+
+            <div class="topbar__center">
+              <a href="#" class="topbar__link">Start</a>
+              <a href="kalendarz.html" class="topbar__link">Kalendarz</a>
+              <a href="index.html" class="topbar__link active">Wyniki i Klasyfikacja</a>
+              <a href="teams.html" class="topbar__link">Zespoly i Kierowcy</a>
+              <a href="#" class="topbar__link">Archiwum</a>
+            </div>
+
+            <div class="topbar__right">
+              <a href="#" class="rallytv-btn">Rally.TV</a>
+              <button class="menu-btn" aria-label="Open menu" type="button">
+                <span></span>
+                <span></span>
+              </button>
+            </div>
+          </nav>
+
+          <div class="hero__title-wrap">
+            <h1 class="hero__title">Wyniki i Klasyfikacja</h1>
+          </div>
+        </div>
+      </header>
+
+      <main class="main">
+        <section class="tabs-section">
+          <div class="tabs">
+            <button class="tab active" type="button" data-tab="results">
+              Wyniki Rajdow
+            </button>
+            <button class="tab" type="button" data-tab="championship">
+              Mistrzostwa Kierowcow
+            </button>
+            <button class="tab" type="button" data-tab="super-sunday">
+              Mistrzostwa Konstruktorow
+            </button>
+            <button class="tab" type="button" data-tab="power-stage">
+              Power Stage
+            </button>
+            <button class="tab" type="button" data-tab="archive">
+              Archiwum
+            </button>
+          </div>
+        </section>
+
+        <section class="table-section">
+          <!-- Panel: Wyniki Rajdow -->
+          <div class="results-card tab-panel active" data-panel="results">
+            <div class="results-table">
+              <div class="results-table__head">
+                <div>RUNDA</div>
+                <div>RAJD</div>
+                <div>DATA</div>
+                <div>STATUS</div>
+                <div>ZWYCIĘZCA</div>
+                <div>WYNIKI</div>
+              </div>
+
+              <div class="results-table__body">
+                <div class="results-row">
+                  <div class="col-round">1</div>
+                  <div class="col-rally">
+                    <span class="fi fi-mc flag"></span>
+                    <span>WRC Rallye Monte-Carlo</span>
+                  </div>
+                  <div class="col-date">22 – 25 JANUARY 2026</div>
+                  <div class="col-status">ZAKOŃCZONY</div>
+                  <div class="col-winner">
+                    <span class="fi fi-se flag"></span>
+                    <a href="#">Oliver Solberg</a>
+                  </div>
+                  <div class="col-results">
+                    <a href="#">Pelne Wyniki</a>
+                  </div>
+                </div>
+
+                <div class="results-row">
+                  <div class="col-round">2</div>
+                  <div class="col-rally">
+                    <span class="fi fi-se flag"></span>
+                    <span>WRC Rally Sweden</span>
+                  </div>
+                  <div class="col-date">12 – 15 FEBRUARY 2026</div>
+                  <div class="col-status">ZAKOŃCZONY</div>
+                  <div class="col-winner">
+                    <span class="fi fi-gb flag"></span>
+                    <a href="#">Elfyn Evans</a>
+                  </div>
+                  <div class="col-results">
+                    <a href="#">Pelne Wyniki</a>
+                  </div>
+                </div>
+
+                <div class="results-row">
+                  <div class="col-round">3</div>
+                  <div class="col-rally">
+                    <span class="fi fi-ke flag"></span>
+                    <span>WRC Safari Rally Kenya</span>
+                  </div>
+                  <div class="col-date">12 – 15 MARCH 2026</div>
+                  <div class="col-status"></div>
+                  <div class="col-winner"></div>
+                  <div class="col-results"></div>
+                </div>
+
+                <div class="results-row">
+                  <div class="col-round">4</div>
+                  <div class="col-rally">
+                    <span class="fi fi-hr flag"></span>
+                    <span>WRC Croatia Rally</span>
+                  </div>
+                  <div class="col-date">09 – 12 APRIL 2026</div>
+                  <div class="col-status"></div>
+                  <div class="col-winner"></div>
+                  <div class="col-results"></div>
+                </div>
+
+                <div class="results-row">
+                  <div class="col-round">5</div>
+                  <div class="col-rally">
+                    <span class="fi fi-es flag"></span>
+                    <span>WRC Rally Islas Canarias</span>
+                  </div>
+                  <div class="col-date">23 – 26 APRIL 2026</div>
+                  <div class="col-status"></div>
+                  <div class="col-winner"></div>
+                  <div class="col-results"></div>
+                </div>
+
+                <div class="results-row">
+                  <div class="col-round">6</div>
+                  <div class="col-rally">
+                    <span class="fi fi-pt flag"></span>
+                    <span>WRC Vodafone Rally de Portugal</span>
+                  </div>
+                  <div class="col-date">07 – 10 MAY 2026</div>
+                  <div class="col-status"></div>
+                  <div class="col-winner"></div>
+                  <div class="col-results"></div>
+                </div>
+
+                <div class="results-row">
+                  <div class="col-round">7</div>
+                  <div class="col-rally">
+                    <span class="fi fi-jp flag"></span>
+                    <span>WRC FORUM8 Rally Japan</span>
+                  </div>
+                  <div class="col-date">28 – 31 MAY 2026</div>
+                  <div class="col-status"></div>
+                  <div class="col-winner"></div>
+                  <div class="col-results"></div>
+                </div>
+
+                <div class="results-row">
+                  <div class="col-round">8</div>
+                  <div class="col-rally">
+                    <span class="fi fi-gr flag"></span>
+                    <span>WRC EKO Acropolis Rally Greece</span>
+                  </div>
+                  <div class="col-date">25 – 28 JUNE 2026</div>
+                  <div class="col-status"></div>
+                  <div class="col-winner"></div>
+                  <div class="col-results"></div>
+                </div>
+
+                <div class="results-row">
+                  <div class="col-round">9</div>
+                  <div class="col-rally">
+                    <span class="fi fi-ee flag"></span>
+                    <span>WRC Delfi Rally Estonia</span>
+                  </div>
+                  <div class="col-date">16 – 19 JULY 2026</div>
+                  <div class="col-status"></div>
+                  <div class="col-winner"></div>
+                  <div class="col-results"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel: Mistrzostwa Kierowcow -->
+          <div class="results-card tab-panel" data-panel="championship">
+            <div class="standings-table standings-table--championship">
+              <div class="standings-table__head">
+                <div>POZ.</div>
+                <div>KIEROWCA</div>
+                <div>ZESPÓŁ</div>
+                <div><span class="fi fi-mc flag"></span></div>
+                <div><span class="fi fi-se flag"></span></div>
+                <div><span class="fi fi-ke flag"></span></div>
+                <div><span class="fi fi-hr flag"></span></div>
+                <div><span class="fi fi-es flag"></span></div>
+                <div><span class="fi fi-pt flag"></span></div>
+                <div><span class="fi fi-jp flag"></span></div>
+                <div><span class="fi fi-gr flag"></span></div>
+                <div><span class="fi fi-ee flag"></span></div>
+                <div>SUMA</div>
+                <div>DIFF.</div>
+              </div>
+
+              <div class="standings-table__body">
+                <div class="standings-row">
+                  <div class="col-pos">1</div>
+                  <div class="col-driver">
+                    <span class="fi fi-gb flag"></span>
+                    <span>Elfyn Evans</span>
+                  </div>
+                  <div class="col-team-logo" title="Toyota Gazoo Racing WRT">
+                    <img src="assets/teams/toyota.png" alt="Toyota" />
+                  </div>
+                  <div title="Rajd: 15&#10;Bonus: 5">15 + 5</div>
+                  <div title="Rajd: 12&#10;Bonus: 3">12 + 3</div>
+                  <div title="Rajd: 15&#10;Bonus: 3">15 + 3</div>
+                  <div title="Rajd: 12">12</div>
+                  <div title="Rajd: 10&#10;Bonus: 3">10 + 3</div>
+                  <div title="Rajd: 8">8</div>
+                  <div title="Rajd: 12 + 3">12 + 3</div>
+                  <div title="Rajd: 10">10</div>
+                  <div title="Rajd: 15 + 5">15 + 5</div>
+                  <div class="col-total">116</div>
+                  <div class="col-diff">—</div>
+                </div>
+
+                <div class="standings-row">
+                  <div class="col-pos">2</div>
+                  <div class="col-driver">
+                    <span class="fi fi-se flag"></span>
+                    <span>Oliver Solberg</span>
+                  </div>
+                  <div class="col-team-logo" title="Hyundai Shell Mobis WRT">
+                    <img src="assets/teams/hyundai.png" alt="Hyundai" />
+                  </div>
+                  <div title="Rajd: 12&#10;Bonus: 3">12 + 3</div>
+                  <div title="Rajd: 15&#10;Bonus: 5">15 + 5</div>
+                  <div title="Rajd: 12">12</div>
+                  <div title="Rajd: 15 + 3">15 + 3</div>
+                  <div title="Rajd: 8">8</div>
+                  <div title="Rajd: 10 + 3">10 + 3</div>
+                  <div title="Rajd: 15">15</div>
+                  <div title="Rajd: 8 + 2">8 + 2</div>
+                  <div title="Rajd: 10 + 3">10 + 3</div>
+                  <div class="col-total">129</div>
+                  <div class="col-diff">+13</div>
+                </div>
+
+                <div class="standings-row">
+                  <div class="col-pos">3</div>
+                  <div class="col-driver">
+                    <span class="fi fi-be flag"></span>
+                    <span>Thierry Neuville</span>
+                  </div>
+                  <div class="col-team-logo" title="Hyundai Shell Mobis WRT">
+                    <img src="assets/teams/hyundai.png" alt="Hyundai" />
+                  </div>
+                  <div title="Rajd: 10&#10;Bonus: 3">10 + 3</div>
+                  <div title="Rajd: 12">12</div>
+                  <div title="Rajd: 15&#10;Bonus: 3">15 + 3</div>
+                  <div title="Rajd: 8 + 2">8 + 2</div>
+                  <div title="Rajd: 12">12</div>
+                  <div title="Rajd: 15">15</div>
+                  <div title="Rajd: 10 + 3">10 + 3</div>
+                  <div title="Rajd: 12 + 3">12 + 3</div>
+                  <div title="Rajd: 8">8</div>
+                  <div class="col-total">128</div>
+                  <div class="col-diff">+12</div>
+                </div>
+
+                <div class="standings-row">
+                  <div class="col-pos">4</div>
+                  <div class="col-driver">
+                    <span class="fi fi-fi flag"></span>
+                    <span>Kalle Rovanperä</span>
+                  </div>
+                  <div class="col-team-logo" title="Toyota Gazoo Racing WRT">
+                    <img src="assets/teams/toyota.png" alt="Toyota" />
+                  </div>
+                  <div title="Rajd: 12">12</div>
+                  <div title="Rajd: 12&#10;Bonus: 3">12 + 3</div>
+                  <div title="Rajd: 10&#10;Bonus: 5">10 + 5</div>
+                  <div title="Rajd: 15">15</div>
+                  <div title="Rajd: 15 + 3">15 + 3</div>
+                  <div title="Rajd: 12">12</div>
+                  <div title="Rajd: 8 + 2">8 + 2</div>
+                  <div title="Rajd: 15 + 5">15 + 5</div>
+                  <div title="Rajd: 12">12</div>
+                  <div class="col-total">141</div>
+                  <div class="col-diff">+25</div>
+                </div>
+
+                <div class="standings-row">
+                  <div class="col-pos">5</div>
+                  <div class="col-driver">
+                    <span class="fi fi-ee flag"></span>
+                    <span>Ott Tänak</span>
+                  </div>
+                  <div class="col-team-logo" title="M-Sport Ford WRT">
+                    <img src="assets/teams/msport.png" alt="M-Sport Ford" />
+                  </div>
+                  <div title="Rajd: 8&#10;Bonus: 2">8 + 2</div>
+                  <div title="Rajd: 10">10</div>
+                  <div title="Rajd: 5&#10;Bonus: 3">5 + 3</div>
+                  <div title="Rajd: 12 + 3">12 + 3</div>
+                  <div title="Rajd: 10">10</div>
+                  <div title="Rajd: 8 + 2">8 + 2</div>
+                  <div title="Rajd: 12">12</div>
+                  <div title="Rajd: 10 + 3">10 + 3</div>
+                  <div title="Rajd: 15">15</div>
+                  <div class="col-total">110</div>
+                  <div class="col-diff">-6</div>
+                </div>
+
+                <div class="standings-row">
+                  <div class="col-pos">6</div>
+                  <div class="col-driver">
+                    <span class="fi fi-fr flag"></span>
+                    <span>Adrien Fourmaux</span>
+                  </div>
+                  <div class="col-team-logo" title="M-Sport Ford WRT">
+                    <img src="assets/teams/msport.png" alt="M-Sport Ford" />
+                  </div>
+                  <div title="Rajd: 6&#10;Bonus: 1">6 + 1</div>
+                  <div title="Rajd: 8&#10;Bonus: 2">8 + 2</div>
+                  <div title="Rajd: 10">10</div>
+                  <div title="Rajd: 5 + 2">5 + 2</div>
+                  <div title="Rajd: 8">8</div>
+                  <div title="Rajd: 12">12</div>
+                  <div title="Rajd: 10">10</div>
+                  <div title="Rajd: 8 + 2">8 + 2</div>
+                  <div title="Rajd: 6 + 1">6 + 1</div>
+                  <div class="col-total">91</div>
+                  <div class="col-diff">-25</div>
+                </div>
+
+                <div class="standings-row">
+                  <div class="col-pos">7</div>
+                  <div class="col-driver">
+                    <span class="fi fi-lv flag"></span>
+                    <span>Mārtiņš Sesks</span>
+                  </div>
+                  <div class="col-team-logo" title="M-Sport Ford WRT">
+                    <img src="assets/teams/msport.png" alt="M-Sport Ford" />
+                  </div>
+                  <div title="Rajd: 5&#10;Bonus: 2">5 + 2</div>
+                  <div title="Rajd: 6&#10;Bonus: 1">6 + 1</div>
+                  <div title="Rajd: 8">8</div>
+                  <div title="Rajd: 10">10</div>
+                  <div title="Rajd: 5">5</div>
+                  <div title="Rajd: 6 + 1">6 + 1</div>
+                  <div title="Rajd: 8 + 2">8 + 2</div>
+                  <div title="Rajd: 10">10</div>
+                  <div title="Rajd: 12">12</div>
+                  <div class="col-total">85</div>
+                  <div class="col-diff">-31</div>
+                </div>
+
+                <div class="standings-row">
+                  <div class="col-pos">8</div>
+                  <div class="col-driver">
+                    <span class="fi fi-ie flag"></span>
+                    <span>Josh McErlean</span>
+                  </div>
+                  <div class="col-team-logo" title="Hyundai Shell Mobis WRT">
+                    <img src="assets/teams/hyundai.png" alt="Hyundai" />
+                  </div>
+                  <div title="Rajd: 4&#10;Bonus: 1">4 + 1</div>
+                  <div title="Rajd: 5">5</div>
+                  <div title="Rajd: 6&#10;Bonus: 1">6 + 1</div>
+                  <div title="Rajd: 8">8</div>
+                  <div title="Rajd: 10">10</div>
+                  <div title="Rajd: 5 + 2">5 + 2</div>
+                  <div title="Rajd: 6">6</div>
+                  <div title="Rajd: 8">8</div>
+                  <div title="Rajd: 10 + 3">10 + 3</div>
+                  <div class="col-total">82</div>
+                  <div class="col-diff">-34</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel: Mistrzostwa Konstruktorow -->
+          <div class="results-card tab-panel" data-panel="super-sunday">
+            <div class="standings-table standings-table--constructors">
+              <div class="standings-table__head">
+                <div>POZ.</div>
+                <div>ZESPÓŁ</div>
+                <div><span class="fi fi-mc flag"></span></div>
+                <div><span class="fi fi-se flag"></span></div>
+                <div><span class="fi fi-ke flag"></span></div>
+                <div><span class="fi fi-hr flag"></span></div>
+                <div><span class="fi fi-es flag"></span></div>
+                <div><span class="fi fi-pt flag"></span></div>
+                <div><span class="fi fi-jp flag"></span></div>
+                <div><span class="fi fi-gr flag"></span></div>
+                <div><span class="fi fi-ee flag"></span></div>
+                <div>SUMA</div>
+                <div>DIFF.</div>
+              </div>
+
+              <div class="standings-table__body">
+                <!-- Toyota Gazoo Racing WRT -->
+                <div class="standings-row">
+                  <div class="col-pos">1</div>
+                  <div class="col-team-logo-constructor">
+                    <img src="assets/teams/toyota.png" alt="Toyota Gazoo Racing WRT" />
+                  </div>
+                  <div>23 + 19</div>
+                  <div>19 + 15</div>
+                  <div>23 + 17</div>
+                  <div>19 + 14</div>
+                  <div>23 + 19</div>
+                  <div>17 + 12</div>
+                  <div>23 + 19</div>
+                  <div>19 + 15</div>
+                  <div>23 + 17</div>
+                  <div class="col-total">286</div>
+                  <div class="col-diff">—</div>
+                </div>
+
+                <!-- Hyundai Shell Mobis WRT -->
+                <div class="standings-row">
+                  <div class="col-pos">2</div>
+                  <div class="col-team-logo-constructor">
+                    <img src="assets/teams/hyundai.png" alt="Hyundai Shell Mobis WRT" />
+                  </div>
+                  <div>19 + 15</div>
+                  <div>23 + 19</div>
+                  <div>19 + 14</div>
+                  <div>23 + 19</div>
+                  <div>17 + 12</div>
+                  <div>23 + 17</div>
+                  <div>23 + 19</div>
+                  <div>19 + 15</div>
+                  <div>17 + 12</div>
+                  <div class="col-total">273</div>
+                  <div class="col-diff">-13</div>
+                </div>
+
+                <!-- M-Sport Ford WRT -->
+                <div class="standings-row">
+                  <div class="col-pos">3</div>
+                  <div class="col-team-logo-constructor">
+                    <img src="assets/teams/msport.png" alt="M-Sport Ford WRT" />
+                  </div>
+                  <div>15 + 12</div>
+                  <div>19 + 15</div>
+                  <div>12 + 9</div>
+                  <div>17 + 14</div>
+                  <div>9 + 7</div>
+                  <div>15 + 12</div>
+                  <div>19 + 15</div>
+                  <div>12 + 9</div>
+                  <div>17 + 14</div>
+                  <div class="col-total">210</div>
+                  <div class="col-diff">-76</div>
+                </div>
+
+                <!-- TokSport WRT -->
+                <div class="standings-row">
+                  <div class="col-pos">4</div>
+                  <div class="col-team-logo-constructor">
+                    <img src="assets/teams/toksport.png" alt="TokSport WRT" />
+                  </div>
+                  <div>12 + 9</div>
+                  <div>15 + 12</div>
+                  <div>9 + 6</div>
+                  <div>12 + 9</div>
+                  <div>7 + 4</div>
+                  <div>9 + 7</div>
+                  <div>15 + 12</div>
+                  <div>9 + 7</div>
+                  <div>12 + 9</div>
+                  <div class="col-total">148</div>
+                  <div class="col-diff">-138</div>
+                </div>
+
+                <!-- Racing 4 You -->
+                <div class="standings-row">
+                  <div class="col-pos">5</div>
+                  <div class="col-team-logo-constructor">
+                    <img src="assets/teams/r4y.png" alt="Racing 4 You" />
+                  </div>
+                  <div>9 + 7</div>
+                  <div>12 + 9</div>
+                  <div>6 + 4</div>
+                  <div>9 + 7</div>
+                  <div>4 + 2</div>
+                  <div>7 + 4</div>
+                  <div>9 + 7</div>
+                  <div>7 + 5</div>
+                  <div>9 + 7</div>
+                  <div class="col-total">102</div>
+                  <div class="col-diff">-184</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel: Power Stage (placeholder) -->
+          <div class="results-card tab-panel" data-panel="power-stage">
+            <div class="placeholder-panel">Power Stage</div>
+          </div>
+
+          <!-- Panel: Archiwum (placeholder) -->
+          <div class="results-card tab-panel" data-panel="archive">
+            <div class="placeholder-panel">Archiwum</div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="footer-spacer"></div>
+
+    <footer class="site-footer">
+      <div class="site-footer__sponsors">
+        <div class="footer-photo">
+          <img src="assets/sponsors/photo1.png" alt="" />
+        </div>
+        <div class="footer-photo">
+          <img src="assets/sponsors/photo2.png" alt="" />
+        </div>
+        <div class="footer-photo">
+          <img src="assets/sponsors/photo3.png" alt="" />
+        </div>
+      </div>
+
+      <div class="site-footer__sponsors site-footer__sponsors--secondary">
+        <div class="footer-photo footer-photo--sm">
+          <img src="assets/sponsors/photo4.png" alt="" />
+        </div>
+        <div class="footer-photo footer-photo--sm">
+          <img src="assets/sponsors/photo5.png" alt="" />
+        </div>
+        <div class="footer-photo footer-photo--sm">
+          <img src="assets/sponsors/photo6.png" alt="" />
+        </div>
+      </div>
+
+      <div class="footer-divider"></div>
+      <p class="footer-copyright">&copy; 2026 WRC. All rights reserved.</p>
+    </footer>
+
+    <script>
+      const logo = document.querySelector(".floating-logo");
+      const hero = document.querySelector(".hero");
+
+      function updateLogo() {
+        const heroBottom = hero.getBoundingClientRect().bottom;
+        if (heroBottom <= 0) {
+          logo.classList.add("logo--dark");
+        } else {
+          logo.classList.remove("logo--dark");
+        }
+      }
+
+      window.addEventListener("scroll", updateLogo, { passive: true });
+      updateLogo();
+
+      const tabs = document.querySelectorAll(".tab");
+      const panels = document.querySelectorAll(".tab-panel");
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          const target = tab.dataset.tab;
+
+          tabs.forEach((t) => t.classList.remove("active"));
+          panels.forEach((p) => p.classList.remove("active"));
+
+          tab.classList.add("active");
+          document
+            .querySelector(`.tab-panel[data-panel="${target}"]`)
+            .classList.add("active");
+        });
+      });
+    </script>
+  </body>
+</html>

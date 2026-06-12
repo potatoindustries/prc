@@ -1,0 +1,308 @@
+/* =========================
+   WYNIKI.CSS
+   Uzupełnienie do style.css
+   ========================= */
+
+/* =========================
+   TAB PANELS — wyniki.html uses .tab-panel as wrapper
+   around .wyniki-section-header + .results-card
+   ========================= */
+.tab-panel {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.tab-panel.active {
+  display: flex;
+}
+
+/* In wyniki.html results-card is always visible inside the tab-panel wrapper */
+.tab-panel .results-card {
+  display: block;
+}
+
+/* HERO TŁO */
+.hero__bg--monaco {
+  background-image: url("../assets/monako.jpg");
+  background-size: cover;
+  background-position: center 35%;
+  background-repeat: no-repeat;
+}
+
+/* =========================
+   NAGŁÓWEK ODCINKA (poza tabelą)
+   ========================= */
+.wyniki-section-header {
+  max-width: 1224px;
+  width: 100%;
+  margin: 0 0 13px;
+  padding: 0 4px 0 8px;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.wyniki-section-header__title {
+  font-family: "WRCCleanBold", Arial, sans-serif;
+  font-size: 22.5px;
+  font-weight: 700;
+  color: var(--text-dark);
+  line-height: 1;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.wyniki-section-header__meta {
+  font-family: "SebinoSoft", Arial, sans-serif;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* =========================
+   TABELA ŁĄCZNIE — SIATKA
+   POZ. | KIEROWCA | AUTO | OS1 | OS2 | OS3 | OS4 | ŁĄCZNY | DIFF. | PUNKTY
+   ========================= */
+.standings-table--lacznie .standings-table__head {
+  display: grid;
+  grid-template-columns: 64px 1.5fr 1.35fr repeat(4, 100px) 130px 90px 80px;
+  align-items: center;
+  min-height: 49px;
+  padding: 0 20px;
+  background: #f2f3f3;
+  color: #67727f;
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  font-family: "SebinoSoft", Arial, sans-serif;
+}
+
+.standings-table--lacznie .standings-table__head > div {
+  display: flex;
+  align-items: center;
+  padding: 0 5px;
+}
+
+.standings-table--lacznie .standings-table__head > div:nth-child(1) { justify-content: flex-start; }
+.standings-table--lacznie .standings-table__head > div:nth-child(2) { justify-content: flex-start;   padding-left: 10px !important; }
+.standings-table--lacznie .standings-table__head > div:nth-child(3) { justify-content: flex-start; }
+.standings-table--lacznie .standings-table__head > div:nth-child(n+4) { justify-content: center; text-align: center; }
+
+.standings-table--lacznie .standings-row {
+  display: grid;
+  grid-template-columns: 64px 1.5fr 1.35fr repeat(4, 100px) 130px 90px 80px;
+  align-items: center;
+  min-height: 59px;
+  padding: 0 20px;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--text-main);
+  font-family: "SebinoSoft", Arial, sans-serif;
+  position: relative;
+}
+
+.standings-table--lacznie .standings-row > div {
+  display: flex;
+  align-items: center;
+  padding: 0 5px;
+}
+
+.standings-table--lacznie .standings-row > div:nth-child(1) { justify-content: flex-start; }
+.standings-table--lacznie .standings-row > div:nth-child(2) { justify-content: flex-start; }
+.standings-table--lacznie .standings-row > div:nth-child(3) { justify-content: flex-start; gap: 7px; }
+.standings-table--lacznie .standings-row > div:nth-child(n+4) { justify-content: center; text-align: center; }
+
+/* =========================
+   TABELA SS (odcinki)
+   POZ. | KIEROWCA | AUTO | KARY | BONUS | CZAS OS | DIFF.
+   ========================= */
+/* SS column order: POZ. | KIEROWCA | AUTO | KARY | CZAS OS | DIFF. | BONUS */
+.standings-table--ss .standings-table__head {
+  display: grid;
+  grid-template-columns: 64px 1.7fr 1.45fr 110px 130px 110px 90px;
+  align-items: center;
+  min-height: 49px;
+  padding: 0 20px;
+  background: #f2f3f3;
+  color: #67727f;
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  font-family: "SebinoSoft", Arial, sans-serif;
+}
+
+.standings-table--ss .standings-table__head > div {
+  display: flex;
+  align-items: center;
+  padding: 0 5px;
+}
+
+.standings-table--ss .standings-table__head > div:nth-child(1) { justify-content: flex-start; }
+/* KIEROWCA header nudged 5px right */
+.standings-table--ss .standings-table__head > div:nth-child(2) { justify-content: flex-start; padding-left: 10px !important; }
+.standings-table--ss .standings-table__head > div:nth-child(3) { justify-content: flex-start; }
+.standings-table--ss .standings-table__head > div:nth-child(n+4) { justify-content: center; text-align: center; }
+
+.standings-table--ss .standings-row {
+  display: grid;
+  grid-template-columns: 64px 1.7fr 1.45fr 110px 130px 110px 90px;
+  align-items: center;
+  min-height: 59px;
+  padding: 0 20px;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--text-main);
+  font-family: "SebinoSoft", Arial, sans-serif;
+  position: relative;
+}
+
+.standings-table--ss .standings-row > div {
+  display: flex;
+  align-items: center;
+  padding: 0 5px;
+}
+
+.standings-table--ss .standings-row > div:nth-child(1) { justify-content: flex-start; }
+.standings-table--ss .standings-row > div:nth-child(2) { justify-content: flex-start; }
+.standings-table--ss .standings-row > div:nth-child(3) { justify-content: flex-start; gap: 7px; }
+.standings-table--ss .standings-row > div:nth-child(n+4) { justify-content: center; text-align: center; }
+
+/* =========================
+   LOGO + MODEL AUTA (wspólna komórka)
+   ========================= */
+.col-car-model {
+  font-family: "SebinoSoft", Arial, sans-serif;
+  font-size: 13px;
+  color: #314256;
+  white-space: nowrap;
+}
+
+/* =========================
+   PUNKTY, KARY, BONUS
+   — takie same kolory jak reszta tabeli
+   ========================= */
+.col-pts {
+  color: #314256;
+  font-family: "SebinoSoft", Arial, sans-serif;
+}
+
+.col-penalty {
+  color: #314256;
+  font-family: "SebinoSoft", Arial, sans-serif;
+}
+
+.col-bonus {
+  color: #314256;
+  font-family: "SebinoSoft", Arial, sans-serif;
+}
+
+/* =========================
+   DARK MODE
+   ========================= */
+body.dark .wyniki-section-header__title { color: #f3f3f3; }
+body.dark .wyniki-section-header__meta  { color: #9a9088; }
+
+body.dark .standings-table--lacznie .standings-table__head,
+body.dark .standings-table--ss .standings-table__head {
+  background: #2e2e2e;
+  color: #beb3ab;
+}
+
+body.dark .col-car-model { color: #c0c0c0; }
+body.dark .col-pts       { color: #c0c0c0; }
+body.dark .col-penalty   { color: #c0c0c0; }
+body.dark .col-bonus     { color: #c0c0c0; }
+
+/* =========================
+   THEME ANIMATION
+   ========================= */
+body.theme-animating .wyniki-section-header__title,
+body.theme-animating .wyniki-section-header__meta,
+body.theme-animating .col-car-model,
+body.theme-animating .col-pts,
+body.theme-animating .col-penalty,
+body.theme-animating .col-bonus {
+  transition: color 0.28s ease, background-color 0.38s ease;
+}
+
+/* =========================
+   HERO Z LOGO (wyniki.html)
+   ========================= */
+
+.hero__title-wrap {
+  position: absolute;
+  left: 50%;
+  transform: translateX(calc(-50% - 10px)); /* przesunięcie o 30px w lewo */
+  bottom: 46px;
+  width: 100%;
+  max-width: 1100px;
+  padding: 0 22px;
+}
+
+.hero__title-container {
+  display: flex;
+  align-items: flex-end; /* ← zmiana tutaj: wyrównanie do dołu */
+  justify-content: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.hero__logo {
+  height: 60px;
+  width: auto;
+  max-width: 180px;
+  object-fit: contain;
+  transform: translateY(-4px); 
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+}
+
+.hero__title {
+  margin: 0;
+  font-family: "WRCCleanBold", Arial, sans-serif;
+  color: #ffffff;
+  font-size: 48px;
+  line-height: 1;
+  font-weight: 700;
+  text-align: left;
+  white-space: nowrap;
+  text-rendering: geometricPrecision;
+}
+
+/* Responsywność */
+@media (max-width: 900px) {
+  .hero__title-container {
+    gap: 12px;
+  }
+  
+  .hero__logo {
+    height: 45px;
+    max-width: 140px;
+  }
+  
+  .hero__title {
+    font-size: 36px;
+    white-space: normal;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero__title-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .hero__logo {
+    height: 40px;
+  }
+  
+  .hero__title {
+    font-size: 28px;
+  }
+}
