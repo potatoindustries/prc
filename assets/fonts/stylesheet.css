@@ -1,0 +1,26 @@
+@font-face {
+    font-family: 'WRC Clean';
+    src: url('WRCCleanBold.eot');
+    src: local('WRC Clean Bold'), local('WRCCleanBold'),
+        url('WRCCleanBold.eot?#iefix') format('embedded-opentype'),
+        url('WRCCleanBold.woff2') format('woff2'),
+        url('WRCCleanBold.woff') format('woff'),
+        url('WRCCleanBold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'WRC Clean Roman';
+    src: url('WRCCleanRoman.eot');
+    src: local('WRC Clean Roman'), local('WRCCleanRoman'),
+        url('WRCCleanRoman.eot?#iefix') format('embedded-opentype'),
+        url('WRCCleanRoman.woff2') format('woff2'),
+        url('WRCCleanRoman.woff') format('woff'),
+        url('WRCCleanRoman.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
