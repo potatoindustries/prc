@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
   
 <head>
   <meta charset="UTF-8" />
@@ -273,58 +273,7 @@
   </style>
   
   <script>
-    // ============================================================
-// KONFIGURACJA ODSŚWIEŻANIA
-// ============================================================
-const REFRESH_THROTTLE_MS = 300000; // 5 minut (zmień na 600000 dla 10 minut)
-let lastFullRefresh = Date.now();
-
-// Modyfikacja funkcji setupAutoRefresh
-function setupAutoRefresh() {
-  // Nasłuchiwanie na zmiany z innych zakładek (BroadcastChannel)
-  try {
-    const channel = new BroadcastChannel('wrc-data-invalidate');
-    channel.onmessage = async (e) => {
-      if (e.data?.action === 'invalidate') {
-        console.log('[Refresh] Wykryto zmianę w adminie - natychmiastowe odświeżenie');
-        // Unieważnij cache
-        if (api) {
-          if (typeof api._invalidateStorage === 'function') api._invalidateStorage();
-          api.data = null;
-          api._l1 = {};
-          api._l1Time = 0;
-          api._etag = null;
-        }
-        // Przeładuj dane
-        cachedData = null;
-        dataLoaded = false;
-        await loadBaseData();
-        const activeTab = document.querySelector('.tab.active');
-        const activeTabName = activeTab ? activeTab.dataset.tab : 'results';
-        loadedTabs.clear(); // Wymuś przeładowanie wszystkich zakładek
-        await loadTabData(activeTabName);
-      }
-    };
-  } catch(e) { console.warn('BroadcastChannel not supported', e); }
-  
-  // Nasłuchuj na powrót do zakładki - tylko jeśli dane są stare
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') {
-      const now = Date.now();
-      if (now - lastFullRefresh > REFRESH_THROTTLE_MS) {
-        console.log('[Refresh] Powrót do zakładki po dłuższej nieobecności - odświeżenie');
-        lastFullRefresh = now;
-        // Delikatne odświeżenie - tylko unieważnij cache L1
-        if (api && api._l1) {
-          api._l1 = {};
-          api._l1Time = 0;
-        }
-        loadBaseData();
-      }
-    }
-  });
-}
-    if(localStorage.getItem('wrc-theme')==='dark')document.documentElement.classList.add('wrc-dark');
+    if(localStorage.getItem('wrc-theme')==='dark') document.documentElement.classList.add('wrc-dark');
   </script>
   
 </head>
@@ -430,15 +379,11 @@ function setupAutoRefresh() {
   <script src="config.js"></script>
   <script src="api.js"></script>
   <script>
-    // ============================================================
-    // OPTYMALIZACJA - TYLKO JEDNO ŻĄDANIE NA SESJĘ
-    // ============================================================
-    
     // Cache danych po załadowaniu
     let cachedData = null;
     let dataLoaded = false;
     let loadingPromise = null;
-    let loadedTabs = new Set(); // które taby zostały już załadowane
+    let loadedTabs = new Set();
     
     // Funkcja do konwersji kodu kraju na emoji flagi
     function getFlagEmoji(countryCode) {
@@ -469,14 +414,26 @@ function setupAutoRefresh() {
       return `<a href="${slug}.html" class="driver-link">${driverName}</a>`;
     }
 
-    // Główna funkcja ładująca dane - tylko RAZ
+    // Funkcja do pobierania URL loga z obsługą błędów
+    function getTeamLogoUrl(teamLogo, teamName) {
+      if (!teamLogo) return 'assets/teams/default.png';
+      
+      // Jeśli logo to pełny URL (zaczyna się od http:// lub https://)
+      if (teamLogo.startsWith('http://') || teamLogo.startsWith('https://')) {
+        return teamLogo;
+      }
+      
+      // Jeśli logo to ścieżka względna
+      return teamLogo;
+    }
+
+    // Główna funkcja ładująca dane
     async function loadBaseData() {
       if (loadingPromise) return loadingPromise;
       if (dataLoaded && cachedData) return cachedData;
       
       loadingPromise = (async () => {
         try {
-          // Pokaż loading tylko w aktywnym panelu
           const activePanel = document.querySelector('.index-tab-panel.active');
           if (activePanel) {
             const body = activePanel.querySelector('.standings-table__body, .results-table__body');
@@ -487,22 +444,26 @@ function setupAutoRefresh() {
           const rawData = api.data;
           let calendar = await api.getCalendar();
           
-          // Sortowanie kalendarza
           calendar = getSortedCalendar(calendar, rawData);
           
           if (!calendar || calendar.length === 0) {
             throw new Error('Brak danych');
           }
           
-          // Jedno wywołanie calculateAllStandings - wszystkie potrzebne dane
           const standings = await api.calculateAllStandings();
           const drivers = await api.getDrivers();
           const teams = await api.getTeams();
           
+          // Pobierz loga dla każdego zespołu
+          const teamsWithLogos = teams.map(team => ({
+            ...team,
+            logoUrl: getTeamLogoUrl(team.logo, team.name)
+          }));
+          
           cachedData = {
             calendar,
             drivers,
-            teams,
+            teams: teamsWithLogos,
             championship: standings.championship,
             constructors: standings.constructors,
             powerStage: standings.powerStage,
@@ -522,7 +483,7 @@ function setupAutoRefresh() {
       return loadingPromise;
     }
     
-    // Funkcja do ładowania konkretnej tabeli (leniwe ładowanie)
+    // Funkcja do ładowania konkretnej tabeli
     async function loadTabData(tabName) {
       if (loadedTabs.has(tabName)) return;
       
@@ -545,7 +506,6 @@ function setupAutoRefresh() {
       loadedTabs.add(tabName);
     }
     
-    // Funkcje sortowania
     function getCalendarGroupedByDate(calendar) {
       const groups = {};
       calendar.forEach(rally => {
@@ -591,7 +551,6 @@ function setupAutoRefresh() {
       return result;
     }
 
-    // Funkcje renderowania tabel (bez dodatkowych zapytań API)
     async function loadResultsTable(calendar, driverMap) {
       const tbody = document.getElementById('resultsTableBody');
       let html = '';
@@ -652,10 +611,15 @@ function setupAutoRefresh() {
         const driver = drivers.find(d => d.id === driverStanding.driverId);
         const team = teams.find(t => t.id === driver?.teamId);
         const driverLink = getDriverLink(driverStanding.driverName, driverStanding.driverId);
+        const teamLogoUrl = team?.logoUrl || 'assets/teams/default.png';
+        
         bodyHtml += `<div class="standings-row" data-pos="${driverStanding.position}" data-total="${driverStanding.totalPoints}" data-diff="${driverStanding.diff}" data-driver="${driverStanding.driverName}">
           <div class="col-pos">${driverStanding.position}</div>
           <div class="col-driver"><span class="flag-emoji">${getFlagEmoji(driverStanding.driverCountry)}</span><span class="driver-name">${driverLink}</span></div>
-          <div class="col-team-logo team-logo-tooltip" data-team-name="${team?.name || '-'}"><img src="${team?.logo || 'assets/teams/default.png'}" alt="${team?.name || '-'}" onerror="this.src='assets/teams/default.png'" /></div>`;
+          <div class="col-team-logo team-logo-tooltip" data-team-name="${team?.name || '-'}">
+            <img src="${teamLogoUrl}" alt="${team?.name || '-'}" onerror="this.src='assets/teams/default.png'" />
+          </div>`;
+        
         for (const rally of calendar) {
           const rallyDetail = driverStanding.rallyDetails?.find(rd => rd.rallyId === rally.id);
           let displayText = '—', tooltipText = '', hasPoints = false;
@@ -710,9 +674,14 @@ function setupAutoRefresh() {
       
       let bodyHtml = '';
       for (const teamStanding of constructors) {
+        const teamLogoUrl = getTeamLogoUrl(teamStanding.teamLogo, teamStanding.teamName);
+        
         bodyHtml += `<div class="standings-row" data-pos="${teamStanding.position}" data-total="${teamStanding.totalPoints}" data-diff="${teamStanding.diff}">
           <div class="col-pos">${teamStanding.position}</div>
-          <div class="col-team-logo-constructor team-logo-tooltip" data-team-name="${teamStanding.teamName}"><img src="${teamStanding.teamLogo}" alt="${teamStanding.teamName}" onerror="this.src='assets/teams/default.png'" style="width:32px;height:32px;object-fit:contain;" /></div>`;
+          <div class="col-team-logo-constructor team-logo-tooltip" data-team-name="${teamStanding.teamName}">
+            <img src="${teamLogoUrl}" alt="${teamStanding.teamName}" onerror="this.src='assets/teams/default.png'" style="width:32px;height:32px;object-fit:contain;" />
+          </div>`;
+        
         for (const rally of calendar) {
           const rallyDetail = teamStanding.rallyDetails?.find(rd => rd.rallyId === rally.id);
           let displayText = '—', tooltipText = '', hasPoints = false;
@@ -756,10 +725,15 @@ function setupAutoRefresh() {
       for (const standing of powerStageStandings) {
         const team = teams.find(t => t.id === standing.teamId);
         const driverLink = getDriverLink(standing.driverName, standing.driverId);
+        const teamLogoUrl = team?.logoUrl || 'assets/teams/default.png';
+        
         bodyHtml += `<div class="standings-row" data-pos="${standing.position}" data-total="${standing.totalPoints}" data-diff="${standing.diff}" data-driver="${standing.driverName}">
           <div class="col-pos">${standing.position}</div>
           <div class="col-driver"><span class="flag-emoji">${getFlagEmoji(standing.driverCountry)}</span><span>${driverLink}</span></div>
-          <div class="col-team-logo team-logo-tooltip" data-team-name="${team?.name || '-'}"><img src="${team?.logo || 'assets/teams/default.png'}" alt="${team?.name || '-'}" onerror="this.src='assets/teams/default.png'" style="width:28px;height:28px;" /></div>`;
+          <div class="col-team-logo team-logo-tooltip" data-team-name="${team?.name || '-'}">
+            <img src="${teamLogoUrl}" alt="${team?.name || '-'}" onerror="this.src='assets/teams/default.png'" style="width:28px;height:28px;" />
+          </div>`;
+        
         for (const rally of calendar) {
           const points = standing.rallyPoints[rally.id] || 0;
           let displayText = '—', tooltipText = '', hasPoints = false;
@@ -843,19 +817,17 @@ function setupAutoRefresh() {
         const target = tab.dataset.tab;
         if (!target) return;
         
-        // Aktywuj zakładkę
         tabButtons.forEach((t) => t.classList.remove("active"));
         panelsList.forEach((p) => p.classList.remove("active"));
         tab.classList.add("active");
         const targetPanel = document.querySelector(`.index-tab-panel[data-panel="${target}"]`);
         if (targetPanel) targetPanel.classList.add("active");
         
-        // Załaduj dane dla tej zakładki (leniwie)
         await loadTabData(target);
       });
     });
     
-    // Inicjalizacja - ładujemy tylko dane podstawowe i aktywną zakładkę
+    // Inicjalizacja
     (async function init() {
       document.body.classList.add('no-transition');
       if(localStorage.getItem('wrc-theme')==='dark') document.body.classList.add('dark');
@@ -878,7 +850,6 @@ function setupAutoRefresh() {
       window.addEventListener("scroll", updateLogo, { passive: true });
       updateLogo();
       
-      // Załaduj tylko podstawowe dane i aktywną zakładkę
       await loadBaseData();
       const activeTab = document.querySelector('.tab.active');
       const activeTabName = activeTab ? activeTab.dataset.tab : 'results';
