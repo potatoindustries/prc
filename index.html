@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wyniki i Klasyfikacja</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="assets/icon.jpg">
+
+  <style>
+    /* Poprawki dla flag */
+    .standings-table__head .fi,
+    .results-table__head .fi,
+    .powerstage-table__head .fi {
+      font-size: 10.5px !important;
+      line-height: 1 !important;
+      vertical-align: middle !important;
+      margin-right: 0px !important;
+    }
+
+    .flag-emoji {
+      font-size: 1em;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 0px;
+    }
+
+    .hero__bg {
+      position: absolute;
+      inset: 0;
+      background-image: url("https://api.motorsporttickets.com/files/images/2c085dd8-71db-464d-9623-f7945e119590.png?w=2500&h=600");
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+    }
+
+    .col-rally .fi, .col-rally .flag-emoji { font-size: 13px; line-height: 1; vertical-align: middle; margin-right: 0px; }
+    .col-winner .fi, .col-winner .flag-emoji { font-size: 12px; line-height: 1; vertical-align: middle; margin-right: 0px; }
+    .col-driver .fi, .col-driver .flag-emoji { font-size: 13px; line-height: 1; vertical-align: middle; margin-right: 0px; }
+
+    html.wrc-dark,html.wrc-dark body,html.wrc-dark .page{background:#1a1a1a!important}
+
+    .standings-table__head > div[data-sort] { cursor: pointer; user-select: none; gap: 5px; transition: color .15s; }
+    .standings-table__head > div[data-sort]:hover { color: #1a2635; }
+    body.dark .standings-table__head > div[data-sort]:hover { color: #f3f3f3; }
+    .sort-icon { display:none; flex-direction:column; gap:1px; flex-shrink:0; }
+    .standings-table__head > div[data-sort].sort-asc .sort-icon,
+    .standings-table__head > div[data-sort].sort-desc .sort-icon { display:inline-flex; }
+    .sort-icon svg { display:block; }
+    
+    .loading-spinner { text-align: center; padding: 60px; color: var(--text-muted); font-size: 0; display: flex; justify-content: center; align-items: center; }
+    .loading-spinner::after { content: ""; width: 32px; height: 32px; border: 3px solid rgba(128, 128, 128, 0.2); border-top-color: #9e9e9e; border-radius: 50%; display: inline-block; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .standings-table--championship .standings-table__head {
+      display: grid;
+      grid-template-columns: 69px 1.2fr 46px repeat(9, 80px) 85px 85px;
+      align-items: center;
+      min-height: 49px;
+      padding: 0 20px;
+      background: #f2f3f3;
+      color: #67727f;
+      font-size: 11px;
+      line-height: 1;
+      font-weight: 400;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      font-family: "SebinoSoft", Arial, sans-serif;
+      border-bottom: 1px solid rgba(225, 231, 238, 0.625);
+    }
+    .standings-table--championship .standings-table__head > div { display: flex; align-items: center; padding: 0 5px; }
+    .standings-table--championship .standings-table__head > div:first-child { justify-content: flex-start; text-align: left; }
+    .standings-table--championship .standings-table__head > div:nth-child(2) { justify-content: flex-start; text-align: left; }
+    .standings-table--championship .standings-table__head > div:nth-child(3) { justify-content: center; text-align: center; }
+    .standings-table--championship .standings-table__head > div:nth-child(n + 4):nth-child(-n + 12) { justify-content: center; text-align: center; }
+    .standings-table--championship .standings-table__head > div:nth-child(13), .standings-table--championship .standings-table__head > div:nth-child(14) { justify-content: center; text-align: center; }
+
+    .standings-table--championship .standings-row {
+      display: grid;
+      grid-template-columns: 69px 1.2fr 46px repeat(9, 80px) 85px 85px;
+      align-items: center;
+      min-height: 59px;
+      padding: 0 20px;
+      font-size: 13px;
+      line-height: 1;
+      color: var(--text-main);
+      font-family: "SebinoSoft", Arial, sans-serif;
+      position: relative;
+    }
+    .standings-table--championship .standings-row > div { display: flex; align-items: center; padding: 0 5px; }
+    .standings-table--championship .standings-row > div:first-child, .standings-table--championship .standings-row > div:nth-child(2) { justify-content: flex-start; text-align: left; }
+    .standings-table--championship .standings-row > div:nth-child(3) { justify-content: center; text-align: center; }
+    .standings-table--championship .standings-row > div:nth-child(n + 4):nth-child(-n + 12) { justify-content: center; text-align: center; white-space: normal !important; word-break: break-word !important; line-height: 1.3 !important; flex-wrap: wrap !important; gap: 2px !important; }
+    .standings-table--championship .standings-row > div:nth-child(13), .standings-table--championship .standings-row > div:nth-child(14) { justify-content: center; text-align: center; }
+
+    .standings-table--constructors .standings-table__head {
+      display: grid;
+      grid-template-columns: 64px 100px repeat(9, 1fr) 85px 85px;
+      align-items: center;
+      min-height: 49px;
+      padding: 0 20px;
+      background: #f2f3f3;
+      color: #67727f;
+      font-size: 11px;
+      line-height: 1;
+      font-weight: 400;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      font-family: "SebinoSoft", Arial, sans-serif;
+      border-bottom: 1px solid rgba(225, 231, 238, 0.625);
+    }
+    .standings-table--constructors .standings-table__head > div { display: flex; align-items: center; padding: 0 5px; }
+    .standings-table--constructors .standings-table__head > div:first-child { justify-content: flex-start; text-align: left; }
+    .standings-table--constructors .standings-table__head > div:nth-child(2) { justify-content: center; text-align: center; }
+    .standings-table--constructors .standings-table__head > div:nth-child(n + 3):nth-child(-n + 11), .standings-table--constructors .standings-table__head > div:nth-child(12), .standings-table--constructors .standings-table__head > div:nth-child(13) { justify-content: center; text-align: center; }
+
+    .standings-table--constructors .standings-row {
+      display: grid;
+      grid-template-columns: 64px 100px repeat(9, 1fr) 85px 85px;
+      align-items: center;
+      min-height: 59px;
+      padding: 0 20px;
+      font-size: 13px;
+      line-height: 1;
+      color: var(--text-main);
+      font-family: "SebinoSoft", Arial, sans-serif;
+      position: relative;
+    }
+    .standings-table--constructors .standings-row > div { display: flex; align-items: center; padding: 0 5px; }
+    .standings-table--constructors .standings-row > div:first-child { justify-content: flex-start; text-align: left; }
+    .standings-table--constructors .standings-row > div:nth-child(2) { justify-content: center; text-align: center; }
+    .standings-table--constructors .standings-row > div:nth-child(n + 3):nth-child(-n + 11), .standings-table--constructors .standings-row > div:nth-child(12), .standings-table--constructors .standings-row > div:nth-child(13) { justify-content: center; text-align: center; }
+
+    .standings-table--powerstage .standings-table__head {
+      display: grid;
+      grid-template-columns: 69px 1.2fr 1.2fr repeat(9, 80px) 85px 85px;
+      align-items: center;
+      min-height: 49px;
+      padding: 0 20px;
+      background: #f2f3f3;
+      color: #67727f;
+      font-size: 11px;
+      line-height: 1;
+      font-weight: 400;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      font-family: "SebinoSoft", Arial, sans-serif;
+      border-bottom: 1px solid rgba(225, 231, 238, 0.625);
+    }
+    .standings-table--powerstage .standings-table__head > div { display: flex; align-items: center; padding: 0 5px; }
+    .standings-table--powerstage .standings-table__head > div:first-child, .standings-table--powerstage .standings-table__head > div:nth-child(2) { justify-content: flex-start; text-align: left; }
+    .standings-table--powerstage .standings-table__head > div:nth-child(3) { justify-content: center; text-align: center; }
+    .standings-table--powerstage .standings-table__head > div:nth-child(n + 4):nth-child(-n + 12), .standings-table--powerstage .standings-table__head > div:nth-child(13), .standings-table--powerstage .standings-table__head > div:nth-child(14) { justify-content: center; text-align: center; }
+
+    .standings-table--powerstage .standings-row {
+      display: grid;
+      grid-template-columns: 69px 1.2fr 1.2fr repeat(9, 80px) 85px 85px;
+      align-items: center;
+      min-height: 59px;
+      padding: 0 20px;
+      font-size: 13px;
+      line-height: 1;
+      color: var(--text-main);
+      font-family: "SebinoSoft", Arial, sans-serif;
+      position: relative;
+    }
+    .standings-table--powerstage .standings-row > div { display: flex; align-items: center; padding: 0 5px; }
+    .standings-table--powerstage .standings-row > div:first-child, .standings-table--powerstage .standings-row > div:nth-child(2) { justify-content: flex-start; text-align: left; }
+    .standings-table--powerstage .standings-row > div:nth-child(3) { justify-content: center; text-align: center; }
+    .standings-table--powerstage .standings-row > div:nth-child(n + 4):nth-child(-n + 12) { justify-content: center; text-align: center; white-space: normal !important; word-break: break-word !important; line-height: 1.3 !important; flex-wrap: wrap !important; gap: 2px !important; }
+    .standings-table--powerstage .standings-row > div:nth-child(13), .standings-table--powerstage .standings-row > div:nth-child(14) { justify-content: center; text-align: center; }
+
+    .points-tooltip { cursor: help; position: relative; display: inline-block; }
+    .points-tooltip:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      top: 50%;
+      left: 100%;
+      transform: translateY(-50%) translateX(8px);
+      background-color: #1e2a3a !important;
+      color: #fff !important;
+      padding: 8px 12px !important;
+      border-radius: 8px !important;
+      font-size: 11px !important;
+      white-space: nowrap !important;
+      z-index: 999999 !important;
+      pointer-events: none !important;
+      font-family: 'SebinoSoft', Arial, sans-serif !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25) !important;
+      line-height: 1.4 !important;
+      font-weight: normal !important;
+      animation: tooltipFadeInRight 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards !important;
+    }
+    .points-tooltip.multiline:hover::after { white-space: pre-line !important; text-align: left !important; min-width: 120px !important; }
+
+    .points-tooltip--above { cursor: help; position: relative; display: inline-block; }
+    .points-tooltip--above:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background-color: #1e2a3a !important;
+      color: #fff !important;
+      padding: 8px 12px !important;
+      border-radius: 8px !important;
+      font-size: 11px !important;
+      white-space: nowrap !important;
+      z-index: 999999 !important;
+      pointer-events: none !important;
+      font-family: 'SebinoSoft', Arial, sans-serif !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25) !important;
+      line-height: 1.4 !important;
+      font-weight: normal !important;
+      animation: tooltipFadeInUp 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards !important;
+    }
+    .points-tooltip--above.multiline:hover::after { white-space: pre-line !important; text-align: left !important; min-width: 120px !important; }
+    body.dark .points-tooltip--above:hover::after { background-color: #2a2a2a !important; color: #f0f0f0 !important; border: 1px solid #444 !important; }
+
+    .team-logo-tooltip { cursor: help; position: relative; display: inline-flex; align-items: center; }
+    .team-logo-tooltip:hover::after {
+      content: attr(data-team-name);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background-color: #1e2a3a !important;
+      color: #fff !important;
+      padding: 6px 10px !important;
+      border-radius: 6px !important;
+      font-size: 11px !important;
+      white-space: nowrap !important;
+      z-index: 999999 !important;
+      pointer-events: none !important;
+      font-family: 'SebinoSoft', Arial, sans-serif !important;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2) !important;
+      font-weight: 500 !important;
+      animation: tooltipFadeInUp 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards !important;
+    }
+
+    @keyframes tooltipFadeInUp { 0% { opacity: 0; transform: translateX(-50%) translateY(0px) scale(0.95); } 100% { opacity: 1; transform: translateX(-50%) translateY(-8px) scale(1); } }
+    @keyframes tooltipFadeInRight { 0% { opacity: 0; transform: translateY(-50%) translateX(4px) scale(0.95); } 100% { opacity: 1; transform: translateY(-50%) translateX(8px) scale(1); } }
+    body.dark .points-tooltip:hover::after, body.dark .team-logo-tooltip:hover::after { background-color: #2a2a2a !important; color: #f0f0f0 !important; border: 1px solid #444 !important; }
+
+    .standings-row { overflow: visible !important; }
+    .standings-table__body { overflow: visible !important; }
+    .results-card { border-radius: 12px; overflow: hidden; }
+
+    .flag-clickable { cursor: pointer; transition: transform 0.1s ease; display: inline-block; }
+    .flag-clickable:hover { transform: scale(1.2); }
+
+    .col-team-logo img { width: 28px; height: 28px; object-fit: contain; }
+    .col-team-logo-constructor { display: flex; align-items: center; justify-content: center; }
+
+    .topbar__link { font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important; font-weight: 550 !important; }
+    .tab { font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important; font-weight: 500 !important; }
+    .championship-sub-tab, .view-sub-tab { font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important; font-weight: 500 !important; }
+    .admin-tab, .stage-nav-btn, .admin-btn, .backup-btn, .home-btn, .rallytv-btn { font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important; font-weight: 500 !important; }
+    .results-table__body, .standings-table__body { font-family: "SebinoSoft", Arial, sans-serif !important; font-weight: 400 !important; }
+    .standings-table__head, .results-table__head { font-family: "SebinoSoft", Arial, sans-serif !important; font-weight: 400 !important; }
+    .col-team-logo img, .col-team-logo-constructor img { border-radius: 1px; }
+    
+    .driver-link { text-decoration: none !important; color: inherit !important; cursor: pointer; transition: opacity 0.15s ease; }
+    .driver-link:hover { opacity: 0.7; text-decoration: none !important; }
+    .col-winner .driver-link { text-decoration: underline !important; text-decoration-thickness: 1px !important; text-underline-offset: 2px !important; }
+    .col-winner .driver-link:hover { text-decoration: underline !important; opacity: 0.7; }
+    .results-table .col-status { position: relative; left: -10px; }
+    .results-table__head div:nth-child(4) { position: relative; left: -10px; }
+  </style>
+  
+  <script>
+    // ============================================================
+// KONFIGURACJA ODSŚWIEŻANIA
+// ============================================================
+const REFRESH_THROTTLE_MS = 300000; // 5 minut (zmień na 600000 dla 10 minut)
+let lastFullRefresh = Date.now();
+
+// Modyfikacja funkcji setupAutoRefresh
+function setupAutoRefresh() {
+  // Nasłuchiwanie na zmiany z innych zakładek (BroadcastChannel)
+  try {
+    const channel = new BroadcastChannel('wrc-data-invalidate');
+    channel.onmessage = async (e) => {
+      if (e.data?.action === 'invalidate') {
+        console.log('[Refresh] Wykryto zmianę w adminie - natychmiastowe odświeżenie');
+        // Unieważnij cache
+        if (api) {
+          if (typeof api._invalidateStorage === 'function') api._invalidateStorage();
+          api.data = null;
+          api._l1 = {};
+          api._l1Time = 0;
+          api._etag = null;
+        }
+        // Przeładuj dane
+        cachedData = null;
+        dataLoaded = false;
+        await loadBaseData();
+        const activeTab = document.querySelector('.tab.active');
+        const activeTabName = activeTab ? activeTab.dataset.tab : 'results';
+        loadedTabs.clear(); // Wymuś przeładowanie wszystkich zakładek
+        await loadTabData(activeTabName);
+      }
+    };
+  } catch(e) { console.warn('BroadcastChannel not supported', e); }
+  
+  // Nasłuchuj na powrót do zakładki - tylko jeśli dane są stare
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      const now = Date.now();
+      if (now - lastFullRefresh > REFRESH_THROTTLE_MS) {
+        console.log('[Refresh] Powrót do zakładki po dłuższej nieobecności - odświeżenie');
+        lastFullRefresh = now;
+        // Delikatne odświeżenie - tylko unieważnij cache L1
+        if (api && api._l1) {
+          api._l1 = {};
+          api._l1Time = 0;
+        }
+        loadBaseData();
+      }
+    }
+  });
+}
+    if(localStorage.getItem('wrc-theme')==='dark')document.documentElement.classList.add('wrc-dark');
+  </script>
+  
+</head>
+<body>
+  <a href="start.html" class="floating-logo" aria-label="Home">
+    <img src="assets/logo.png" alt="Logo" class="floating-logo__img" />
+  </a>
+
+  <div class="page">
+    <header class="hero">
+      <div class="hero__bg"></div>
+      <div class="hero__overlay"></div>
+      <div class="hero__content">
+        <nav class="topbar">
+          <div class="topbar__left"></div>
+          <div class="topbar__center">
+            <a href="start.html" class="topbar__link">Start</a>
+            <a href="kalendarz.html" class="topbar__link">Kalendarz</a>
+            <a href="index.html" class="topbar__link active">Wyniki i klasyfikacja</a>
+            <a href="teams.html" class="topbar__link">Zespoły i kierowcy</a>
+            <a href="archiwum.html" class="topbar__link">Archiwum</a>
+          </div>
+          <div class="topbar__right">
+            <a href="#" class="rallytv-btn">Rally.TV</a>
+            <button class="theme-toggle-btn" id="themeToggle" aria-label="Przełącz motyw" type="button">
+              <svg class="icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+              <svg class="icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+          </div>
+        </nav>
+        <div class="hero__title-wrap">
+          <h1 class="hero__title">Wyniki i Klasyfikacja</h1>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="tabs-section">
+        <div class="tabs">
+          <button class="tab active" type="button" data-tab="results" data-load-on-show="true">Wyniki Rajdów</button>
+          <button class="tab" type="button" data-tab="championship" data-load-on-show="true">Mistrzostwa Kierowców</button>
+          <button class="tab" type="button" data-tab="super-sunday" data-load-on-show="true">Mistrzostwa Konstruktorów</button>
+          <button class="tab" type="button" data-tab="power-stage" data-load-on-show="true">Power Stage</button>
+          <button class="tab" type="button" data-tab="archive" onclick="location.href='archiwum.html';">Archiwum</button>
+        </div>
+      </section>
+
+      <section class="table-section">
+        <div class="index-tab-panel active" data-panel="results">
+          <div class="results-card">
+            <div class="results-table">
+              <div class="results-table__head">
+                <div>RUNDA</div><div>RAJD</div><div>DATA</div><div>STATUS</div><div>ZWYCIĘZCA</div><div>WYNIKI</div>
+              </div>
+              <div class="results-table__body" id="resultsTableBody"><div class="loading-spinner"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="index-tab-panel" data-panel="championship">
+          <div class="results-card">
+            <div class="standings-table standings-table--championship" id="championshipTable">
+              <div class="standings-table__head" id="championshipHead"></div>
+              <div class="standings-table__body" id="championshipBody"><div class="loading-spinner"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="index-tab-panel" data-panel="super-sunday">
+          <div class="results-card">
+            <div class="standings-table standings-table--constructors" id="constructorsTable">
+              <div class="standings-table__head" id="constructorsHead"></div>
+              <div class="standings-table__body" id="constructorsBody"><div class="loading-spinner"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="index-tab-panel" data-panel="power-stage">
+          <div class="results-card">
+            <div class="standings-table standings-table--powerstage" id="powerStageTable">
+              <div class="standings-table__head" id="powerStageHead"></div>
+              <div class="standings-table__body" id="powerStageBody"><div class="loading-spinner"></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="footer-spacer"></div>
+  <footer class="site-footer">
+    <div class="site-footer__sponsors">
+      <div class="footer-photo"><img src="assets/sponsors/photo1.png" alt="" /></div>
+      <div class="footer-photo"><img src="assets/sponsors/photo2.png" alt="" /></div>
+      <div class="footer-photo"><img src="assets/sponsors/photo3.png" alt="" /></div>
+    </div>
+    <div class="site-footer__sponsors site-footer__sponsors--secondary">
+      <div class="footer-photo footer-photo--sm"><img src="assets/sponsors/photo4.png" alt="" /></div>
+      <div class="footer-photo footer-photo--sm"><img src="assets/sponsors/photo5.png" alt="" /></div>
+      <div class="footer-photo footer-photo--sm"><img src="assets/sponsors/photo6.png" alt="" /></div>
+    </div>
+    <div class="footer-divider"></div>
+    <p class="footer-copyright">&copy; 2026 PRC. All rights reserved.</p>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="api.js"></script>
+  <script>
+    // ============================================================
+    // OPTYMALIZACJA - TYLKO JEDNO ŻĄDANIE NA SESJĘ
+    // ============================================================
+    
+    // Cache danych po załadowaniu
+    let cachedData = null;
+    let dataLoaded = false;
+    let loadingPromise = null;
+    let loadedTabs = new Set(); // które taby zostały już załadowane
+    
+    // Funkcja do konwersji kodu kraju na emoji flagi
+    function getFlagEmoji(countryCode) {
+      if (!countryCode) return '🏁';
+      const specialFlags = {
+        'wls': '🏴󠁧󠁢󠁷󠁬󠁳󠁿', 'sct': '🏴󠁧󠁢󠁳󠁣󠁴󠁿', 'eng': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'gb': '🇬🇧',
+        'gb-eng': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'gb-sct': '🏴󠁧󠁢󠁳󠁣󠁴󠁿', 'gb-wls': '🏴󠁧󠁢󠁷󠁬󠁳󠁿'
+      };
+      const code = countryCode.toLowerCase();
+      if (specialFlags[code]) return specialFlags[code];
+      if (code.length === 2) {
+        try {
+          const codePoints = code.toUpperCase().split('').map(char => 127397 + char.charCodeAt());
+          return String.fromCodePoint(...codePoints);
+        } catch(e) { return '🏁'; }
+      }
+      return '🏁';
+    }
+    
+    // Funkcja tworząca link do strony kierowcy
+    function getDriverLink(driverName, driverId) {
+      let slug = driverName.toLowerCase()
+        .replace(/ł/g, 'l').replace(/ą/g, 'a').replace(/ć/g, 'c')
+        .replace(/ę/g, 'e').replace(/ń/g, 'n').replace(/ó/g, 'o')
+        .replace(/ś/g, 's').replace(/ź/g, 'z').replace(/ż/g, 'z')
+        .replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+      if (driverId) slug = driverId;
+      return `<a href="${slug}.html" class="driver-link">${driverName}</a>`;
+    }
+
+    // Główna funkcja ładująca dane - tylko RAZ
+    async function loadBaseData() {
+      if (loadingPromise) return loadingPromise;
+      if (dataLoaded && cachedData) return cachedData;
+      
+      loadingPromise = (async () => {
+        try {
+          // Pokaż loading tylko w aktywnym panelu
+          const activePanel = document.querySelector('.index-tab-panel.active');
+          if (activePanel) {
+            const body = activePanel.querySelector('.standings-table__body, .results-table__body');
+            if (body) body.innerHTML = '<div class="loading-spinner"></div>';
+          }
+          
+          await api.loadData();
+          const rawData = api.data;
+          let calendar = await api.getCalendar();
+          
+          // Sortowanie kalendarza
+          calendar = getSortedCalendar(calendar, rawData);
+          
+          if (!calendar || calendar.length === 0) {
+            throw new Error('Brak danych');
+          }
+          
+          // Jedno wywołanie calculateAllStandings - wszystkie potrzebne dane
+          const standings = await api.calculateAllStandings();
+          const drivers = await api.getDrivers();
+          const teams = await api.getTeams();
+          
+          cachedData = {
+            calendar,
+            drivers,
+            teams,
+            championship: standings.championship,
+            constructors: standings.constructors,
+            powerStage: standings.powerStage,
+            driverMap: new Map(drivers.map(d => [d.id, d]))
+          };
+          
+          dataLoaded = true;
+          return cachedData;
+        } catch (error) {
+          console.error('Error loading data:', error);
+          throw error;
+        } finally {
+          loadingPromise = null;
+        }
+      })();
+      
+      return loadingPromise;
+    }
+    
+    // Funkcja do ładowania konkretnej tabeli (leniwe ładowanie)
+    async function loadTabData(tabName) {
+      if (loadedTabs.has(tabName)) return;
+      
+      const data = await loadBaseData();
+      
+      switch(tabName) {
+        case 'results':
+          await loadResultsTable(data.calendar, data.driverMap);
+          break;
+        case 'championship':
+          await loadChampionshipTable(data.championship, data.drivers, data.teams, data.calendar);
+          break;
+        case 'super-sunday':
+          await loadConstructorsTable(data.constructors, data.calendar);
+          break;
+        case 'power-stage':
+          await loadPowerStageTable(data.powerStage, data.calendar, data.drivers, data.teams, data.driverMap);
+          break;
+      }
+      loadedTabs.add(tabName);
+    }
+    
+    // Funkcje sortowania
+    function getCalendarGroupedByDate(calendar) {
+      const groups = {};
+      calendar.forEach(rally => {
+        const dateKey = rally.startDate;
+        if (!groups[dateKey]) groups[dateKey] = [];
+        groups[dateKey].push(rally);
+      });
+      const sortedDates = Object.keys(groups).sort();
+      return { groups, sortedDates };
+    }
+    
+    function getStoredOrderForDate(data, dateKey) {
+      const season = data?.seasons?.[data?.settings?.currentSeason];
+      const order = season?.calendarOrder || {};
+      return order[dateKey] || [];
+    }
+    
+    function getSortedCalendar(calendar, rawData) {
+      if (!calendar || calendar.length === 0) return [];
+      if (!rawData) return [...calendar];
+      
+      const { groups, sortedDates } = getCalendarGroupedByDate(calendar);
+      const result = [];
+      
+      for (const date of sortedDates) {
+        const rallies = groups[date];
+        const storedOrder = getStoredOrderForDate(rawData, date);
+        
+        if (storedOrder.length === rallies.length && storedOrder.every(id => rallies.some(r => r.id === id))) {
+          const ordered = [];
+          for (const id of storedOrder) {
+            const rally = rallies.find(r => r.id === id);
+            if (rally) ordered.push(rally);
+          }
+          for (const rally of rallies) {
+            if (!ordered.includes(rally)) ordered.push(rally);
+          }
+          result.push(...ordered);
+        } else {
+          result.push(...rallies.sort((a, b) => a.name.localeCompare(b.name)));
+        }
+      }
+      return result;
+    }
+
+    // Funkcje renderowania tabel (bez dodatkowych zapytań API)
+    async function loadResultsTable(calendar, driverMap) {
+      const tbody = document.getElementById('resultsTableBody');
+      let html = '';
+      for (let index = 0; index < calendar.length; index++) {
+        const rally = calendar[index];
+        const round = index + 1;
+        const statusText = getStatusText(rally.status);
+        let winner = '', winnerCountry = '', winnerId = '';
+        if (rally.status === 'completed') {
+          const calculated = await api.calculateRallyResults(rally.id);
+          if (calculated?.overall && calculated.overall.length > 0) {
+            const firstPlace = calculated.overall.find(r => r.status !== 'DSQ' && r.status !== '—');
+            if (firstPlace) { 
+              winner = firstPlace.driverName; 
+              winnerCountry = firstPlace.driverCountry;
+              winnerId = firstPlace.driverId;
+            }
+          }
+        }
+        const winnerDisplay = winner ? 
+          `<span class="flag-emoji">${getFlagEmoji(winnerCountry)}</span>${getDriverLink(winner, winnerId)}` : '';
+        
+        html += `<div class="results-row">
+          <div class="col-round">${round}</div>
+          <div class="col-rally"><span class="flag-emoji">${getFlagEmoji(rally.country)}</span><span>${rally.name}</span></div>
+          <div class="col-date">${formatDateRange(rally.startDate, rally.endDate)}</div>
+          <div class="col-status">${statusText}</div>
+          <div class="col-winner">${winnerDisplay}</div>
+          <div class="col-results">${(rally.status === 'completed' || rally.status === 'ongoing') ? `<a href="wyniki.html?rally=${rally.id}" class="results-link">Pełne wyniki</a>` : ''}</div>
+        </div>`;
+      }
+      tbody.innerHTML = html;
+    }
+    
+    async function loadChampionshipTable(championship, drivers, teams, calendar) {
+      const head = document.getElementById('championshipHead');
+      const body = document.getElementById('championshipBody');
+      if (!championship || championship.length === 0) { body.innerHTML = '<div class="loading-spinner"></div>'; return; }
+      
+      let headHtml = `<div data-sort="pos" data-type="num" class="sort-asc">POZ.<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>
+        <div data-sort="driver" data-type="str">KIEROWCA<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>
+        <div>ZESPÓŁ</div>`;
+      
+      calendar.forEach(rally => { 
+        headHtml += `<div><span class="fi fi-${rally.country} flag flag-clickable" data-rally-id="${rally.id}" title="${rally.name}"></span></div>`; 
+      });
+      
+      headHtml += `<div data-sort="total" data-type="num">SUMA<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>
+        <div data-sort="diff" data-type="num">DIFF.<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>`;
+      head.innerHTML = headHtml;
+      
+      document.querySelectorAll('#championshipHead .flag-clickable').forEach(flag => {
+        flag.addEventListener('click', (e) => { e.stopPropagation(); const rallyId = flag.dataset.rallyId; if (rallyId) window.location.href = `wyniki.html?rally=${rallyId}`; });
+      });
+      
+      let bodyHtml = '';
+      for (const driverStanding of championship) {
+        const driver = drivers.find(d => d.id === driverStanding.driverId);
+        const team = teams.find(t => t.id === driver?.teamId);
+        const driverLink = getDriverLink(driverStanding.driverName, driverStanding.driverId);
+        bodyHtml += `<div class="standings-row" data-pos="${driverStanding.position}" data-total="${driverStanding.totalPoints}" data-diff="${driverStanding.diff}" data-driver="${driverStanding.driverName}">
+          <div class="col-pos">${driverStanding.position}</div>
+          <div class="col-driver"><span class="flag-emoji">${getFlagEmoji(driverStanding.driverCountry)}</span><span class="driver-name">${driverLink}</span></div>
+          <div class="col-team-logo team-logo-tooltip" data-team-name="${team?.name || '-'}"><img src="${team?.logo || 'assets/teams/default.png'}" alt="${team?.name || '-'}" onerror="this.src='assets/teams/default.png'" /></div>`;
+        for (const rally of calendar) {
+          const rallyDetail = driverStanding.rallyDetails?.find(rd => rd.rallyId === rally.id);
+          let displayText = '—', tooltipText = '', hasPoints = false;
+          if (rallyDetail && rallyDetail.points > 0) {
+            const details = rallyDetail.details || [];
+            const racePoints = details.find(d => d.type === 'Position')?.points || 0;
+            const bonusPoints = details.find(d => d.type === 'Bonus')?.points || 0;
+            const psPoints = details.find(d => d.type === 'Power Stage')?.points || 0;
+            const extraPoints = details.find(d => d.type === 'Extra')?.points || 0;
+            const parts = [];
+            if (racePoints > 0) parts.push(racePoints);
+            if (bonusPoints > 0) parts.push(bonusPoints);
+            if (psPoints > 0) parts.push(psPoints);
+            if (extraPoints > 0) parts.push(extraPoints);
+            if (parts.length > 0) { displayText = parts.join(' + '); hasPoints = true; }
+            const tooltipParts = [];
+            if (racePoints > 0) tooltipParts.push(`Rajd: ${racePoints}`);
+            if (bonusPoints > 0) tooltipParts.push(`Bonus: ${bonusPoints}`);
+            if (psPoints > 0) tooltipParts.push(`Power Stage: ${psPoints}`);
+            if (extraPoints > 0) tooltipParts.push(`Dodatkowe: ${extraPoints}`);
+            if (tooltipParts.length > 0) tooltipText = tooltipParts.join('\n');
+          }
+          const tooltipClass = hasPoints ? (tooltipText.includes('\n') ? 'points-tooltip multiline' : 'points-tooltip') : '';
+          const safeTooltipText = tooltipText.replace(/"/g, '&quot;');
+          bodyHtml += `<div class="${tooltipClass}" ${hasPoints ? `data-tooltip="${safeTooltipText}"` : ''}>${displayText}</div>`;
+        }
+        bodyHtml += `<div class="col-total">${driverStanding.totalPoints}</div><div class="col-diff">${driverStanding.diff === 0 ? '—' : `-${driverStanding.diff}`}</div></div>`;
+      }
+      body.innerHTML = bodyHtml;
+      initSorting(document.querySelector('#championshipTable'));
+    }
+    
+    async function loadConstructorsTable(constructors, calendar) {
+      const head = document.getElementById('constructorsHead');
+      const body = document.getElementById('constructorsBody');
+      if (!constructors || constructors.length === 0) { body.innerHTML = '<div class="loading-spinner"></div>'; return; }
+      
+      let headHtml = `<div data-sort="pos" data-type="num" class="sort-asc">POZ.<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>
+        <div>ZESPÓŁ</div>`;
+      
+      calendar.forEach(rally => { 
+        headHtml += `<div><span class="fi fi-${rally.country} flag flag-clickable" data-rally-id="${rally.id}" title="${rally.name}"></span></div>`; 
+      });
+      
+      headHtml += `<div data-sort="total" data-type="num">SUMA<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>
+        <div data-sort="diff" data-type="num">DIFF.<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>`;
+      head.innerHTML = headHtml;
+      
+      document.querySelectorAll('#constructorsHead .flag-clickable').forEach(flag => {
+        flag.addEventListener('click', (e) => { e.stopPropagation(); const rallyId = flag.dataset.rallyId; if (rallyId) window.location.href = `wyniki.html?rally=${rallyId}`; });
+      });
+      
+      let bodyHtml = '';
+      for (const teamStanding of constructors) {
+        bodyHtml += `<div class="standings-row" data-pos="${teamStanding.position}" data-total="${teamStanding.totalPoints}" data-diff="${teamStanding.diff}">
+          <div class="col-pos">${teamStanding.position}</div>
+          <div class="col-team-logo-constructor team-logo-tooltip" data-team-name="${teamStanding.teamName}"><img src="${teamStanding.teamLogo}" alt="${teamStanding.teamName}" onerror="this.src='assets/teams/default.png'" style="width:32px;height:32px;object-fit:contain;" /></div>`;
+        for (const rally of calendar) {
+          const rallyDetail = teamStanding.rallyDetails?.find(rd => rd.rallyId === rally.id);
+          let displayText = '—', tooltipText = '', hasPoints = false;
+          if (rallyDetail && rallyDetail.points > 0) {
+            const breakdown = rallyDetail.driverPoints?.map(dp => dp.points).join(' + ');
+            if (breakdown) { displayText = breakdown; hasPoints = true; tooltipText = rallyDetail.driverPoints?.map(dp => `${dp.driverName}: ${dp.points}`).join('\n') || breakdown; }
+            else { displayText = `${rallyDetail.points}`; hasPoints = true; tooltipText = `${rallyDetail.points}`; }
+          }
+          const tooltipClass = hasPoints ? (tooltipText.includes('\n') ? 'points-tooltip--above multiline' : 'points-tooltip--above') : '';
+          const safeTooltipText = tooltipText.replace(/"/g, '&quot;');
+          bodyHtml += `<div class="${tooltipClass}" ${hasPoints ? `data-tooltip="${safeTooltipText}"` : ''}>${displayText}</div>`;
+        }
+        bodyHtml += `<div class="col-total">${teamStanding.totalPoints}</div><div class="col-diff">${teamStanding.diff === 0 ? '—' : `-${teamStanding.diff}`}</div></div>`;
+      }
+      body.innerHTML = bodyHtml;
+      initSorting(document.querySelector('#constructorsTable'));
+    }
+    
+    async function loadPowerStageTable(powerStageStandings, calendar, drivers, teams, driverMap) {
+      const head = document.getElementById('powerStageHead');
+      const body = document.getElementById('powerStageBody');
+      if (!powerStageStandings || powerStageStandings.length === 0) { body.innerHTML = '<div class="loading-spinner">Brak danych Power Stage</div>'; return; }
+      
+      let headHtml = `<div data-sort="pos" data-type="num" class="sort-asc">POZ.<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>
+        <div data-sort="driver" data-type="str">KIEROWCA<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>
+        <div>ZESPÓŁ</div>`;
+      
+      calendar.forEach(rally => { 
+        headHtml += `<div><span class="fi fi-${rally.country} flag flag-clickable" data-rally-id="${rally.id}" title="Kliknij, aby zobaczyć wyniki ${rally.name}"></span></div>`; 
+      });
+      
+      headHtml += `<div data-sort="total" data-type="num">SUMA<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>
+        <div data-sort="diff" data-type="num">DIFF.<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>`;
+      head.innerHTML = headHtml;
+      
+      document.querySelectorAll('#powerStageHead .flag-clickable').forEach(flag => {
+        flag.addEventListener('click', (e) => { e.stopPropagation(); const rallyId = flag.dataset.rallyId; if (rallyId) window.location.href = `wyniki.html?rally=${rallyId}`; });
+      });
+      
+      let bodyHtml = '';
+      for (const standing of powerStageStandings) {
+        const team = teams.find(t => t.id === standing.teamId);
+        const driverLink = getDriverLink(standing.driverName, standing.driverId);
+        bodyHtml += `<div class="standings-row" data-pos="${standing.position}" data-total="${standing.totalPoints}" data-diff="${standing.diff}" data-driver="${standing.driverName}">
+          <div class="col-pos">${standing.position}</div>
+          <div class="col-driver"><span class="flag-emoji">${getFlagEmoji(standing.driverCountry)}</span><span>${driverLink}</span></div>
+          <div class="col-team-logo team-logo-tooltip" data-team-name="${team?.name || '-'}"><img src="${team?.logo || 'assets/teams/default.png'}" alt="${team?.name || '-'}" onerror="this.src='assets/teams/default.png'" style="width:28px;height:28px;" /></div>`;
+        for (const rally of calendar) {
+          const points = standing.rallyPoints[rally.id] || 0;
+          let displayText = '—', tooltipText = '', hasPoints = false;
+          if (points > 0) { displayText = points.toString(); hasPoints = true; tooltipText = `${standing.driverName} zdobył ${points} pkt. na Power Stage`; }
+          const tooltipClass = hasPoints ? 'points-tooltip' : '';
+          const safeTooltipText = tooltipText.replace(/"/g, '&quot;');
+          bodyHtml += `<div class="${tooltipClass}" ${hasPoints ? `data-tooltip="${safeTooltipText}"` : ''}>${displayText}</div>`;
+        }
+        bodyHtml += `<div class="col-total">${standing.totalPoints}</div><div class="col-diff">${standing.diff === 0 ? '—' : `-${standing.diff}`}</div></div>`;
+      }
+      body.innerHTML = bodyHtml;
+      initSorting(document.querySelector('#powerStageTable'));
+    }
+    
+    function formatDateRange(start, end) {
+      const startDate = new Date(start), endDate = new Date(end);
+      const sameDay = startDate.toDateString() === endDate.toDateString();
+      const monthNames = { 'sty': 'STYCZNIA', 'lut': 'LUTEGO', 'mar': 'MARCA', 'kwi': 'KWIETNIA', 'maj': 'MAJA', 'cze': 'CZERWCA', 'lip': 'LIPCA', 'sie': 'SIERPNIA', 'wrz': 'WRZEŚNIA', 'paź': 'PAŹDZIERNIKA', 'lis': 'LISTOPADA', 'gru': 'GRUDNIA' };
+      function formatDate(date) {
+        const day = date.getDate();
+        const monthShort = date.toLocaleDateString('pl-PL', { month: 'short' }).replace('.', '').toLowerCase();
+        const month = monthNames[monthShort] || monthShort.toUpperCase();
+        return `${day} ${month} ${date.getFullYear()}`;
+      }
+      function formatShortDate(date) {
+        const day = date.getDate();
+        const monthShort = date.toLocaleDateString('pl-PL', { month: 'short' }).replace('.', '').toLowerCase();
+        const month = monthNames[monthShort] || monthShort.toUpperCase();
+        return `${day} ${month}`;
+      }
+      if (sameDay) return formatDate(startDate);
+      return `${formatShortDate(startDate)} – ${formatDate(endDate)}`;
+    }
+
+    function getStatusText(status) {
+      switch(status) {
+        case 'completed': return 'ZAKOŃCZONY';
+        case 'ongoing': return 'TRWA';
+        default: return '';
+      }
+    }
+    
+    function initSorting(table) {
+      if (!table) return;
+      const head = table.querySelector('.standings-table__head');
+      const body = table.querySelector('.standings-table__body');
+      if (!head || !body) return;
+      const allEls = Array.from(head.querySelectorAll('[data-sort]'));
+      let cur = { key: 'pos', dir: 'asc' };
+      function applySort(activeEl, key, type, dir) {
+        allEls.forEach(c => c.classList.remove('sort-asc', 'sort-desc'));
+        activeEl.classList.add(dir === 'asc' ? 'sort-asc' : 'sort-desc');
+        const rows = Array.from(body.querySelectorAll('.standings-row'));
+        rows.sort((a, b) => {
+          let va = a.dataset[key] || '', vb = b.dataset[key] || '';
+          let cmp;
+          if (type === 'num') cmp = (parseFloat(va) || 0) - (parseFloat(vb) || 0);
+          else cmp = va.localeCompare(vb, 'pl');
+          return dir === 'asc' ? cmp : -cmp;
+        });
+        rows.forEach(r => body.appendChild(r));
+      }
+      allEls.forEach(el => {
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const k = el.dataset.sort;
+          const t = el.dataset.type;
+          cur.dir = (cur.key === k) ? (cur.dir === 'asc' ? 'desc' : 'asc') : 'asc';
+          cur.key = k;
+          applySort(el, k, t, cur.dir);
+        });
+      });
+    }
+    
+    // Obsługa przełączania zakładek z leniwym ładowaniem
+    const tabButtons = document.querySelectorAll(".tab");
+    const panelsList = document.querySelectorAll(".index-tab-panel");
+    
+    tabButtons.forEach((tab) => {
+      tab.addEventListener("click", async () => {
+        const target = tab.dataset.tab;
+        if (!target) return;
+        
+        // Aktywuj zakładkę
+        tabButtons.forEach((t) => t.classList.remove("active"));
+        panelsList.forEach((p) => p.classList.remove("active"));
+        tab.classList.add("active");
+        const targetPanel = document.querySelector(`.index-tab-panel[data-panel="${target}"]`);
+        if (targetPanel) targetPanel.classList.add("active");
+        
+        // Załaduj dane dla tej zakładki (leniwie)
+        await loadTabData(target);
+      });
+    });
+    
+    // Inicjalizacja - ładujemy tylko dane podstawowe i aktywną zakładkę
+    (async function init() {
+      document.body.classList.add('no-transition');
+      if(localStorage.getItem('wrc-theme')==='dark') document.body.classList.add('dark');
+      document.documentElement.classList.remove('wrc-dark');
+      requestAnimationFrame(function(){ requestAnimationFrame(function(){ document.body.classList.remove('no-transition'); }); });
+      
+      const btn = document.getElementById('themeToggle');
+      if(btn){
+        btn.addEventListener('click', function(){
+          document.body.classList.add('theme-animating');
+          var isDark = document.body.classList.toggle('dark');
+          localStorage.setItem('wrc-theme', isDark ? 'dark' : 'light');
+          setTimeout(function(){ document.body.classList.remove('theme-animating'); }, 420);
+        });
+      }
+      
+      const logo = document.querySelector(".floating-logo");
+      const hero = document.querySelector(".hero");
+      function updateLogo() { logo.classList.toggle("logo--dark", hero.getBoundingClientRect().bottom <= 0); }
+      window.addEventListener("scroll", updateLogo, { passive: true });
+      updateLogo();
+      
+      // Załaduj tylko podstawowe dane i aktywną zakładkę
+      await loadBaseData();
+      const activeTab = document.querySelector('.tab.active');
+      const activeTabName = activeTab ? activeTab.dataset.tab : 'results';
+      await loadTabData(activeTabName);
+    })();
+  </script>
+</body>
+</html>
