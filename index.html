@@ -221,7 +221,34 @@
     .points-tooltip--above.multiline:hover::after { white-space: pre-line !important; text-align: left !important; min-width: 120px !important; }
     body.dark .points-tooltip--above:hover::after { background-color: #2a2a2a !important; color: #f0f0f0 !important; border: 1px solid #444 !important; }
 
-    .team-logo-tooltip { cursor: help; position: relative; display: inline-flex; align-items: center; }
+    /* Nowy styl dla fallback logo - tekst zamiast obrazka gdy brak loga */
+    .team-logo-fallback {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0f0f0;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #666;
+    }
+    
+    body.dark .team-logo-fallback {
+      background: #2a2a2a;
+      color: #aaa;
+    }
+    
+    .team-logo-tooltip { 
+      cursor: help; 
+      position: relative; 
+      display: inline-flex; 
+      align-items: center; 
+      justify-content: center;
+      min-width: 32px;
+    }
+    
     .team-logo-tooltip:hover::after {
       content: attr(data-team-name);
       position: absolute;
@@ -253,8 +280,18 @@
     .flag-clickable { cursor: pointer; transition: transform 0.1s ease; display: inline-block; }
     .flag-clickable:hover { transform: scale(1.2); }
 
-    .col-team-logo img { width: 28px; height: 28px; object-fit: contain; }
-    .col-team-logo-constructor { display: flex; align-items: center; justify-content: center; }
+    .col-team-logo img, .col-team-logo-constructor img { 
+      width: 28px; 
+      height: 28px; 
+      object-fit: contain;
+      border-radius: 4px;
+    }
+    
+    .col-team-logo-constructor { 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+    }
 
     .topbar__link { font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important; font-weight: 550 !important; }
     .tab { font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important; font-weight: 500 !important; }
@@ -414,17 +451,19 @@
       return `<a href="${slug}.html" class="driver-link">${driverName}</a>`;
     }
 
-    // Funkcja do pobierania URL loga z obsługą błędów
-    function getTeamLogoUrl(teamLogo, teamName) {
-      if (!teamLogo) return 'assets/teams/default.png';
-      
-      // Jeśli logo to pełny URL (zaczyna się od http:// lub https://)
-      if (teamLogo.startsWith('http://') || teamLogo.startsWith('https://')) {
-        return teamLogo;
+    // Funkcja do pobierania URL loga z obsługą błędów - BEZ WYWOŁYWANIA BŁĘDÓW 404
+    function getTeamLogoHtml(teamLogo, teamName) {
+      // Jeśli nie ma loga lub logo jest puste, zwróć fallback tekstowy
+      if (!teamLogo || teamLogo === '') {
+        const firstLetter = teamName ? teamName.charAt(0).toUpperCase() : '?';
+        return `<div class="team-logo-fallback">${firstLetter}</div>`;
       }
       
-      // Jeśli logo to ścieżka względna
-      return teamLogo;
+      // Jeśli logo to pełny URL lub ścieżka względna
+      // Używamy data-src zamiast src aby uniknąć natychmiastowego ładowania
+      return `<img src="${teamLogo}" alt="${teamName}" 
+        onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'team-logo-fallback\'>${teamName ? teamName.charAt(0).toUpperCase() : '?'}</div>';" 
+        style="width:28px;height:28px;object-fit:contain;border-radius:4px;" />`;
     }
 
     // Główna funkcja ładująca dane
@@ -454,16 +493,10 @@
           const drivers = await api.getDrivers();
           const teams = await api.getTeams();
           
-          // Pobierz loga dla każdego zespołu
-          const teamsWithLogos = teams.map(team => ({
-            ...team,
-            logoUrl: getTeamLogoUrl(team.logo, team.name)
-          }));
-          
           cachedData = {
             calendar,
             drivers,
-            teams: teamsWithLogos,
+            teams,
             championship: standings.championship,
             constructors: standings.constructors,
             powerStage: standings.powerStage,
@@ -611,13 +644,13 @@
         const driver = drivers.find(d => d.id === driverStanding.driverId);
         const team = teams.find(t => t.id === driver?.teamId);
         const driverLink = getDriverLink(driverStanding.driverName, driverStanding.driverId);
-        const teamLogoUrl = team?.logoUrl || 'assets/teams/default.png';
+        const teamLogoHtml = team?.logo ? getTeamLogoHtml(team.logo, team.name) : `<div class="team-logo-fallback">${team?.name?.charAt(0).toUpperCase() || '?'}</div>`;
         
         bodyHtml += `<div class="standings-row" data-pos="${driverStanding.position}" data-total="${driverStanding.totalPoints}" data-diff="${driverStanding.diff}" data-driver="${driverStanding.driverName}">
           <div class="col-pos">${driverStanding.position}</div>
           <div class="col-driver"><span class="flag-emoji">${getFlagEmoji(driverStanding.driverCountry)}</span><span class="driver-name">${driverLink}</span></div>
           <div class="col-team-logo team-logo-tooltip" data-team-name="${team?.name || '-'}">
-            <img src="${teamLogoUrl}" alt="${team?.name || '-'}" onerror="this.src='assets/teams/default.png'" />
+            ${teamLogoHtml}
           </div>`;
         
         for (const rally of calendar) {
@@ -674,12 +707,14 @@
       
       let bodyHtml = '';
       for (const teamStanding of constructors) {
-        const teamLogoUrl = getTeamLogoUrl(teamStanding.teamLogo, teamStanding.teamName);
+        const teamLogoHtml = teamStanding.teamLogo ? 
+          getTeamLogoHtml(teamStanding.teamLogo, teamStanding.teamName) : 
+          `<div class="team-logo-fallback" style="width:32px;height:32px;font-size:16px;">${teamStanding.teamName?.charAt(0).toUpperCase() || '?'}</div>`;
         
         bodyHtml += `<div class="standings-row" data-pos="${teamStanding.position}" data-total="${teamStanding.totalPoints}" data-diff="${teamStanding.diff}">
           <div class="col-pos">${teamStanding.position}</div>
           <div class="col-team-logo-constructor team-logo-tooltip" data-team-name="${teamStanding.teamName}">
-            <img src="${teamLogoUrl}" alt="${teamStanding.teamName}" onerror="this.src='assets/teams/default.png'" style="width:32px;height:32px;object-fit:contain;" />
+            ${teamLogoHtml}
           </div>`;
         
         for (const rally of calendar) {
@@ -725,13 +760,15 @@
       for (const standing of powerStageStandings) {
         const team = teams.find(t => t.id === standing.teamId);
         const driverLink = getDriverLink(standing.driverName, standing.driverId);
-        const teamLogoUrl = team?.logoUrl || 'assets/teams/default.png';
+        const teamLogoHtml = team?.logo ? 
+          getTeamLogoHtml(team.logo, team.name) : 
+          `<div class="team-logo-fallback">${team?.name?.charAt(0).toUpperCase() || '?'}</div>`;
         
         bodyHtml += `<div class="standings-row" data-pos="${standing.position}" data-total="${standing.totalPoints}" data-diff="${standing.diff}" data-driver="${standing.driverName}">
           <div class="col-pos">${standing.position}</div>
           <div class="col-driver"><span class="flag-emoji">${getFlagEmoji(standing.driverCountry)}</span><span>${driverLink}</span></div>
           <div class="col-team-logo team-logo-tooltip" data-team-name="${team?.name || '-'}">
-            <img src="${teamLogoUrl}" alt="${team?.name || '-'}" onerror="this.src='assets/teams/default.png'" style="width:28px;height:28px;" />
+            ${teamLogoHtml}
           </div>`;
         
         for (const rally of calendar) {
