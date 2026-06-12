@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wyniki – PRC</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="assets/icon.jpg" />
+
+  <style>
+    .flag-emoji {
+      font-size: 1em;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 0px;
+    }
+    
+    .standings-table__head .fi {
+      font-size: 12px !important;
+      line-height: 1 !important;
+      vertical-align: middle !important;
+      margin-right: 0px !important;
+    }
+    
+    .col-driver .flag-emoji {
+      font-size: 13px;
+      margin-right: 0px;
+    }
+    
+    html.wrc-dark,html.wrc-dark body,html.wrc-dark .page{background:#1a1a1a!important}
+
+    .standings-table .col-driver,
+    .standings-table .col-team-logo { padding-left: 10px !important; }
+
+    .standings-table__head > div[data-sort] {
+      cursor: pointer; user-select: none; gap: 5px; transition: color .15s;
+    }
+    .standings-table__head > div[data-sort]:hover { color: #1a2635; }
+    body.dark .standings-table__head > div[data-sort]:hover { color: #f3f3f3; }
+    .sort-icon { display:none; flex-direction:column; gap:1px; flex-shrink:0; }
+    .standings-table__head > div[data-sort].sort-asc  .sort-icon,
+    .standings-table__head > div[data-sort].sort-desc .sort-icon { display:inline-flex; }
+    .sort-icon svg { display:block; }
+    
+    .loading-spinner {
+      text-align: center;
+      padding: 60px;
+      color: var(--text-muted);
+      font-size: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .loading-spinner::after {
+      content: "";
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba(128, 128, 128, 0.2);
+      border-top-color: #9e9e9e;
+      border-radius: 50%;
+      display: inline-block;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .standings-table--lacznie .standings-table__head > div {
+      justify-content: center !important;
+      text-align: center !important;
+    }
+    
+    .standings-table--lacznie .standings-table__head > div:nth-child(1),
+    .standings-table--lacznie .standings-table__head > div:nth-child(2),
+    .standings-table--lacznie .standings-table__head > div:nth-child(3) {
+      justify-content: flex-start !important;
+      text-align: left !important;
+    }
+    
+    .standings-table--lacznie .standings-row > div {
+      justify-content: center !important;
+      text-align: center !important;
+    }
+    
+    .standings-table--lacznie .standings-row > div:nth-child(1),
+    .standings-table--lacznie .standings-row > div:nth-child(2),
+    .standings-table--lacznie .standings-row > div:nth-child(3) {
+      justify-content: flex-start !important;
+      text-align: left !important;
+    }
+    
+    .col-team-logo img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+      margin-right: 8px;
+    }
+    
+    .standings-table--ss .standings-table__head {
+      display: grid;
+      grid-template-columns: 64px 1.7fr 1.45fr 100px 110px 130px 90px 90px;
+      align-items: center;
+      min-height: 49px;
+      padding: 0 20px;
+      background: #f2f3f3;
+      color: #67727f;
+      font-size: 11px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      font-family: "SebinoSoft", Arial, sans-serif;
+    }
+    
+    .standings-table--ss .standings-table__head > div {
+      display: flex;
+      align-items: center;
+      padding: 0 5px;
+    }
+    
+    .standings-table--ss .standings-table__head > div:nth-child(1) { justify-content: flex-start; }
+    .standings-table--ss .standings-table__head > div:nth-child(2) { justify-content: flex-start; padding-left: 10px !important; }
+    .standings-table--ss .standings-table__head > div:nth-child(3) { justify-content: flex-start; }
+    .standings-table--ss .standings-table__head > div:nth-child(4) { justify-content: center; text-align: center; }
+    .standings-table--ss .standings-table__head > div:nth-child(5) { justify-content: center; text-align: center; }
+    .standings-table--ss .standings-table__head > div:nth-child(6) { justify-content: center; text-align: center; }
+    .standings-table--ss .standings-table__head > div:nth-child(7) { justify-content: center; text-align: center; }
+    .standings-table--ss .standings-table__head > div:nth-child(8) { justify-content: center; text-align: center; }
+    
+    .standings-table--ss .standings-row {
+      display: grid;
+      grid-template-columns: 64px 1.7fr 1.45fr 100px 110px 130px 90px 90px;
+      align-items: center;
+      min-height: 59px;
+      padding: 0 20px;
+      font-size: 13px;
+      line-height: 1;
+      color: var(--text-main);
+      font-family: "SebinoSoft", Arial, sans-serif;
+      position: relative;
+    }
+    
+    .standings-table--ss .standings-row > div {
+      display: flex;
+      align-items: center;
+      padding: 0 5px;
+    }
+    
+    .standings-table--ss .standings-row > div:nth-child(1) { justify-content: flex-start; }
+    .standings-table--ss .standings-row > div:nth-child(2) { justify-content: flex-start; }
+    .standings-table--ss .standings-row > div:nth-child(3) { justify-content: flex-start; gap: 7px; }
+    .standings-table--ss .standings-row > div:nth-child(4) { justify-content: center; text-align: center; }
+    .standings-table--ss .standings-row > div:nth-child(5) { justify-content: center; text-align: center; }
+    .standings-table--ss .standings-row > div:nth-child(6) { justify-content: center; text-align: center; }
+    .standings-table--ss .standings-row > div:nth-child(7) { justify-content: center; text-align: center; }
+    .standings-table--ss .standings-row > div:nth-child(8) { justify-content: center; text-align: center; }
+
+    .tire-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-left: 2px;
+      line-height: 1;
+      position: relative;
+      top: -0.5px;
+    }
+    .tire-icon svg {
+      width: 10px;
+      height: 11px;
+      display: block;
+      color: inherit;
+      opacity: 0.90;
+    }
+    .time-with-tire {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      white-space: nowrap;
+      line-height: 1;
+    }
+
+    [data-tooltip] {
+      position: relative;
+      cursor: help;
+      display: inline-block;
+    }
+
+    .points-tooltip {
+      cursor: help;
+      position: relative;
+      display: inline-block;
+    }
+    .points-tooltip:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      top: 50%;
+      left: 100%;
+      transform: translateY(-50%) translateX(8px);
+      background-color: #1e2a3a !important;
+      color: #fff !important;
+      padding: 8px 12px !important;
+      border-radius: 8px !important;
+      font-size: 11px !important;
+      white-space: nowrap !important;
+      z-index: 999999 !important;
+      pointer-events: none !important;
+      font-family: 'SebinoSoft', Arial, sans-serif !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25) !important;
+      line-height: 1.4 !important;
+      font-weight: normal !important;
+      animation: tooltipFadeInRight 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards !important;
+    }
+    .points-tooltip.multiline:hover::after {
+      white-space: pre-line !important;
+      text-align: left !important;
+      min-width: 120px !important;
+    }
+
+    .team-logo-tooltip {
+      cursor: help;
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+    .team-logo-tooltip:hover::after {
+      content: attr(data-team-name);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background-color: #1e2a3a !important;
+      color: #fff !important;
+      padding: 6px 10px !important;
+      border-radius: 6px !important;
+      font-size: 11px !important;
+      white-space: nowrap !important;
+      z-index: 999999 !important;
+      pointer-events: none !important;
+      font-family: 'SebinoSoft', Arial, sans-serif !important;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2) !important;
+      font-weight: 500 !important;
+      animation: tooltipFadeInUp 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards !important;
+    }
+
+    .tire-icon {
+      position: relative;
+    }
+    .tire-icon:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background-color: #1e2a3a !important;
+      color: #fff !important;
+      padding: 6px 10px !important;
+      border-radius: 6px !important;
+      font-size: 11px !important;
+      white-space: nowrap !important;
+      z-index: 999999 !important;
+      pointer-events: none !important;
+      font-family: 'SebinoSoft', Arial, sans-serif !important;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2) !important;
+      font-weight: 500 !important;
+      animation: tooltipFadeInUp 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards !important;
+    }
+
+    @keyframes tooltipFadeInUp {
+      0%   { opacity: 0; transform: translateX(-50%) translateY(0px) scale(0.95); }
+      100% { opacity: 1; transform: translateX(-50%) translateY(-8px) scale(1); }
+    }
+    @keyframes tooltipFadeInRight {
+      0%   { opacity: 0; transform: translateY(-50%) translateX(4px) scale(0.95); }
+      100% { opacity: 1; transform: translateY(-50%) translateX(8px) scale(1); }
+    }
+
+    body.dark .points-tooltip:hover::after,
+    body.dark .team-logo-tooltip:hover::after,
+    body.dark .tire-icon:hover::after {
+      background-color: #2a2a2a !important;
+      color: #f0f0f0 !important;
+      border: 1px solid #444 !important;
+    }
+
+    .standings-row         { overflow: visible !important; }
+    .standings-table__body { overflow: visible !important; }
+
+    .topbar__link {
+      font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+      font-weight: 550 !important;
+    }
+    
+    .tab {
+      font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+      font-weight: 500 !important;
+    }
+    
+    .rallytv-btn {
+      font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+      font-weight: 500 !important;
+    }
+    
+    .standings-row,
+    .standings-table__head {
+      font-family: "SebinoSoft", Arial, sans-serif !important;
+      font-weight: 400 !important;
+    }
+
+    .standings-row {
+      color: var(--text-main);
+    }
+    
+    body.dark .standings-row {
+      color: #c0c0c0;
+    }
+
+    .hero__logo {
+      max-width: auto;
+    }
+
+    
+    /* ═══════════════════════════════════════════
+       Wskaźnik zmiany pozycji
+       Układ: [cyfra pozycji]  [pill: strzałka + cyfra]
+       ═══════════════════════════════════════════ */
+
+    /* wrapper całej komórki: cyfra pozycji + pill obok */
+    .col-pos-wrap {
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 6px;          /* odstęp między cyfrą pozycji a pillem */
+      line-height: 1;
+    }
+
+    /* główna cyfra pozycji – bez zmian rozmiaru */
+    .pos-number {
+      font-size: 13px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    /* pill zawierający strzałkę + cyfrę zmiany */
+    .pos-change {
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 5px 2px 4px;
+      border-radius: 4px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    /* tło pilla w zależności od kierunku */
+    .pos-change--up   { background-color: rgba(34, 169, 75, 0.12); }
+    .pos-change--down { background-color: rgba(224, 53, 53, 0.12); }
+
+    body.dark .pos-change--up   { background-color: rgba(34, 169, 75, 0.18); }
+    body.dark .pos-change--down { background-color: rgba(224, 53, 53, 0.18); }
+
+    /* strzałka SVG */
+    .pos-change__arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .pos-change__arrow svg {
+      width: 8px;
+      height: 6px;
+      display: block;
+    }
+
+    /* cyfra zmiany */
+    .pos-change__num {
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    /* kolory */
+    .pos-change--up   .pos-change__arrow,
+    .pos-change--up   .pos-change__num   { color: #1d9944; }
+
+    .pos-change--down .pos-change__arrow,
+    .pos-change--down .pos-change__num   { color: #d42f2f; }
+
+    body.dark .pos-change--up   .pos-change__arrow,
+    body.dark .pos-change--up   .pos-change__num   { color: #2ec85e; }
+
+    body.dark .pos-change--down .pos-change__arrow,
+    body.dark .pos-change--down .pos-change__num   { color: #f05555; }
+    
+    .hero__title-container {
+    display: flex;
+    gap: 2px;
+  }
+
+
+  </style>
+  <script>
+    // Funkcja tworząca link do strony kierowcy w folderze drivers/
+function getDriverLink(driverName, driverId) {
+  let slug = driverName.toLowerCase()
+    .replace(/ł/g, 'l')
+    .replace(/ą/g, 'a')
+    .replace(/ć/g, 'c')
+    .replace(/ę/g, 'e')
+    .replace(/ń/g, 'n')
+    .replace(/ó/g, 'o')
+    .replace(/ś/g, 's')
+    .replace(/ź/g, 'z')
+    .replace(/ż/g, 'z')
+    .replace(/\s+/g, '_')
+    .replace(/[^a-z0-9_]/g, '');
+  
+  if (driverId) slug = driverId;
+  
+  return `<a href="${slug}.html" class="driver-link">${driverName}</a>`;
+}
+
+    if(localStorage.getItem('wrc-theme')==='dark')document.documentElement.classList.add('wrc-dark');
+  </script>
+</head>
+<body>
+  <a href="start.html" class="floating-logo" aria-label="Home">
+    <img src="assets/logo.png" alt="Logo" class="floating-logo__img" />
+  </a>
+
+  <div class="page">
+    <header class="hero">
+      <div class="hero__bg" id="heroBg"></div>
+      <div class="hero__overlay"></div>
+
+      <div class="hero__content">
+        <nav class="topbar">
+          <div class="topbar__left"></div>
+          <div class="topbar__center">
+            <a href="start.html" class="topbar__link">Start</a>
+            <a href="kalendarz.html" class="topbar__link">Kalendarz</a>
+            <a href="index.html" class="topbar__link active">Wyniki i klasyfikacja</a>
+            <a href="teams.html" class="topbar__link">Zespoły i kierowcy</a>
+            <a href="archiwum.html" class="topbar__link">Archiwum</a>
+          </div>
+          <div class="topbar__right">
+            <a href="#" class="rallytv-btn">Rally.TV</a>
+            <button class="theme-toggle-btn" id="themeToggle" aria-label="Przełącz motyw" type="button">
+              <svg class="icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+              <svg class="icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+          </div>
+        </nav>
+
+        <div class="hero__title-wrap">
+          <div class="hero__title-container">
+            <img id="rallyLogo" src="" alt="" class="hero__logo" style="display: none;" />
+            <h1 class="hero__title" id="rallyTitle">Wyniki i Klasyfikacja</h1>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="tabs-section">
+        <div class="tabs" id="stageTabs">
+          <button class="tab active" type="button" data-tab="lacznie">Łącznie</button>
+        </div>
+      </section>
+
+      <section class="table-section">
+        <div class="tab-panel active" data-panel="lacznie">
+          <div class="results-card">
+            <div class="standings-table standings-table--lacznie" id="overallTable">
+              <div class="standings-table__head" id="overallHead"></div>
+              <div class="standings-table__body" id="overallBody">
+                <div class="loading-spinner"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="footer-spacer"></div>
+
+  <footer class="site-footer">
+    <div class="site-footer__sponsors">
+      <div class="footer-photo"><img src="assets/sponsors/photo1.png" alt="" /></div>
+      <div class="footer-photo"><img src="assets/sponsors/photo2.png" alt="" /></div>
+      <div class="footer-photo"><img src="assets/sponsors/photo3.png" alt="" /></div>
+    </div>
+    <div class="site-footer__sponsors site-footer__sponsors--secondary">
+      <div class="footer-photo footer-photo--sm"><img src="assets/sponsors/photo4.png" alt="" /></div>
+      <div class="footer-photo footer-photo--sm"><img src="assets/sponsors/photo5.png" alt="" /></div>
+      <div class="footer-photo footer-photo--sm"><img src="assets/sponsors/photo6.png" alt="" /></div>
+    </div>
+    <div class="footer-divider"></div>
+    <p class="footer-copyright">&copy; 2026 WRC. All rights reserved.</p>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="api.js"></script>
+  <script>
+    function getFlagEmoji(countryCode) {
+      if (!countryCode) return '🏁';
+      const specialFlags = {
+        'wls': '🏴󠁧󠁢󠁷󠁬󠁳󠁿', 'sct': '🏴󠁧󠁢󠁳󠁣󠁴󠁿', 'eng': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'gb': '🇬🇧',
+        'gb-eng': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'gb-sct': '🏴󠁧󠁢󠁳󠁣󠁴󠁿', 'gb-wls': '🏴󠁧󠁢󠁷󠁬󠁳󠁿'
+      };
+      const code = countryCode.toLowerCase();
+      if (specialFlags[code]) return specialFlags[code];
+      if (code.length === 2) {
+        try {
+          const codePoints = code.toUpperCase().split('').map(char => 127397 + char.charCodeAt());
+          return String.fromCodePoint(...codePoints);
+        } catch(e) { return '🏁'; }
+      }
+      return '🏁';
+    }
+
+    const logo = document.querySelector(".floating-logo");
+    const hero = document.querySelector(".hero");
+    
+    function updateLogo() {
+      logo.classList.toggle("logo--dark", hero.getBoundingClientRect().bottom <= 0);
+    }
+    window.addEventListener("scroll", updateLogo, { passive: true });
+    updateLogo();
+
+    let currentRallyId = null;
+    let rallyData      = null;
+
+    function getRallyIdFromUrl() {
+      return new URLSearchParams(window.location.search).get('rally');
+    }
+
+    function timeToSeconds(timeStr) {
+      if (!timeStr || timeStr === '—' || timeStr === 'DNF' || timeStr === 'DNS' || timeStr === 'DSQ' || timeStr === 'RET') return Infinity;
+      const match = timeStr.match(/^(\d+):(\d+)\.(\d+)$/);
+      if (match) return parseInt(match[1]) * 60 + parseInt(match[2]) + parseInt(match[3]) / 1000;
+      return Infinity;
+    }
+
+    function secondsToTime(totalSeconds) {
+      if (totalSeconds === Infinity || totalSeconds === null || isNaN(totalSeconds)) return '—';
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = (totalSeconds % 60).toFixed(3);
+      return `${minutes}:${seconds.padStart(6, '0')}`;
+    }
+
+    function shortTime(timeStr) {
+      if (!timeStr) return timeStr;
+      const m = timeStr.match(/^(\d+:\d{2})\.(\d{3})$/);
+      if (!m) return timeStr;
+      const rounded = Math.round(parseInt(m[2]) / 100);
+      if (rounded >= 10) {
+        const secs = timeToSeconds(timeStr);
+        if (secs === Infinity) return timeStr;
+        const carry = Math.floor(secs) + 1;
+        const mm = Math.floor(carry / 60);
+        const ss = carry % 60;
+        return `${mm}:${String(ss).padStart(2,'0')}.0`;
+      }
+      return `${m[1]}.${rounded}`;
+    }
+
+    function formatDiff(diffSeconds) {
+      if (diffSeconds === Infinity || diffSeconds === null || isNaN(diffSeconds)) return '—';
+      if (diffSeconds === 0) return '—';
+      const absDiff = Math.abs(diffSeconds);
+      const minutes = Math.floor(absDiff / 60);
+      const seconds = (absDiff % 60).toFixed(3);
+      const sign = diffSeconds > 0 ? '+' : '';
+      if (minutes > 0) {
+        return `${sign}${minutes}:${seconds.padStart(6, '0')}`;
+      }
+      return `${sign}${seconds}s`;
+    }
+
+    function getSortPriority(status) {
+      if (status === 'OK') return 0;
+      if (status === 'DNF') return 1;
+      if (status === 'RET') return 2;
+      if (status === 'DNS') return 3;
+      if (status === 'DSQ') return 4;
+      return 0;
+    }
+
+    function sortResultsWithPriority(results) {
+      return [...results].sort((a, b) => {
+        const priorityA = getSortPriority(a.status);
+        const priorityB = getSortPriority(b.status);
+        if (priorityA !== priorityB) return priorityA - priorityB;
+        const timeA = a.totalTimeSeconds !== undefined && a.totalTimeSeconds !== Infinity ? a.totalTimeSeconds : Infinity;
+        const timeB = b.totalTimeSeconds !== undefined && b.totalTimeSeconds !== Infinity ? b.totalTimeSeconds : Infinity;
+        return timeA - timeB;
+      });
+    }
+
+    function getCumulativePenalty(penalties, stagesToSum, driverId) {
+      let total = 0;
+      for (const stageName of stagesToSum) {
+        const stagePenalties = penalties?.[stageName] || {};
+        total += stagePenalties[driverId] || 0;
+      }
+      return total;
+    }
+
+    function computePositionsAfterStages(results, regularStages, upToIndex, allDriverIds) {
+      const cumMap = {};
+      for (const driverId of allDriverIds) {
+        let total = 0, valid = true;
+        for (let si = 0; si <= upToIndex; si++) {
+          const sName  = regularStages[si];
+          const sData  = results.stages?.[sName] || [];
+          const dEntry = sData.find(e => e.driverId === driverId);
+          if (!dEntry || dEntry.status !== 'OK') { valid = false; break; }
+          const t = timeToSeconds(dEntry.time);
+          if (t === Infinity) { valid = false; break; }
+          total += t;
+        }
+        cumMap[driverId] = valid ? total : Infinity;
+      }
+
+      const sorted = allDriverIds
+        .filter(id => cumMap[id] !== Infinity)
+        .sort((a, b) => cumMap[a] - cumMap[b]);
+
+      const posMap = {};
+      let pos = 1;
+      for (let i = 0; i < sorted.length; i++) {
+        if (i > 0 && Math.abs(cumMap[sorted[i]] - cumMap[sorted[i-1]]) < 0.001) {
+          posMap[sorted[i]] = posMap[sorted[i-1]];
+        } else {
+          posMap[sorted[i]] = pos;
+        }
+        pos++;
+      }
+      for (const id of allDriverIds) {
+        if (!(id in posMap)) posMap[id] = null;
+      }
+      return posMap;
+    }
+
+    /**
+     * Buduje HTML komórki pozycji.
+     * Wynik: [cyfra pozycji]  [pill: ▲/▼  cyfra zmiany]
+     */
+    function buildPosCellHtml(currentPos, prevPos) {
+      const posText = currentPos !== null ? currentPos : '—';
+
+      if (currentPos === null || prevPos === null) {
+        return `<span class="pos-number">${posText}</span>`;
+      }
+
+      const diff    = prevPos - currentPos; // >0 awans, <0 spadek
+      const absDiff = Math.abs(diff);
+
+      if (diff === 0) {
+        return `<span class="pos-number">${posText}</span>`;
+      }
+
+      const cls = diff > 0 ? 'up' : 'down';
+
+      const arrowUp   = `<svg viewBox="0 0 8 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 0L8 6H0z" fill="currentColor"/></svg>`;
+      const arrowDown = `<svg viewBox="0 0 8 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 6L0 0H8z" fill="currentColor"/></svg>`;
+      const arrow     = diff > 0 ? arrowUp : arrowDown;
+
+      return `<span class="col-pos-wrap">` +
+                `<span class="pos-number">${posText}</span>` +
+                `<span class="pos-change pos-change--${cls}">` +
+                  `<span class="pos-change__arrow">${arrow}</span>` +
+                  `<span class="pos-change__num">${absDiff}</span>` +
+                `</span>` +
+             `</span>`;
+    }
+
+    async function loadRallyResults() {
+      currentRallyId = getRallyIdFromUrl();
+      if (!currentRallyId) {
+        document.getElementById('rallyTitle').innerText = 'Nie znaleziono rajdu';
+        document.getElementById('overallBody').innerHTML = '<div class="loading-spinner"></div>';
+        return;
+      }
+      try {
+        await api.loadData();
+        const season = await api.getCurrentSeason();
+        rallyData = season?.calendar?.find(r => r.id === currentRallyId);
+        if (!rallyData) {
+          document.getElementById('rallyTitle').innerText = 'Rajd nie istnieje';
+          document.getElementById('overallBody').innerHTML = '<div class="loading-spinner"></div>';
+          return;
+        }
+        const heroBg = document.getElementById('heroBg');
+        if (rallyData.heroImage) {
+          heroBg.style.backgroundImage    = `url('${rallyData.heroImage}')`;
+          heroBg.style.backgroundSize     = 'cover';
+          heroBg.style.backgroundPosition = 'center';
+        }
+        const rallyLogo = document.getElementById('rallyLogo');
+        if (rallyData.logo && rallyData.logo !== '') {
+          rallyLogo.src = rallyData.logo; rallyLogo.style.display = 'block';
+        } else {
+          rallyLogo.style.display = 'none';
+        }
+        document.getElementById('rallyTitle').innerText = rallyData.name;
+        const [calculated, teams] = await Promise.all([
+          api.calculateRallyResults(currentRallyId),
+          api.getTeams()
+        ]);
+        if (calculated && calculated.overall && calculated.overall.length > 0) {
+          renderOverallTable(calculated.overall, rallyData.stages, calculated.powerStage || [], teams);
+        } else {
+          document.getElementById('overallBody').innerHTML = '<div class="loading-spinner">Brak wyników</div>';
+        }
+        generateStageTabs();
+      } catch (error) {
+        console.error('Error loading rally results:', error);
+        document.getElementById('overallBody').innerHTML = '<div class="loading-spinner">Błąd ładowania danych</div>';
+      }
+    }
+    
+    function renderOverallTable(results, stages, powerStageResults, teams) {
+      const head = document.getElementById('overallHead');
+      const body = document.getElementById('overallBody');
+      if (!results || results.length === 0) { body.innerHTML = '<div class="loading-spinner"></div>'; return; }
+      const sortedResults = sortResultsWithPriority(results);
+      const resultsWithTotalPoints = sortedResults.map(result => {
+        const psResult    = (powerStageResults || []).find(ps => ps.driverId === result.driverId);
+        const psPoints    = psResult ? (psResult.points || 0) : 0;
+        const totalPoints = (result.points || 0) + (result.totalBonus || 0) + psPoints + (result.extraPoints || 0);
+        return { ...result, totalPoints, psPoints };
+      });
+      let leaderTime = null, currentPos = 1, prevTime = null;
+      for (let i = 0; i < resultsWithTotalPoints.length; i++) {
+        const result = resultsWithTotalPoints[i];
+        if (leaderTime === null && result.status === 'OK' && result.totalTimeSeconds !== null && result.totalTimeSeconds !== Infinity) leaderTime = result.totalTimeSeconds;
+        if (i > 0 && result.status === 'OK' && prevTime !== null && Math.abs(result.totalTimeSeconds - prevTime) < 0.001) result.position = currentPos;
+        else if (result.status === 'OK') { currentPos = i + 1; result.position = currentPos; }
+        else result.position = null;
+        result.diff = (leaderTime !== null && result.totalTimeSeconds !== null && result.totalTimeSeconds !== Infinity) ? result.totalTimeSeconds - leaderTime : null;
+        prevTime = result.totalTimeSeconds;
+      }
+      const powerStage    = rallyData.powerStage;
+      const regularStages = stages.filter(s => s !== powerStage);
+      const hasPowerStage = powerStage && stages.includes(powerStage);
+      let headHtml = `
+        <div data-sort="pos" data-type="number" class="sort-asc">POZ.<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>
+        <div data-sort="driver" data-type="string">KIEROWCA<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>
+        <div>ZESPÓŁ / AUTO</div>`;
+      if (hasPowerStage) headHtml += `<div data-sort="ps" data-type="time" data-stage-name="${powerStage}">PS<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>`;
+      regularStages.forEach((stage, idx) => {
+        headHtml += `<div data-sort="os_${idx}" data-type="time" data-stage-index="${idx}">OS${idx + 1}<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>`;
+      });
+      headHtml += `
+        <div data-sort="total" data-type="time" class="sort-asc">ŁĄCZNY CZAS<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>
+        <div>DIFF.</div>
+        <div data-sort="points" data-type="number">PUNKTY<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>`;
+      head.innerHTML = headHtml;
+      let bodyHtml = '';
+      for (const result of resultsWithTotalPoints) {
+        const team = teams.find(t => t.id === result.teamId);
+        const _parts = [];
+        if (result.points      > 0) _parts.push(result.points);
+        if (result.totalBonus  > 0) _parts.push(result.totalBonus);
+        if (result.psPoints    > 0) _parts.push(result.psPoints);
+        if (result.extraPoints > 0) _parts.push(result.extraPoints);
+        const pointsHtml = _parts.length > 0 ? _parts.join(' + ') : '0';
+        bodyHtml += `
+          <div class="standings-row"
+            data-pos="${result.position !== null ? result.position : 999}"
+            data-total-seconds="${result.totalTimeSeconds !== null ? result.totalTimeSeconds : Infinity}"
+            data-driver-name="${result.driverName}"
+            data-total-points="${result.totalPoints}"
+            data-diff="${result.diff !== null ? result.diff : Infinity}"
+            data-status="${result.status}">
+            <div class="col-pos">${result.position !== null ? result.position : '—'}</div>
+            <div class="col-driver">
+              <span class="flag-emoji">${getFlagEmoji(result.driverCountry)}</span>
+              ${getDriverLink(result.driverName, result.driverId)}
+            </div>
+            <div class="col-team-logo">
+              <img class="team-logo-tooltip" data-team-name="${team?.name || '-'}" src="${team?.logo || 'assets/teams/default.png'}" alt="${team?.name || '-'}" onerror="this.src='assets/teams/default.png'" style="width:28px;height:28px;object-fit:contain;" />
+              <span class="col-car-model">${result.carModel || team?.carModel || '-'}</span>
+            </div>`;
+        if (hasPowerStage) {
+          const psStageTime = result.stageTimes?.find(st => st.stage === powerStage);
+          let timeHtml = '—', timeSecs = Infinity;
+          if (psStageTime?.time) {
+            if (psStageTime.status === 'OK') {
+              timeHtml = psStageTime.time; timeSecs = timeToSeconds(psStageTime.time);
+              if (psStageTime.tireChange) timeHtml = `<span class="time-with-tire">${shortTime(psStageTime.time)}<span class="tire-icon" data-tooltip="Zmiana opony podczas OS"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="11.5"/><circle cx="12" cy="12" r="8.8" fill="var(--color-background-primary,#fff)"/><circle cx="12" cy="12" r="8.1"/><circle cx="12" cy="12" r="7.2" fill="var(--color-background-primary,#fff)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(45 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(90 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(135 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(180 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(225 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(270 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(315 12 12)"/><circle cx="12" cy="12" r="2.4" fill="var(--color-background-primary,#fff)"/><circle cx="12" cy="12" r="1.6"/></svg></span></span>`;
+            } else timeHtml = psStageTime.status;
+          }
+          bodyHtml += `<div data-ps-time="${timeSecs}" data-ps-display="${psStageTime?.time || '—'}">${timeHtml}</div>`;
+        }
+        regularStages.forEach((stage, j) => {
+          const stageTime = result.stageTimes?.find(st => st.stage === stage);
+          let timeHtml = '—', timeSecs = Infinity;
+          if (stageTime?.time) {
+            if (stageTime.status === 'OK') {
+              timeHtml = stageTime.time; timeSecs = timeToSeconds(stageTime.time);
+              if (stageTime.tireChange) timeHtml = `<span class="time-with-tire">${shortTime(stageTime.time)}<span class="tire-icon" data-tooltip="Zmiana opony podczas OS"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="11.5"/><circle cx="12" cy="12" r="8.8" fill="var(--color-background-primary,#fff)"/><circle cx="12" cy="12" r="8.1"/><circle cx="12" cy="12" r="7.2" fill="var(--color-background-primary,#fff)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(45 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(90 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(135 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(180 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(225 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(270 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(315 12 12)"/><circle cx="12" cy="12" r="2.4" fill="var(--color-background-primary,#fff)"/><circle cx="12" cy="12" r="1.6"/></svg></span></span>`;
+            } else timeHtml = stageTime.status;
+          }
+          bodyHtml += `<div data-os-time="${timeSecs}" data-os-display="${stageTime?.time || '—'}" data-stage-index="${j}">${timeHtml}</div>`;
+        });
+        bodyHtml += `
+            <div class="col-total">${result.totalTime}</div>
+            <div class="col-diff">${result.diff !== null ? formatDiff(result.diff) : '—'}</div>
+            <div class="col-pts">${pointsHtml}</div>
+          </div>`;
+      }
+      body.innerHTML = bodyHtml;
+      initOverallSorting();
+    }
+    
+    function initOverallSorting() {
+      const table = document.getElementById('overallTable');
+      if (!table) return;
+      const head = table.querySelector('.standings-table__head');
+      const body = table.querySelector('.standings-table__body');
+      if (!head || !body) return;
+      const sortableColumns = Array.from(head.querySelectorAll('[data-sort]'));
+      let currentSort = { column: 'total', direction: 'asc', stageIndex: null, stageName: null };
+      const totalTimeColumn = head.querySelector('[data-sort="total"]');
+      if (totalTimeColumn) totalTimeColumn.classList.add('sort-asc');
+      function getSortValue(row, columnKey, stageIndex = null) {
+        const status = row.dataset.status, priority = getSortPriority(status);
+        if (columnKey === 'pos')    return parseFloat(row.dataset.pos) || 999;
+        if (columnKey === 'total')  return priority * 1e9 + (parseFloat(row.dataset.totalSeconds) || Infinity);
+        if (columnKey === 'points') return parseFloat(row.dataset.totalPoints) || 0;
+        if (columnKey === 'ps')     { const c = row.querySelector('[data-ps-time]'); return priority * 1e9 + (c ? parseFloat(c.getAttribute('data-ps-time')) || Infinity : Infinity); }
+        if (columnKey.startsWith('os_')) { const c = row.querySelector(`[data-stage-index="${stageIndex}"]`); return priority * 1e9 + (c ? parseFloat(c.getAttribute('data-os-time')) || Infinity : Infinity); }
+        return 0;
+      }
+      function sortTable(columnKey, sortType, direction, stageIndex = null, stageName = null) {
+        const rows = Array.from(body.querySelectorAll('.standings-row'));
+        rows.sort((a, b) => {
+          if (columnKey === 'driver') return direction === 'asc' ? (a.dataset.driverName || '').localeCompare(b.dataset.driverName || '', 'pl') : (b.dataset.driverName || '').localeCompare(a.dataset.driverName || '', 'pl');
+          return direction === 'asc' ? getSortValue(a, columnKey, stageIndex) - getSortValue(b, columnKey, stageIndex) : getSortValue(b, columnKey, stageIndex) - getSortValue(a, columnKey, stageIndex);
+        });
+        rows.forEach(row => body.appendChild(row));
+        const updatedRows = Array.from(body.querySelectorAll('.standings-row'));
+        let curPos = 1, prevT = null, leaderT = null;
+        updatedRows.forEach((row, i) => {
+          const status = row.dataset.status, priority = getSortPriority(status);
+          let timeValue;
+          if (columnKey === 'total' || columnKey === 'pos') timeValue = parseFloat(row.dataset.totalSeconds) || Infinity;
+          else if (columnKey === 'ps') { const c = row.querySelector('[data-ps-time]'); timeValue = c ? parseFloat(c.getAttribute('data-ps-time')) || Infinity : Infinity; }
+          else if (columnKey.startsWith('os_')) { const c = row.querySelector(`[data-stage-index="${stageIndex}"]`); timeValue = c ? parseFloat(c.getAttribute('data-os-time')) || Infinity : Infinity; }
+          else timeValue = parseFloat(row.dataset.totalSeconds) || Infinity;
+          const posCell = row.querySelector('.col-pos'), diffCell = row.querySelector('.col-diff');
+          if (priority === 0 && timeValue !== Infinity) {
+            if (i === 0) leaderT = timeValue;
+            if (i > 0 && Math.abs(timeValue - prevT) < 0.001) { posCell.textContent = curPos; row.dataset.pos = curPos; }
+            else { curPos = i + 1; posCell.textContent = curPos; row.dataset.pos = curPos; }
+            if (diffCell && (columnKey === 'total' || columnKey === 'pos' || columnKey === 'ps' || columnKey === ('os_' + stageIndex))) { const diff = timeValue - leaderT; diffCell.textContent = diff === 0 ? '—' : formatDiff(diff); row.dataset.diff = diff; }
+          } else if (priority === 1 && timeValue !== Infinity && leaderT !== null) {
+            posCell.textContent = '—'; row.dataset.pos = 999;
+            if (diffCell) diffCell.textContent = formatDiff(timeValue - leaderT);
+          } else { posCell.textContent = '—'; row.dataset.pos = 999; if (diffCell) diffCell.textContent = '—'; }
+          prevT = timeValue;
+        });
+      }
+      sortableColumns.forEach(col => {
+        col.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const columnKey = col.dataset.sort, sortType = col.dataset.type;
+          const stageIndex = col.dataset.stageIndex ? parseInt(col.dataset.stageIndex) : null;
+          const stageName  = col.dataset.stageName || null;
+          sortableColumns.forEach(c => c.classList.remove('sort-asc', 'sort-desc'));
+          const direction = (currentSort.column === columnKey && currentSort.stageIndex === stageIndex && currentSort.stageName === stageName) ? (currentSort.direction === 'asc' ? 'desc' : 'asc') : 'asc';
+          currentSort = { column: columnKey, direction, stageIndex, stageName };
+          col.classList.add(direction === 'asc' ? 'sort-asc' : 'sort-desc');
+          sortTable(columnKey, sortType, direction, stageIndex, stageName);
+        });
+      });
+      sortTable('total', 'time', 'asc', null, null);
+    }
+    
+    function generateStageTabs() {
+      const tabsContainer = document.getElementById('stageTabs');
+      const stages = rallyData.stages, powerStage = rallyData.powerStage;
+      if (!stages || stages.length === 0) return;
+      const regularStages = stages.filter(s => s !== powerStage);
+      const hasPowerStage = powerStage && stages.includes(powerStage);
+      let html = '<button class="tab active" type="button" data-tab="lacznie">Łącznie</button>';
+      if (hasPowerStage) html += `<button class="tab" type="button" data-tab="powerstage" data-is-ps="true">Power Stage</button>`;
+      regularStages.forEach((stage, index) => {
+        const originalIndex = stages.findIndex(s => s === stage);
+        html += `<button class="tab" type="button" data-tab="stage_${originalIndex}" data-is-ps="false">OS${index + 1}</button>`;
+      });
+      tabsContainer.innerHTML = html;
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', async () => {
+          const target = tab.dataset.tab, isPS = tab.dataset.isPs === 'true';
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+          tab.classList.add('active');
+          if (target === 'lacznie') {
+            document.querySelector('.tab-panel[data-panel="lacznie"]').classList.add('active');
+          } else if (target === 'powerstage') {
+            const powerStageIndex = rallyData.stages.findIndex(s => s === rallyData.powerStage);
+            await showStageResults(powerStageIndex, true);
+            document.querySelector(`.tab-panel[data-panel="stage_${powerStageIndex}"]`)?.classList.add('active');
+          } else {
+            const stageIndex = parseInt(target.split('_')[1]);
+            await showStageResults(stageIndex, false);
+            document.querySelector(`.tab-panel[data-panel="stage_${stageIndex}"]`)?.classList.add('active');
+          }
+        });
+      });
+    }
+    
+    async function showStageResults(stageIndex, isPowerStage = false) {
+      const stageName = rallyData.stages[stageIndex];
+      const [results, drivers, teams] = await Promise.all([
+        api.getRallyResults(currentRallyId),
+        api.getDrivers(),
+        api.getTeams()
+      ]);
+      if (!results?.stages?.[stageName] || results.stages[stageName].length === 0) {
+        let stagePanel = document.querySelector(`.tab-panel[data-panel="stage_${stageIndex}"]`);
+        if (!stagePanel) { stagePanel = document.createElement('div'); stagePanel.className = 'tab-panel'; stagePanel.setAttribute('data-panel', `stage_${stageIndex}`); document.querySelector('.table-section').appendChild(stagePanel); }
+        stagePanel.innerHTML = '<div class="results-card"><div class="placeholder-panel">Brak danych dla tego odcinka</div></div>';
+        return;
+      }
+      const stageResults  = results.stages[stageName];
+      const allPenalties  = results.penalties || {};
+      const powerStage    = rallyData.powerStage;
+      const regularStages = rallyData.stages.filter(s => s !== powerStage);
+      const regularStageIndex    = isPowerStage ? -1 : regularStages.indexOf(stageName);
+      const stagesToSumPenalties = isPowerStage ? [stageName] : regularStages.slice(0, regularStageIndex + 1);
+      const allDriverIds = stageResults.map(r => r.driverId);
+
+      // Pozycje po poprzednim OS
+      let prevPosMap = {};
+      if (!isPowerStage) {
+        if (regularStageIndex <= 0) { for (const id of allDriverIds) prevPosMap[id] = null; }
+        else prevPosMap = computePositionsAfterStages(results, regularStages, regularStageIndex - 1, allDriverIds);
+      }
+
+      // Łączne czasy bez kar
+      let cumulativeMap = {};
+      if (!isPowerStage && regularStageIndex >= 0) {
+        for (const driverId of allDriverIds) {
+          let total = 0, valid = true;
+          for (let si = 0; si <= regularStageIndex; si++) {
+            const sName = regularStages[si], sData = results.stages[sName] || [];
+            const dEntry = sData.find(e => e.driverId === driverId);
+            if (!dEntry || dEntry.status !== 'OK') { valid = false; break; }
+            const t = timeToSeconds(dEntry.time);
+            if (t === Infinity) { valid = false; break; }
+            total += t;
+          }
+          cumulativeMap[driverId] = valid ? total : Infinity;
+        }
+      }
+
+      const sortedResults = [...stageResults].sort((a, b) => {
+        const pA = getSortPriority(a.status), pB = getSortPriority(b.status);
+        if (pA !== pB) return pA - pB;
+        if (!isPowerStage) return (cumulativeMap[a.driverId] ?? Infinity) - (cumulativeMap[b.driverId] ?? Infinity);
+        return timeToSeconds(a.time) - timeToSeconds(b.time);
+      });
+
+      let leaderTime = null, currentPos = 1, prevCumTime = null;
+      for (let i = 0; i < sortedResults.length; i++) {
+        const result  = sortedResults[i];
+        const useTime = isPowerStage ? timeToSeconds(result.time) : (cumulativeMap[result.driverId] ?? Infinity);
+        if (result.status === 'OK' && useTime !== Infinity) {
+          if (leaderTime === null) leaderTime = useTime;
+          if (i > 0 && prevCumTime !== null && Math.abs(useTime - prevCumTime) < 0.001) result.position = currentPos;
+          else { currentPos = i + 1; result.position = currentPos; }
+          result.diff     = useTime - leaderTime;
+          result.diffPrev = i > 0 && prevCumTime !== null && sortedResults[i-1].status === 'OK' ? useTime - prevCumTime : null;
+        } else {
+          result.position = null;
+          result.diff     = (leaderTime !== null && useTime !== Infinity) ? useTime - leaderTime : Infinity;
+          result.diffPrev = null;
+        }
+        result.cumulativeSeconds = useTime;
+        prevCumTime = useTime;
+      }
+
+      const powerStagePointsMap = {};
+      if (results.calculated?.powerStage) {
+        for (const ps of results.calculated.powerStage) powerStagePointsMap[ps.driverId] = ps.points;
+      }
+
+      const timeColLabel = isPowerStage ? 'CZAS OS' : 'ŁĄCZNY CZAS';
+      let html = `
+        <div class="results-card">
+          <div class="standings-table standings-table--ss" id="stageTable_${stageIndex}">
+            <div class="standings-table__head">
+              <div data-sort="pos" data-type="number">POZ.<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>
+              <div data-sort="driver" data-type="string">KIEROWCA<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>
+              <div>ZESPÓŁ / AUTO</div>
+              <div data-sort="penalty" data-type="number">KARY<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>
+              <div data-sort="time" data-type="time" class="sort-asc">${timeColLabel}<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>
+              <div data-sort="diffprev" data-type="time">DIFF. PREV<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>
+              <div>DIFF.<span class="sort-icon"></span></div>
+              <div data-sort="pspoints" data-type="number">${isPowerStage ? 'PUNKTY' : 'BONUS'}<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>
+            </div>
+            <div class="standings-table__body">`;
+
+      for (let i = 0; i < sortedResults.length; i++) {
+        const result  = sortedResults[i];
+        const driver  = drivers.find(d => d.id === result.driverId);
+        const team    = teams.find(t => t.id === driver?.teamId);
+        const cumulativePenalty = getCumulativePenalty(allPenalties, stagesToSumPenalties, result.driverId);
+        const penaltyDisplay    = cumulativePenalty !== 0 ? (cumulativePenalty > 0 ? `+${cumulativePenalty}s` : `${cumulativePenalty}s`) : '—';
+        const cumSecs = result.cumulativeSeconds;
+        let timeDisplay;
+        if (isPowerStage) {
+          if (result.status === 'OK') {
+            timeDisplay = result.time;
+            if (result.tireChange) timeDisplay = `<span class="time-with-tire">${shortTime(result.time)}<span class="tire-icon" data-tooltip="Zmiana opony podczas OS"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="11.5"/><circle cx="12" cy="12" r="8.8" fill="var(--color-background-primary,#fff)"/><circle cx="12" cy="12" r="8.1"/><circle cx="12" cy="12" r="7.2" fill="var(--color-background-primary,#fff)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(45 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(90 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(135 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(180 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(225 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(270 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(315 12 12)"/><circle cx="12" cy="12" r="2.4" fill="var(--color-background-primary,#fff)"/><circle cx="12" cy="12" r="1.6"/></svg></span></span>`;
+          } else timeDisplay = result.status;
+        } else {
+          timeDisplay = (cumSecs !== Infinity && cumSecs !== undefined) ? secondsToTime(cumSecs) : (result.status !== 'OK' ? result.status : '—');
+        }
+
+        let bonusOrPointsDisplay = '—';
+        if (isPowerStage) {
+          const psPoints = powerStagePointsMap[result.driverId] || 0;
+          if (psPoints > 0) bonusOrPointsDisplay = `+${psPoints}`;
+        } else {
+          let cumulativeBonus = 0;
+          for (let si = 0; si <= regularStageIndex; si++) {
+            const sName = regularStages[si], sData = results.stages?.[sName] || [];
+            const dEntry = sData.find(e => e.driverId === result.driverId);
+            if (dEntry && dEntry.bonus && dEntry.bonus > 0) cumulativeBonus += dEntry.bonus;
+          }
+          bonusOrPointsDisplay = cumulativeBonus > 0 ? `+${cumulativeBonus}` : '—';
+        }
+
+        const diffDisplay     = formatDiff(result.diff === Infinity ? null : result.diff);
+        const diffPrevDisplay = result.diffPrev !== null && result.diffPrev !== undefined ? formatDiff(result.diffPrev) : '—';
+        const dataTimeSecs    = cumSecs !== undefined ? cumSecs : Infinity;
+        const prevPos         = isPowerStage ? null : (prevPosMap[result.driverId] ?? null);
+        const posCellHtml     = isPowerStage ? (result.position !== null ? result.position : '—') : buildPosCellHtml(result.position, prevPos);
+
+        html += `
+          <div class="standings-row"
+            data-pos="${result.position !== null ? result.position : 999}"
+            data-driver-name="${driver?.name || result.driverId}"
+            data-time-seconds="${dataTimeSecs}"
+            data-penalty-value="${cumulativePenalty}"
+            data-diff="${result.diff === Infinity ? 999 : (result.diff ?? 999)}"
+            data-diff-prev="${result.diffPrev !== null && result.diffPrev !== undefined ? result.diffPrev : 999}"
+            data-ps-points="${isPowerStage ? (powerStagePointsMap[result.driverId] || 0) : 0}"
+            data-status="${result.status}">
+            <div class="col-pos">${posCellHtml}</div>
+            <div class="col-driver">
+              <span class="flag-emoji">${getFlagEmoji(driver?.country || 'pl')}</span>
+              <span>${driver?.name || result.driverId}</span>
+            </div>
+            <div class="col-team-logo">
+              <img class="team-logo-tooltip" data-team-name="${team?.name || '-'}" src="${team?.logo || 'assets/teams/default.png'}" alt="${team?.name || '-'}" onerror="this.src='assets/teams/default.png'" style="width:28px;height:28px;object-fit:contain;" />
+              <span class="col-car-model">${driver?.carModel || team?.carModel || '-'}</span>
+            </div>
+            <div class="col-penalty penalty-value">${penaltyDisplay}</div>
+            <div class="col-total stage-status-cell">${timeDisplay}</div>
+            <div class="col-diff-prev">${diffPrevDisplay}</div>
+            <div class="col-diff">${diffDisplay}</div>
+            <div class="col-bonus bonus-value">${bonusOrPointsDisplay}</div>
+          </div>`;
+      }
+
+      html += `</div></div></div>`;
+      let stagePanel = document.querySelector(`.tab-panel[data-panel="stage_${stageIndex}"]`);
+      if (!stagePanel) {
+        stagePanel = document.createElement('div');
+        stagePanel.className = 'tab-panel';
+        stagePanel.setAttribute('data-panel', `stage_${stageIndex}`);
+        document.querySelector('.table-section').appendChild(stagePanel);
+      }
+      stagePanel.innerHTML = html;
+      document.querySelector('.tab-panel[data-panel="lacznie"]').classList.remove('active');
+      initStageSorting(stagePanel.querySelector('.standings-table'), isPowerStage);
+    }
+    
+    function initStageSorting(table, isPowerStage = false) {
+      if (!table) return;
+      const head = table.querySelector('.standings-table__head');
+      const body = table.querySelector('.standings-table__body');
+      if (!head || !body) return;
+      const sortableColumns = Array.from(head.querySelectorAll('[data-sort]'));
+      let currentSort = { column: 'time', direction: 'asc' };
+      const timeColumn = head.querySelector('[data-sort="time"]');
+      if (timeColumn) timeColumn.classList.add('sort-asc');
+      function getStageSortValue(row, columnKey) {
+        const priority = getSortPriority(row.dataset.status);
+        if (columnKey === 'pos')      return parseFloat(row.dataset.pos) || 999;
+        if (columnKey === 'time')     return priority * 1e9 + (parseFloat(row.dataset.timeSeconds) || Infinity);
+        if (columnKey === 'penalty')  return parseFloat(row.dataset.penaltyValue) || 0;
+        if (columnKey === 'pspoints') return parseFloat(row.dataset.psPoints) || 0;
+        if (columnKey === 'diffprev') { const v = parseFloat(row.dataset.diffPrev); return isNaN(v) || v === 999 ? Infinity : v; }
+        return 0;
+      }
+      function sortStageTable(columnKey, sortType, direction) {
+        const rows = Array.from(body.querySelectorAll('.standings-row'));
+        rows.sort((a, b) => {
+          if (columnKey === 'driver') return direction === 'asc' ? (a.dataset.driverName || '').localeCompare(b.dataset.driverName || '', 'pl') : (b.dataset.driverName || '').localeCompare(a.dataset.driverName || '', 'pl');
+          const vA = getStageSortValue(a, columnKey), vB = getStageSortValue(b, columnKey);
+          return direction === 'asc' ? vA - vB : vB - vA;
+        });
+        rows.forEach(row => body.appendChild(row));
+        const updatedRows = Array.from(body.querySelectorAll('.standings-row'));
+        let curPos = 1, prevT = null, leaderT = null;
+        updatedRows.forEach((row, i) => {
+          const priority  = getSortPriority(row.dataset.status);
+          const timeValue = parseFloat(row.dataset.timeSeconds) || Infinity;
+          const posCell   = row.querySelector('.col-pos');
+          const diffCell  = row.querySelector('.col-diff');
+          const diffPrevCell = row.querySelector('.col-diff-prev');
+          if (priority === 0 && timeValue !== Infinity) {
+            if (i === 0) leaderT = timeValue;
+            if (i > 0 && prevT !== null && Math.abs(timeValue - prevT) < 0.001) {
+              const numSpan = posCell.querySelector('.pos-number');
+              if (numSpan) numSpan.textContent = curPos; else posCell.textContent = curPos;
+              row.dataset.pos = curPos;
+            } else {
+              curPos = i + 1;
+              const numSpan = posCell.querySelector('.pos-number');
+              if (numSpan) numSpan.textContent = curPos; else posCell.textContent = curPos;
+              row.dataset.pos = curPos;
+            }
+            if (diffCell) { const diff = timeValue - leaderT; diffCell.textContent = diff === 0 ? '—' : formatDiff(diff); }
+            if (diffPrevCell) {
+              if (i === 0) { diffPrevCell.textContent = '—'; row.dataset.diffPrev = 999; }
+              else {
+                const prevRow = updatedRows[i - 1], prevTime = parseFloat(prevRow.dataset.timeSeconds) || Infinity;
+                if (prevRow.dataset.status === 'OK' && prevTime !== Infinity) { const dp = timeValue - prevTime; diffPrevCell.textContent = formatDiff(dp); row.dataset.diffPrev = dp; }
+                else { diffPrevCell.textContent = '—'; row.dataset.diffPrev = 999; }
+              }
+            }
+          } else if (priority > 0 && timeValue !== Infinity && leaderT !== null) {
+            posCell.textContent = '—'; row.dataset.pos = 999;
+            if (diffCell) diffCell.textContent = formatDiff(timeValue - leaderT);
+            if (diffPrevCell) { diffPrevCell.textContent = '—'; row.dataset.diffPrev = 999; }
+          } else {
+            posCell.textContent = '—'; row.dataset.pos = 999;
+            if (diffCell) diffCell.textContent = '—';
+            if (diffPrevCell) { diffPrevCell.textContent = '—'; row.dataset.diffPrev = 999; }
+          }
+          prevT = timeValue;
+        });
+      }
+      sortableColumns.forEach(col => {
+        col.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const columnKey = col.dataset.sort, sortType = col.dataset.type;
+          sortableColumns.forEach(c => c.classList.remove('sort-asc', 'sort-desc'));
+          const direction = currentSort.column === columnKey ? (currentSort.direction === 'asc' ? 'desc' : 'asc') : 'asc';
+          currentSort = { column: columnKey, direction };
+          col.classList.add(direction === 'asc' ? 'sort-asc' : 'sort-desc');
+          sortStageTable(columnKey, sortType, direction);
+        });
+      });
+      sortStageTable('time', 'time', 'asc');
+    }
+    
+    (function(){
+      document.body.classList.add('no-transition');
+      if(localStorage.getItem('wrc-theme')==='dark') document.body.classList.add('dark');
+      document.documentElement.classList.remove('wrc-dark');
+      requestAnimationFrame(function(){ requestAnimationFrame(function(){ document.body.classList.remove('no-transition'); }); });
+      var btn = document.getElementById('themeToggle');
+      if(btn){
+        btn.addEventListener('click', function(){
+          document.body.classList.add('theme-animating');
+          var isDark = document.body.classList.toggle('dark');
+          localStorage.setItem('wrc-theme', isDark ? 'dark' : 'light');
+          setTimeout(function(){ document.body.classList.remove('theme-animating'); }, 420);
+        });
+      }
+    })();
+    
+    loadRallyResults();
+  </script>
+</body>
+</html>

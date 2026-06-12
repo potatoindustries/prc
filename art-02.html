@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profil Kierowcy - Przygotowania do sezonu DiRT Rally 2.0</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css" />
+    <link rel="stylesheet" href="css/archiwum.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="icon" href="assets/icon.jpg" />
+
+    <style>
+        /* ===== HELPERS ===== */
+        .no-transition * { transition: none !important; }
+        .icon-moon { display: none; }
+        body.dark .icon-sun  { display: none; }
+        body.dark .icon-moon { display: block; }
+
+        /* ===== HERO BG ===== */
+        .hero__bg {
+            position: absolute; inset: 0;
+            background-image: url("https://rallypl.com/wp-content/uploads/2024/12/350d8451085e551844c32e3f08c23e732f86b021.jpg");
+            background-size: cover;
+            background-position: center 30%;
+            background-repeat: no-repeat;
+        }
+
+        .hero {
+            min-height: 50vh;
+        }
+
+        .driver-hero-bottom {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            padding: 0 44px 36px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .driver-hero-bottom__socials {
+            display: flex;
+            gap: 10px;
+            margin-left: auto;
+            flex-shrink: 0;
+            align-self: flex-end;
+            margin-right: 40px;
+            padding-bottom: 4px;
+        }
+        .driver-social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(15, 20, 30, 0.55);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #e8eaf0;
+            text-decoration: none;
+            transition: background .22s, transform .18s, border-color .22s;
+        }
+        .driver-social-icon:hover {
+            background: rgba(255, 255, 255, 0.18);
+        }
+        .driver-social-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+            flex-shrink: 0;
+        }
+        .driver-hero-bottom__avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255,255,255,.45);
+            flex-shrink: 0;
+            display: block;
+        }
+        .driver-hero-bottom__text {
+            flex: 1;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 24px;
+            row-gap: 12px;
+        }
+        .driver-hero-bottom__name {
+            font-family: "WRCCleanBold", Arial, sans-serif;
+            font-size: 48px;
+            line-height: 1.05;
+            color: #fff;
+            text-shadow: 0 2px 14px rgba(0,0,0,.5);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .driver-main {
+            background: var(--section-bg);
+            transition: background-color .38s ease;
+        }
+        body.dark .driver-main { background: #1a1a1a; }
+
+        .driver-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1px 44px 80px;
+        }
+
+        .driver-section-title {
+            font-family: "WRCCleanBold", Arial, sans-serif;
+            font-size: 25px;
+            margin: 44px 0 18px;
+            color: #26384b;
+            border-left: 4px solid var(--orange);
+            padding-left: 15px;
+            transition: color .28s;
+        }
+        body.dark .driver-section-title { color: #f3f3f3; }
+
+        .stats-card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06);
+            margin-bottom: 32px;
+            transition: background .38s, box-shadow .32s;
+            box-sizing: border-box;
+        }
+        body.dark .stats-card {
+            background: #1e1e1e;
+            box-shadow: 0 7px 18px rgba(0,0,0,.28);
+        }
+
+        .stats-card__head--two {
+            background: #f2f3f3;
+            color: #67727f;
+            font-family: "SebinoSoft", Arial, sans-serif;
+            font-size: 11px;
+            letter-spacing: .03em;
+            text-transform: uppercase;
+            font-weight: 500;
+            padding: 0 18px;
+            min-height: 44px;
+            display: grid;
+            grid-template-columns: 1fr 200px;
+            align-items: center;
+            transition: background .38s, color .28s;
+        }
+        
+        .stats-card__row--two {
+            display: grid;
+            grid-template-columns: 1fr 200px;
+            align-items: center;
+            padding: 0 18px;
+            min-height: 48px;
+            background: #fff;
+            font-family: "SebinoSoft", Arial, sans-serif;
+            font-size: 13px;
+            color: #26384b;
+            border-bottom: 1px solid rgba(225, 231, 238, 0.8);
+            transition: background .28s, color .28s, border-bottom-color .28s;
+            box-sizing: border-box;
+        }
+        
+        body.dark .stats-card__head--two {
+            background: #2e2e2e;
+            color: #9a9088;
+        }
+        
+        body.dark .stats-card__row--two {
+            background: #1e1e1e;
+            color: #c0c0c0;
+            border-bottom-color: rgba(60, 72, 88, 0.4);
+        }
+        
+        .stats-card__row--two:last-child {
+            border-bottom: none;
+        }
+        
+        .stats-card__row--two:hover { background: #fcfdff; }
+        body.dark .stats-card__row--two:hover { background: #252525; }
+        
+        .archive-panel {
+            display: none;
+        }
+        
+        .archive-panel.active {
+            display: block;
+        }
+
+        .driver-bio p {
+            font-family: "SebinoMedium", Arial, sans-serif !important;
+            font-size: 16px;
+            line-height: 1.75;
+            color: #26384b;
+            margin-bottom: 16px;
+        }
+        body.dark .driver-bio p { color: #c0c0c0; }
+
+        .driver-img-wrap { margin: 28px 0 32px; }
+        .driver-img-wrap img { width: 100%; border-radius: 10px; display: block; max-height: 450px; object-fit: cover; }
+        .driver-img-caption { font-family: "SebinoSoft", Arial, sans-serif; font-size: 12px; color: #67727f; margin-top: 8px; margin-left: 5px;}
+        .driver-img-copyright { display: block; font-size: 10px; color: #aaa; margin-top: 2px; }
+
+        .driver-footer-img { width: 100%; border-radius: 10px; display: block; object-fit: cover; max-height: 500px; margin-top: 52px; }
+
+        .animate-on-scroll { opacity: 0; transform: translateY(18px); transition: opacity .5s ease, transform .5s ease; }
+        .animate-on-scroll.visible { opacity: 1; transform: none; }
+
+        @media (max-width: 860px) {
+            .driver-hero-bottom__name { font-size: 40px; }
+        }
+
+        .highlight-box {
+            background: rgba(0,0,0,0.03);
+            border-left: 3px solid #ff6b00;
+            padding: 16px 24px;
+            margin: 24px 0;
+            border-radius: 8px;
+        }
+        body.dark .highlight-box {
+            background: rgba(255,255,255,0.05);
+        }
+        hr {
+            margin: 32px 0;
+            border: none;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #ccc, transparent);
+        }
+        body.dark hr {
+            background: linear-gradient(to right, transparent, #444, transparent);
+        }
+    </style>
+
+    <script>
+        if (localStorage.getItem("wrc-theme") === "dark")
+            document.documentElement.classList.add("wrc-dark");
+    </script>
+    <script src="theme.js"></script>
+</head>
+<body>
+<a href="index.html" class="floating-logo" aria-label="Home">
+    <img src="assets/logo.png" alt="Logo" class="floating-logo__img" />
+</a>
+
+<div class="page">
+    <header class="hero">
+        <div class="hero__bg"></div>
+        <div class="hero__overlay"></div>
+        <div class="hero__content">
+            <nav class="topbar">
+                <div class="topbar__left"></div>
+                <div class="topbar__center">
+                    <a href="start.html" class="topbar__link">Start</a>
+                    <a href="kalendarz.html" class="topbar__link">Kalendarz</a>
+                    <a href="index.html" class="topbar__link">Wyniki i klasyfikacja</a>
+                    <a href="teams.html" class="topbar__link">Zespoły i kierowcy</a>
+                    <a href="archiwum.html" class="topbar__link">Archiwum</a>
+                </div>
+                <div class="topbar__right">
+                    <a href="#" class="rallytv-btn">PRC</a>
+                    <button class="theme-toggle-btn" id="themeToggle" aria-label="Przełącz motyw" type="button">
+                        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5" />
+                            <line x1="12" y1="1" x2="12" y2="3" />
+                            <line x1="12" y1="21" x2="12" y2="23" />
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                            <line x1="1" y1="12" x2="3" y2="12" />
+                            <line x1="21" y1="12" x2="23" y2="12" />
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                        </svg>
+                        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                        </svg>
+                    </button>
+                </div>
+            </nav>
+            <div class="hero__title-wrap">
+                <h1 class="hero__title">Za kierownicą Lancii <br> <small>czyli jak Dyxan przygotowuje się do sezonu</small></h1>
+            </div>
+        </div>
+    </header>
+    <main class="driver-main">
+        <div class="driver-content">
+            <div id="panel-prc1" class="archive-panel active">
+                
+                <!-- Wprowadzenie -->
+                <div class="driver-section-title animate-on-scroll">Przygotowania przedsezonowe</div>
+                <div class="driver-bio animate-on-scroll">
+                    <p>Damian „Dyxan” Siemaszko spędził ostatnie dni na intensywnych treningach przed zbliżającym się turniejem PRC. Jego główny cel to dopracowanie techniki jazdy w swojej Lancii, bez ingerowania w zabronione w najnowszym regulaminie tuningi pojazdu. Nowe przepisy FIA PRC mocno ograniczyły możliwość modyfikacji samochodów, co wymusiło na kierowcach powrót do podstaw i skupienie się na czystej technice jazdy.</p>
+                    <p>Celem Dyxana na nadchodzący turniej jest walka o czołowe lokaty w każdym rajdzie. <br>„Walić Pana Cenzure za brak tuningów” – komentuje Dyxan. </p>
+                </div>
+
+                <!-- Grafika 1 -->
+                <div class="driver-img-wrap animate-on-scroll">
+                </div>
+
+                <!-- Sekcja Trening w Monte Carlo -->
+                <div class="driver-section-title animate-on-scroll">Treningi w Monte Carlo</div>
+                <div class="driver-bio animate-on-scroll">
+                    <p>Rajd Monte Carlo to bez wątpienia wizytówka całego sezonu. Dyxan od dawna pokazuje, że to jego ulubiona runda – wymagająca, nieprzewidywalna i pełna kontrastów. Na szczęście Lancia Delta HF Integrale, którą aktualnie prowadzi, jest zdecydowanym faworytem pod względem tempa. Szybka i stabilna – te cechy sprawiają, że Dyxan czuje się w niej wyjątkowo pewnie.</p>
+                    <p>Przez ostatnie tygodnie Dyxan spędził wiele godzin na przeróżnych odcinkach - szukał on limitów swojego auta, testując różne linie jazdy zarówno na suchym asfalcie, jak i na oblodzonych fragmentach.</p>
+                    <p>A oto jak wygląda jego rutyna przed turniejem</p>
+                </div>
+
+                <!-- Film -->
+                <div class="animate-on-scroll">
+                    <video width="100%" height="auto" controls poster="mini.png" style="border-radius: 11px; margin: 20px 0;">
+                        <source src="assets/test.mp4" type="video/mp4">
+                        Twoja przeglądarka nie obsługuje odtwarzacza wideo.
+                    </video>
+                </div>
+                <!-- Cytat -->
+                <div class="driver-section-title animate-on-scroll" style="margin-bottom: 12px; margin-top: 0px;"><small><em>„No nie da się jeździć bez tych tuningów... Prosze wstawić tu kręcące się zdjęcie maFIA”</em><br><small> <i>~ Damian Siemaszko</i></small></small></div>
+
+
+                <!-- Druga grafika -->
+                <div class="driver-img-wrap animate-on-scroll">
+                </div>
+
+                <!-- Ostatnie przygotowania -->
+                <div class="driver-section-title animate-on-scroll">Ostatnie dni przed rajdem</div>
+                <div class="driver-bio animate-on-scroll">
+                    <p>Przed turniejem Dyxan planuje przejechać jeszcze kilka odcinków w różnych warunkach i w różnych lokacjach. Wie, że kluczem do sukcesu jest wszechstronność – na trasach turnieju pojawią się zarówno szybkie odcinki w Finlandii, jak i techniczne, ciasne drogi w Argentynie.</p>
+                    <p>„Chcę sprawdzić, jak Lancia zachowuje się na każdej nawierzchni. Asfalt, żwir, śnieg – wszystko trzeba przećwiczyć. W DiRT Rally 2.0 nie ma miejsca na przypadkowość. Albo jesteś przygotowany, albo wracasz do domu z niczym” – podkreśla Dyxan.</p>
+                    <p>Jego celem jest jak najwyższe miejsce w rajdzie Monte Carlo, które jest jego koronną rundą, a także walka o czołową lokatę w całym turnieju. Fani z pewnością będą trzymać kciuki za tego utalentowanego kierowcę.</p>
+                </div>
+
+                <!-- Plan taktyczny -->
+                <div class="driver-section-title animate-on-scroll">Plan na turniej</div>
+                <div class="driver-bio animate-on-scroll">
+                    <p>Dyxan zdradził nam, że kluczowym elementem jego strategii będzie zachowanie zimnej krwi i jazda na 90% możliwości auta. „W DiRT Rally 2.0 łatwo przesadzić. Wystarczy jeden zakręt wzięty zbyt optymistycznie i cały rajd idzie się walić. Dlatego będę stawiał na regularność i czyste przejazdy, a ataki zostawię na odcinki, które znam najlepiej” – tłumaczy.</p>
+                    <p>Dodatkowo Dyxan przeanalizował nagrania z poprzednich edycji turnieju, aby poznać słabe strony rywali i wykorzystać swoje atuty – doskonałe wyczucie auta i znajomość tras Monte Carlo. Czy to wystarczy do zwycięstwa? Przekonamy się już wkrótce.</p>
+                </div>
+
+                <!-- Podsumowanie -->
+            </div>
+        </div>
+    </main>
+</div>
+
+<footer class="site-footer">
+    <div class="site-footer__sponsors">
+        <div class="footer-photo"><img src="assets/sponsors/photo1.png" alt="" /></div>
+        <div class="footer-photo"><img src="assets/sponsors/photo2.png" alt="" /></div>
+        <div class="footer-photo"><img src="assets/sponsors/photo3.png" alt="" /></div>
+    </div>
+    <div class="footer-divider"></div>
+    <p class="footer-copyright">&copy; 2026 PRC. All rights reserved.</p>
+</footer>
+
+<script>
+    const logo = document.querySelector(".floating-logo");
+    const hero = document.querySelector(".hero");
+    window.addEventListener("scroll", () => {
+        if (hero.getBoundingClientRect().bottom <= 0) logo.classList.add("logo--dark");
+        else logo.classList.remove("logo--dark");
+    }, { passive: true });
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((e) => { 
+            if (e.isIntersecting) { 
+                e.target.classList.add("visible"); 
+                observer.unobserve(e.target); 
+            } 
+        });
+    }, { threshold: 0.1 });
+
+    function observeActivePanelElements() {
+        const activePanel = document.querySelector('.archive-panel.active');
+        if (activePanel) {
+            const elements = activePanel.querySelectorAll('.animate-on-scroll:not(.visible)');
+            elements.forEach((el) => observer.observe(el));
+        }
+    }
+
+    observeActivePanelElements();
+
+    function switchArchivePanel(panelId) {
+        document.querySelectorAll('.archive-panel').forEach(panel => {
+            panel.classList.remove('active');
+        });
+        const activePanel = document.getElementById(panelId);
+        if (activePanel) {
+            activePanel.classList.add('active');
+        }
+        setTimeout(() => {
+            observeActivePanelElements();
+        }, 100);
+    }
+
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            const tabId = this.getAttribute('data-tab');
+            let panelId = 'panel-prc1';
+            switch(tabId) {
+                case 'prc1': panelId = 'panel-prc1'; break;
+                case 'prc2': panelId = 'panel-prc2'; break;
+                case 'prxc': panelId = 'panel-prxc'; break;
+                case 'prc3': panelId = 'panel-prc3'; break;
+                default: panelId = 'panel-prc1';
+            }
+            switchArchivePanel(panelId);
+        });
+    });
+
+    (function () {
+        if (localStorage.getItem("wrc-theme") === "dark") document.body.classList.add("dark");
+        var btn = document.getElementById("themeToggle");
+        if (btn) {
+            btn.addEventListener("click", function () {
+                var isDark = document.body.classList.toggle("dark");
+                localStorage.setItem("wrc-theme", isDark ? "dark" : "light");
+            });
+        }
+    })();
+</script>
+</body>
+</html>

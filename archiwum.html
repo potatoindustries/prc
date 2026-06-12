@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profil Kierowcy</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css" />
+    <link rel="stylesheet" href="css/archiwum.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="icon" href="assets/icon.jpg" />
+
+    <style>
+        /* ===== HELPERS ===== */
+        .no-transition * { transition: none !important; }
+        .icon-moon { display: none; }
+        body.dark .icon-sun  { display: none; }
+        body.dark .icon-moon { display: block; }
+
+        /* ===== HERO BG ===== */
+        .hero__bg {
+            position: absolute; inset: 0;
+            background-image: url("https://wallup.net/wp-content/uploads/2019/09/193949-2013-ford-fiesta-r5-race-racing-r-5-wrc-rw.jpg");
+            background-size: cover;
+            background-position: center 30%;
+            background-repeat: no-repeat;
+        }
+
+        /* ===== DRIVER NAME BLOCK ===== */
+        .driver-hero-bottom {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            padding: 0 44px 36px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .driver-hero-bottom__socials {
+            display: flex;
+            gap: 10px;
+            margin-left: auto;
+            flex-shrink: 0;
+            align-self: flex-end;
+            margin-right: 40px;
+            padding-bottom: 4px;
+        }
+        .driver-social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(15, 20, 30, 0.55);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #e8eaf0;
+            text-decoration: none;
+            transition: background .22s, transform .18s, border-color .22s;
+        }
+        .driver-social-icon:hover {
+            background: rgba(255, 255, 255, 0.18);
+        }
+        .driver-social-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+            flex-shrink: 0;
+        }
+        .driver-hero-bottom__avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255,255,255,.45);
+            flex-shrink: 0;
+            display: block;
+        }
+        .driver-hero-bottom__text {
+            flex: 1;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 24px;
+            row-gap: 12px;
+        }
+        .driver-hero-bottom__name {
+            font-family: "WRCCleanBold", Arial, sans-serif;
+            font-size: 48px;
+            line-height: 1.05;
+            color: #fff;
+            text-shadow: 0 2px 14px rgba(0,0,0,.5);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== MAIN BACKGROUND ===== */
+        .driver-main {
+            background: var(--section-bg);
+            transition: background-color .38s ease;
+        }
+        body.dark .driver-main { background: #1a1a1a; }
+
+        .driver-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1px 44px 80px;
+        }
+
+        /* ===== SECTION TITLE ===== */
+        .driver-section-title {
+            font-family: "WRCCleanBold", Arial, sans-serif;
+            font-size: 25px;
+            margin: 44px 0 18px;
+            color: #26384b;
+            border-left: 4px solid var(--orange);
+            padding-left: 15px;
+            transition: color .28s;
+        }
+        body.dark .driver-section-title { color: #f3f3f3; }
+
+        /* ===== KARTY ===== */
+        .facts-card, .stats-card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06);
+            margin-bottom: 32px;
+            transition: background .38s, box-shadow .32s;
+            box-sizing: border-box;
+        }
+        body.dark .facts-card, body.dark .stats-card {
+            background: #1e1e1e;
+            box-shadow: 0 7px 18px rgba(0,0,0,.28);
+        }
+
+        /* ===== KATEGORIE (2 kolumny) ===== */
+        .stats-card__head--two {
+            background: #f2f3f3;
+            color: #67727f;
+            font-family: "SebinoSoft", Arial, sans-serif;
+            font-size: 11px;
+            letter-spacing: .03em;
+            text-transform: uppercase;
+            font-weight: 500;
+            padding: 0 18px;
+            min-height: 44px;
+            display: grid;
+            grid-template-columns: 1fr 200px;
+            align-items: center;
+            transition: background .38s, color .28s;
+        }
+        
+        .stats-card__row--two {
+            display: grid;
+            grid-template-columns: 1fr 200px;
+            align-items: center;
+            padding: 0 18px;
+            min-height: 48px;
+            background: #fff;
+            font-family: "SebinoSoft", Arial, sans-serif;
+            font-size: 13px;
+            color: #26384b;
+            border-bottom: 1px solid rgba(225, 231, 238, 0.8);
+            transition: background .28s, color .28s, border-bottom-color .28s;
+            box-sizing: border-box;
+        }
+        
+        body.dark .stats-card__head--two {
+            background: #2e2e2e;
+            color: #9a9088;
+        }
+        
+        body.dark .stats-card__row--two {
+            background: #1e1e1e;
+            color: #c0c0c0;
+            border-bottom-color: rgba(60, 72, 88, 0.4);
+        }
+        
+        .stats-card__row--two:last-child {
+            border-bottom: none;
+        }
+        
+        .stats-card__row--two:hover { background: #fcfdff; }
+        body.dark .stats-card__row--two:hover { background: #252525; }
+        
+        .stats-card__head--two > div,
+        .stats-card__row--two > div {
+            text-align: left !important;
+            justify-content: flex-start !important;
+        }
+        
+        .stats-card__row--two > div:last-child {
+            color: #26384b;
+            font-weight: 500;
+        }
+        body.dark .stats-card__row--two > div:last-child { color: #5b9de0; }
+
+        /* ===== KALENDARZ (5 równych kolumn) ===== */
+        .stats-card--calendar {
+            overflow-x: auto;
+        }
+        
+        .stats-card--calendar .stats-card__head--calendar {
+            background: #f2f3f3;
+            color: #67727f;
+            font-family: "SebinoSoft", Arial, sans-serif;
+            font-size: 11px;
+            letter-spacing: .03em;
+            text-transform: uppercase;
+            font-weight: 500;
+            min-height: 44px;
+            transition: background .38s, color .28s;
+        }
+        
+        body.dark .stats-card--calendar .stats-card__head--calendar {
+            background: #2e2e2e;
+            color: #9a9088;
+        }
+        
+        .stats-card--calendar .stats-card__row--calendar {
+            background: #fff;
+            font-family: "SebinoSoft", Arial, sans-serif;
+            font-size: 13px;
+            color: #26384b;
+            border-bottom: 1px solid rgba(225, 231, 238, 0.8);
+            transition: background .28s, color .28s, border-bottom-color .28s;
+            box-sizing: border-box;
+        }
+        
+        body.dark .stats-card--calendar .stats-card__row--calendar {
+            background: #1e1e1e;
+            color: #c0c0c0;
+            border-bottom-color: rgba(60, 72, 88, 0.4);
+        }
+        
+        .stats-card--calendar .stats-card__row--calendar:last-child {
+            border-bottom: none;
+        }
+        
+        .stats-card--calendar .stats-card__row--calendar:hover {
+            background: #fcfdff;
+        }
+        
+        body.dark .stats-card--calendar .stats-card__row--calendar:hover {
+            background: #252525;
+        }
+        
+        .stats-card--calendar .stats-card__head--calendar,
+        .stats-card--calendar .stats-card__row--calendar {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 12px;
+            padding: 0 18px;
+            align-items: center;
+        }
+        
+        .stats-card--calendar .stats-card__head--calendar {
+            min-height: 44px;
+        }
+        
+        .stats-card--calendar .stats-card__row--calendar {
+            min-height: 48px;
+        }
+        
+        .stats-card--calendar .stats-card__head--calendar > div,
+        .stats-card--calendar .stats-card__row--calendar > div {
+            text-align: left !important;
+            justify-content: flex-start !important;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 8px 4px;
+        }
+        
+        .stats-card--calendar .stats-card__head--calendar > div:first-child,
+        .stats-card--calendar .stats-card__row--calendar > div:first-child {
+            font-weight: 500;
+        }
+        
+        /* Panel archiwum - przełączanie */
+        .archive-panel {
+            display: none;
+        }
+        
+        .archive-panel.active {
+            display: block;
+        }
+        
+        /* Responsywność */
+        @media (max-width: 860px) {
+            .stats-card--calendar .stats-card__head--calendar,
+            .stats-card--calendar .stats-card__row--calendar {
+                min-width: 700px;
+            }
+            .stats-card--calendar .stats-card__head--calendar > div,
+            .stats-card--calendar .stats-card__row--calendar > div {
+                white-space: normal;
+                word-break: break-word;
+            }
+        }
+
+        /* ===== BIO & IMAGES ===== */
+        .driver-bio p {
+            font-family: "SebinoMedium", Arial, sans-serif !important;
+            font-size: 14px;
+            line-height: 1.75;
+            color: #26384b;
+            margin-bottom: 16px;
+        }
+        body.dark .driver-bio p { color: #c0c0c0; }
+
+        .driver-img-wrap { margin: 28px 0 32px; }
+        .driver-img-wrap img { width: 100%; border-radius: 10px; display: block; max-height: 460px; object-fit: cover; }
+        .driver-img-caption { font-family: "SebinoSoft", Arial, sans-serif; font-size: 12px; color: #67727f; margin-top: 8px; margin-left: 5px;}
+        .driver-img-copyright { display: block; font-size: 10px; color: #aaa; margin-top: 2px; }
+
+        .driver-footer-img { width: 100%; border-radius: 10px; display: block; object-fit: cover; max-height: 360px; margin-top: 52px; }
+
+        /* ANIMATE */
+        .animate-on-scroll { opacity: 0; transform: translateY(18px); transition: opacity .5s ease, transform .5s ease; }
+        .animate-on-scroll.visible { opacity: 1; transform: none; }
+
+        @media (max-width: 860px) {
+            .driver-hero-bottom__name { font-size: 40px; }
+        }
+    </style>
+
+    <style>
+        /* Poprawki dla archiwum */
+        .archive-main { background: var(--section-bg); padding-top: 0; }
+        body.dark .archive-main { background: #1a1a1a; }
+        
+        .tabs-section {
+            background: var(--section-bg);
+            margin-bottom: 0;
+            padding: 30px 22px 0;
+            position: relative;
+            z-index: 5;
+            transition: background-color 0.38s ease;
+        }
+        body.dark .tabs-section { background: #1a1a1a; }
+
+        .hero__title-wrap {
+            position: absolute;
+            left: 50%;
+            transform: translateX(calc(-50% + 30px));
+            bottom: 46px;
+            width: 100%;
+            max-width: 1100px;
+            padding: 0 22px;
+        }
+
+        .tab {
+            transition: color 0.22s ease;
+            font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+            font-weight: 500 !important;
+        }
+        body.dark .tab { color: rgba(255, 255, 255, 0.82); }
+
+        .tabs {
+            transition: background-color 0.38s ease;
+        }
+        body.dark .tabs { background: #2a2a2a; }
+
+        .topbar__link {
+            font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+            font-weight: 550 !important;
+        }
+
+        .rallytv-btn {
+            font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+            font-weight: 500 !important;
+        }
+
+        p { font-family: "SebinoMedium", Arial, sans-serif !important; }
+
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            will-change: opacity, transform;
+        }
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+
+    <script>
+        if (localStorage.getItem("wrc-theme") === "dark")
+            document.documentElement.classList.add("wrc-dark");
+    </script>
+    <script src="theme.js"></script>
+</head>
+<body>
+<a href="start.html" class="floating-logo" aria-label="Home">
+    <img src="assets/logo.png" alt="Logo" class="floating-logo__img" />
+</a>
+
+<div class="page">
+    <header class="hero">
+        <div class="hero__bg"></div>
+        <div class="hero__overlay"></div>
+        <div class="hero__content">
+            <nav class="topbar">
+                <div class="topbar__left"></div>
+                <div class="topbar__center">
+                    <a href="start.html" class="topbar__link">Start</a>
+                    <a href="kalendarz.html" class="topbar__link">Kalendarz</a>
+                    <a href="index.html" class="topbar__link">Wyniki i klasyfikacja</a>
+                    <a href="teams.html" class="topbar__link">Zespoły i kierowcy</a>
+                    <a href="archiwum.html" class="topbar__link active">Archiwum</a>
+                </div>
+                <div class="topbar__right">
+                    <a href="#" class="rallytv-btn">PRC</a>
+                    <button class="theme-toggle-btn" id="themeToggle" aria-label="Przełącz motyw" type="button">
+                        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5" />
+                            <line x1="12" y1="1" x2="12" y2="3" />
+                            <line x1="12" y1="21" x2="12" y2="23" />
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                            <line x1="1" y1="12" x2="3" y2="12" />
+                            <line x1="21" y1="12" x2="23" y2="12" />
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                        </svg>
+                        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                        </svg>
+                    </button>
+                </div>
+            </nav>
+            <div class="hero__title-wrap">
+                <h1 class="hero__title">Archiwum</h1>
+            </div>
+        </div>
+    </header>
+
+    <main class="driver-main">
+        <div class="driver-content">
+            <!-- MENU ZAKŁADEK -->
+            <section class="tabs-section">
+                <div class="tabs">
+                    <button class="tab active" type="button" data-tab="prc1">PRC #1</button>
+                    <button class="tab" type="button" data-tab="prc2">PRC #2</button>
+                    <button class="tab" type="button" data-tab="prxc">PRXC #1</button>
+                    <button class="tab" type="button" data-tab="prc3">PRC #3</button>
+                </div>
+            </section>
+            <!-- PANEL PRC #1 -->
+            <div id="panel-prc1" class="archive-panel active">
+                <img src="https://images.girardo.com/girardo/image/upload/2025/CS349%20-%201998%20Subaru%20Impreza%20WRC98%20-%20Lasagni/SubaruR7WRC-1920x1280-269.jpg" alt="Rally action" class="driver-footer-img animate-on-scroll" style="object-position: center 47%;" />
+                <div class="driver-img-caption animate-on-scroll">
+                    P.Rajchel &amp; S.Kowalczyk, PRC 2025
+                    <span class="driver-img-copyright">© Copyright PRC / Dirt Rally 2.0</span>
+                </div>
+
+                <div class="driver-section-title animate-on-scroll">Informacje o turnieju</div>
+
+                <div class="driver-bio animate-on-scroll">
+                    <p>Po około pół roku luźnej jazdy najwierniejsze grono potato industries postanowiło zorganizować pierwszy oficjalny turniej na podstawowych zasadach – pierwszą edycję Potato Rally Championship. Funkcję dyrektora zawodów objął Krzycho, który wziął na siebie odpowiedzialność organizacji dwóch dni rywalizacji.</p>
+                    <p>Dla wszystkich uczestników był to debiut. Jednak od samego początku było widać, że ponad stawką wyraźnie górował jeden kierowca – Rendi. Wschodząca gwiazda z łatwością sięgnęła po tytuł z imponującym dorobkiem 88 punktów, rozpoczynając tym samym erę swojej dominacji.</p>
+                    <p>Największą niespodzianką turnieju nie były jednak same odcinki specjalne, a wydarzenia poza trasą. Dombart, faworyt do walki o miejsce na podium turnieju, został zmuszony do wycofania się przed ostatnim dniem rywalizacji.</p>
+                </div>
+
+                <div class="stats-card animate-on-scroll">
+                    <div class="stats-card__head--two">
+                        <div>Kategoria</div>
+                        <div>Wartość</div>
+                    </div>
+                    <div class="stats-card__row--two">
+                        <div>Mistrz Kierowców</div>
+                        <div>Rendi (88pkt)</div>
+                    </div>
+                    <div class="stats-card__row--two">
+                        <div>Ilość rajdów</div>
+                        <div>5 + Power Stage</div>
+                    </div>
+                </div>
+
+                <img src="https://i.redd.it/e2mt50htwjj21.jpg" alt="Rally action" class="driver-footer-img animate-on-scroll" />
+
+                <div class="driver-section-title animate-on-scroll">Kalendarz</div>
+
+                <div class="stats-card stats-card--calendar animate-on-scroll">
+                    <div class="stats-card__head--calendar">
+                        <div>Runda</div>
+                        <div>Kraj</div>
+                        <div>Rajd</div>
+                        <div>Data</div>
+                        <div>Zwycięzca</div>
+                    </div>
+                    <div class="stats-card__row--calendar">
+                        <div>1</div>
+                        <div>Hiszpania</div>
+                        <div>Rajd Katalonii</div>
+                        <div>5 Kwietnia 2025</div>
+                        <div>Rendi</div>
+                    </div>
+                    <div class="stats-card__row--calendar">
+                        <div>2</div>
+                        <div>Szwecja</div>
+                        <div>Rajd Szwecji</div>
+                        <div>5 Kwietnia 2025</div>
+                        <div>Rendi</div>
+                    </div>
+                    <div class="stats-card__row--calendar">
+                        <div>3</div>
+                        <div>Grecja</div>
+                        <div>Rajd Akropolu</div>
+                        <div>6 Kwietnia 2025</div>
+                        <div>Rendi</div>
+                    </div>
+                    <div class="stats-card__row--calendar">
+                        <div>4</div>
+                        <div>Polska</div>
+                        <div>Rajd Polski</div>
+                        <div>6 Kwietnia 2025</div>
+                        <div>Rendi</div>
+                    </div>
+                    <div class="stats-card__row--calendar">
+                        <div>5</div>
+                        <div>Australia</div>
+                        <div>Rajd Australii</div>
+                        <div>6 Kwietnia 2025</div>
+                        <div>Rendi</div>
+                    </div>
+                </div>
+
+                <!-- Zdjęcie na dole dla PRC #1 -->
+            </div>
+
+            <!-- PANEL PRC #2 (pusty do uzupełnienia) -->
+            <div id="panel-prc2" class="archive-panel">
+                <img src="https://www.gasolinasuper.es/wp-content/uploads/2015/03/imprezawrc2008_subaru_002.jpg" alt="Rally action" class="driver-footer-img animate-on-scroll" style="object-position: center 80%;"/>
+                <div class="driver-img-caption animate-on-scroll">
+                    B.Stanisz &amp; P.Mills, PRC 2025
+                    <span class="driver-img-copyright">© Copyright FIA PRC</span>
+                </div>
+
+                <div class="driver-section-title animate-on-scroll">Informacje o turnieju</div>
+
+                <div class="driver-bio animate-on-scroll">
+                    <p>Po sukcesie inauguracyjnej edycji i usprawnieniu kilku zasad, postanowiono pójść za ciosem. Lato 2025 roku przyniosło drugą odsłonę PRC – tym razem z rozbudowanym kalendarzem obejmującym osiem rajdów na czterech kontynentach. To miała być prawdziwa weryfikacja umiejętności, a nie tylko sprint na dwóch dniach. Krzycho ponownie stanął na czele komisji, a stawkę zasiliło kilku nowych, głodnych sukcesów zawodników. Faworyt nadal był tylko jeden – Rendi, który po debiutanckim tytule chciał udowodnić, że jego dominacja to nie przypadek.</p>
+                    <p>Mistrz nie pozostawił złudzeń rywalom. Siedem zwycięstw w ośmiu rajdach... Wyniki mówią same za siebie. Jedynym przebłyskiem nadziei dla reszty stawki okazał się ekstremalnie wymagający Rajd Finlandii, gdzie Rusell wykorzystał chaos panujący na legendarnych skokach, sięgając po swoje pierwsze zwycięstwo w zawodach.</p>
+                    <p>Mimo jednostronnej dominacji, sezon nie był pozbawiony emocji. Dombart i White robili wszystko, by nawiązać walkę. Ostatecznie Rendi sięgnął po drugi tytuł z rzędu z imponującym dorobkiem 135 punktów, pozostawiając rywali z poczuciem, że w tym sezonie można było walczyć wyłącznie o miano best of the rest.</p>
+                </div>
+
+                <div class="stats-card animate-on-scroll">
+                    <div class="stats-card__head--two">
+                        <div>Kategoria</div>
+                        <div>Wartość</div>
+                    </div>
+                    <div class="stats-card__row--two">
+                        <div>Mistrz Kierowców</div>
+                        <div>Rendi (135 pkt)</div>
+                    </div>
+                    <div class="stats-card__row--two">
+                        <div>Ilość rajdów</div>
+                        <div>8 + Power Stage</div>
+                    </div>
+                </div>
+
+                                <img src="https://live.staticflickr.com/7422/13250763723_710b9c1207_b.jpg" alt="Rally action" class="driver-footer-img animate-on-scroll" style="object-position: center 40%;" />
+
+
+                <div class="driver-section-title animate-on-scroll">Kalendarz</div>
+
+                <div class="stats-card stats-card--calendar animate-on-scroll">
+                    <div class="stats-card__head--calendar">
+                        <div>Runda</div>
+                        <div>Kraj</div>
+                        <div>Rajd</div>
+                        <div>Data</div>
+                        <div>Zwycięzca</div>
+                    </div>
+                    <div class="stats-card__row--calendar">
+                        <div>1</div>
+                        <div>Monako</div>
+                        <div>Rajd Monte Carlo</div>
+                        <div>21 Lipca 2025</div>
+                        <div>Rendi</div>
+                    </div>
+                    <div class="stats-card__row--calendar">
+                        <div>2</div>
+                        <div>Finlandia</div>
+                        <div>Rajd Finlandii</div>
+                        <div>21 Lipca 2025</div>
+                        <div>Rusell</div>
+                    </div>
+                    <div class="stats-card__row--calendar">
+                        <div>3</div>
+                        <div>USA</div>
+                        <div>Rajd USA</div>
+                        <div>22 Lipca 2025</div>
+                        <div>Rendi</div>
+                    </div>
+                    <div class="stats-card__row--calendar">
+                        <div>4</div>
+                        <div>Szwecja</div>
+                        <div>Rajd Szwecji</div>
+                        <div>22 Lipca 2025</div>
+                        <div>Rendi</div>
+                    </div>
+                    <div class="stats-card__row--calendar">
+                        <div>5</div>
+                        <div>Argentyna</div>
+                        <div>Rajd Argentyny</div>
+                        <div>23 Lipca 2025</div>
+                        <div>Rendi</div>
+                    </div>
+                    <div class="stats-card__row--calendar">
+                        <div>6</div>
+                        <div>Polska</div>
+                        <div>Rajd Polski</div>
+                        <div>23 Lipca 2025</div>
+                        <div>Rendi</div>
+                    </div>
+                    <div class="stats-card__row--calendar">
+                        <div>7</div>
+                        <div>Grecja</div>
+                        <div>Rajd Akropolu</div>
+                        <div>24 Lipca 2025</div>
+                        <div>Rendi</div>
+                    </div>
+                    <div class="stats-card__row--calendar">
+                        <div>8</div>
+                        <div>Walia</div>
+                        <div>Rajd Walii</div>
+                        <div>24 Lipca 2025</div>
+                        <div>Rendi</div>
+                    </div>
+                </div>
+
+                <!-- Zdjęcie na dole dla PRC #2 -->
+
+            </div>
+
+            <!-- PANEL PRXC #1 (pusty do uzupełnienia) -->
+            <div id="panel-prxc" class="archive-panel">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/World_RX_-_2018_-_RD6_Sweden_%2829262747938%29.jpg/1280px-World_RX_-_2018_-_RD6_Sweden_%2829262747938%29.jpg" alt="Rally action" class="driver-footer-img animate-on-scroll" style="object-position: center 20%;" />
+                <div class="driver-img-caption animate-on-scroll">
+                    PRXC #1
+                    <span class="driver-img-copyright">© Copyright FIA PRC</span>
+                </div>
+
+                <div class="driver-section-title animate-on-scroll">Informacje o turnieju</div>
+
+                <div class="driver-bio animate-on-scroll">
+                    <p>Eksperymentalna edycja PRXC — krótsza, bardziej intensywna formuła z zaledwie czterema wyścigami. Format był ciekawy, a każda runda była kluczowa. Rendi podtrzymał passę wygranych sięgając po tytuł w tej istnej clown fieście</p>
+                    <p>PRXC udowodniło, że krótki sezon potrafi być równie emocjonujący co pełna liga — a czasem nawet bardziej.</p>
+                </div>
+
+                <div class="stats-card animate-on-scroll">
+                    <div class="stats-card__head--two">
+                        <div>Kategoria</div>
+                        <div>Wartość</div>
+                    </div>
+                    <div class="stats-card__row--two">
+                        <div>Mistrz Kierowców</div>
+                        <div>Rendi (112 pkt)</div>
+                    </div>
+                    <div class="stats-card__row--two">
+                        <div>Ilość rajdów</div>
+                        <div>4 Wyścigi</div>
+                    </div>
+                </div>
+
+                <img src="https://media.evo.co.uk/image/private/s--X-WVjvBW--/f_auto,t_content-image-full-desktop@1/v1556222040/evo/2018/12/p-20170514-01523_hires-jpeg-24bit-rgb.jpg" alt="Rally action" class="driver-footer-img animate-on-scroll" style="object-position: center 90%;"/>
+
+
+                <div class="driver-section-title animate-on-scroll">Kalendarz</div>
+
+                <div class="stats-card stats-card--calendar animate-on-scroll">
+                    <div class="stats-card__head--calendar">
+                        <div>Runda</div>
+                        <div>Kraj</div>
+                        <div>Rajd</div>
+                        <div>Data</div>
+                    </div>
+                    <div class="stats-card__row--calendar">
+                        <div>1</div>
+                        <div>Łotwa</div>
+                        <div>PRX Łotwy</div>
+                        <div>30 Listopada 2025</div>
+
+                    </div>
+                    <div class="stats-card__row--calendar">
+                        <div>2</div>
+                        <div>Norwegia</div>
+                        <div>PRX Norwegii</div>
+                        <div>30 Listopada 2025</div>
+                    </div>
+                    <div class="stats-card__row--calendar">
+                        <div>3</div>
+                        <div>RPA</div>
+                        <div>PRX RPA</div>
+                        <div>30 Listopada 2025</div>
+                    </div>
+                    <div class="stats-card__row--calendar">
+                        <div>4</div>
+                        <div>ZEA</div>
+                        <div>PRX Abu Dhabi</div>
+                        <div>30 Listopada 2025</div>
+                    </div>
+                </div>
+
+                <!-- Zdjęcie na dole dla PRXC #1 -->
+            </div>
+
+            <!-- PANEL PRC #3 (pusty do uzupełnienia) -->
+            <div id="panel-prc3" class="archive-panel">
+                <img src="https://skoda-motorsport.s3.amazonaws.com/com/2020/01/Fabia-Turkey.jpg" alt="Rally action" class="driver-footer-img animate-on-scroll" style="object-position: center 77%;" />
+                <div class="driver-img-caption animate-on-scroll">
+                    D.Siemaszko &amp; S.Kowalczyk, PRC 2025
+                    <span class="driver-img-copyright">© Copyright FIA PRC</span>
+                </div>
+
+                <div class="driver-section-title animate-on-scroll">Informacje o turnieju</div>
+
+                <div class="driver-bio animate-on-scroll">
+                    <p>Po eksperymentalnej edycji PRXC nadszedł czas na wielki powrót do korzeni. Trzecia edycja PRC była rewolucyjna – Nowa formuła mistrzostw konstruktorów oraz lekkie zmiany w zasadach turnieju</p>
+                    <p>Przez długie miesiące wydawało się, że Rendi może stracić koronę. Dombart, który w PRC #2 musiał uznać wyższość rywala, wrócił z zimną krwią i brakiem głosu. Zwycięstwa niemiego jeźdzca w Szkocji i Nowej Zelandii postawiły go na tymczasowej pozycji lidera. Lecz Rendi po raz kolejny udowodnił, że sportowa historia lubi niespodzianki.</p>
+                    <p>Cztery zwycięstwa w drugiej części sezonu – w Argentynie, Walii i Polsce – oraz triumf w finałowym Power Stage w USA odwróciły losy rywalizacji. Rendi sięgnął po trzeci tytuł z rzędu, zdobywając 129 punktów. Podium uzupełnili: Dombart (115 punkty) oraz D4xan (93 punkty). W klasyfikacji konstruktorów bezkonkurencyjne okazało się Mitsubishi (198 punktów), które zdominowało całą stawkę.</p>
+                    
+                </div>
+
+                <div class="stats-card animate-on-scroll">
+                    <div class="stats-card__head--two">
+                        <div>Kategoria</div>
+                        <div>Wartość</div>
+                    </div>
+                    <div class="stats-card__row--two">
+                        <div>Mistrz Kierowców</div>
+                        <div>Rendi (129 pkt)</div>
+                    </div>
+                    <div class="stats-card__row--two">
+                        <div>Mistrz Konstruktorów</div>
+                        <div>Mitsubishi (198 pkt)</div>
+                    </div>
+                    <div class="stats-card__row--two">
+                        <div>Najwięcej zwycięstw</div>
+                        <div>Rendi (4)</div>
+                    </div>
+                </div>
+
+                                <img src="https://www.ginomotorsport.com/wp-content/uploads/AMG-05-1659-90002.jpg" alt="Rally action" class="driver-footer-img animate-on-scroll" style="object-position: center 87%;"/>
+
+
+                <div class="driver-section-title animate-on-scroll">Kalendarz</div>
+
+                <div class="stats-card stats-card--calendar animate-on-scroll">
+                    <div class="stats-card__head--calendar">
+                        <div>Runda</div>
+                        <div>Kraj</div>
+                        <div>Rajd</div>
+                        <div>Data</div>
+                        <div>Zwycięzca</div>
+                    </div>
+                    <div class="stats-card__row--calendar">
+                        <div>1</div>
+                        <div>Monako</div>
+                        <div>Rajd Monte-Carlo</div>
+                        <div>29 Grudnia 2025</div>
+                        <div>Dyxan</div>
+                    </div>
+                    <div class="stats-card__row--calendar">
+                        <div>2</div>
+                        <div>Szkocja</div>
+                        <div>Rajd Szkocji</div>
+                        <div>29 Grudnia 2025</div>
+                        <div>Dombart</div>
+                    </div>
+                    <div class="stats-card__row--calendar">
+                        <div>3</div>
+                        <div>Argentyna</div>
+                        <div>Rajd Argentyny</div>
+                        <div>30 Grudnia 2025</div>
+                        <div>Rendi</div>
+                    </div>
+                    <div class="stats-card__row--calendar">
+                        <div>4</div>
+                        <div>Szwecja</div>
+                        <div>Rajd Szwecji</div>
+                        <div>30 Grudnia 2025</div>
+                        <div>Dombart</div>
+                    </div>
+                    <div class="stats-card__row--calendar">
+                        <div>5</div>
+                        <div>Walia</div>
+                        <div>Rajd Walii</div>
+                        <div>1 Stycznia 2026</div>
+                        <div>Rendi</div>
+                    </div>
+                    <div class="stats-card__row--calendar">
+                        <div>6</div>
+                        <div>Nowa Zelandia</div>
+                        <div>Rajd Nowej Zelandii</div>
+                        <div>1 Stycznia 2026</div>
+                        <div>Rendi</div>
+                    </div>
+                    <div class="stats-card__row--calendar">
+                        <div>7</div>
+                        <div>Niemcy</div>
+                        <div>Rajd Niemiec</div>
+                        <div>2 Stycznia 2026</div>
+                        <div>Dyxan</div>
+                    </div>
+                    <div class="stats-card__row--calendar">
+                        <div>8</div>
+                        <div>Polska</div>
+                        <div>Rajd Polski</div>
+                        <div>2 Stycznia 2026</div>
+                        <div>Rendi</div>
+                    </div>
+                </div>
+
+                <!-- Zdjęcie na dole dla PRC #3 -->
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<footer class="site-footer">
+    <div class="site-footer__sponsors">
+        <div class="footer-photo"><img src="assets/sponsors/photo1.png" alt="" /></div>
+        <div class="footer-photo"><img src="assets/sponsors/photo2.png" alt="" /></div>
+        <div class="footer-photo"><img src="assets/sponsors/photo3.png" alt="" /></div>
+    </div>
+    <div class="footer-divider"></div>
+    <p class="footer-copyright">&copy; 2026 PRC. All rights reserved.</p>
+</footer>
+
+<script>
+    const logo = document.querySelector(".floating-logo");
+    const hero = document.querySelector(".hero");
+    window.addEventListener("scroll", () => {
+        if (hero.getBoundingClientRect().bottom <= 0) logo.classList.add("logo--dark");
+        else logo.classList.remove("logo--dark");
+    }, { passive: true });
+
+    // Obserwator animacji dla elementów w widocznym panelu
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((e) => { 
+            if (e.isIntersecting) { 
+                e.target.classList.add("visible"); 
+                observer.unobserve(e.target); 
+            } 
+        });
+    }, { threshold: 0.1 });
+
+    // Funkcja do obserwowania elementów w aktywnym panelu
+    function observeActivePanelElements() {
+        const activePanel = document.querySelector('.archive-panel.active');
+        if (activePanel) {
+            const elements = activePanel.querySelectorAll('.animate-on-scroll:not(.visible)');
+            elements.forEach((el) => observer.observe(el));
+        }
+    }
+
+    // Obserwuj początkowe elementy
+    observeActivePanelElements();
+
+    // Przełączanie między panelami archiwum
+    function switchArchivePanel(panelId) {
+        // Ukryj wszystkie panele
+        document.querySelectorAll('.archive-panel').forEach(panel => {
+            panel.classList.remove('active');
+        });
+        // Pokaż wybrany panel
+        const activePanel = document.getElementById(panelId);
+        if (activePanel) {
+            activePanel.classList.add('active');
+        }
+        
+        // Obserwuj nowe elementy w aktywnym panelu
+        setTimeout(() => {
+            observeActivePanelElements();
+        }, 100);
+    }
+
+    // Obsługa kliknięć w zakładki
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            // Usuń active ze wszystkich zakładek
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            // Dodaj active do klikniętej
+            this.classList.add('active');
+            
+            // Pobierz ID panelu
+            const tabId = this.getAttribute('data-tab');
+            let panelId = '';
+            switch(tabId) {
+                case 'prc1':
+                    panelId = 'panel-prc1';
+                    break;
+                case 'prc2':
+                    panelId = 'panel-prc2';
+                    break;
+                case 'prxc':
+                    panelId = 'panel-prxc';
+                    break;
+                case 'prc3':
+                    panelId = 'panel-prc3';
+                    break;
+                default:
+                    panelId = 'panel-prc1';
+            }
+            switchArchivePanel(panelId);
+        });
+    });
+
+    (function () {
+        if (localStorage.getItem("wrc-theme") === "dark") document.body.classList.add("dark");
+        var btn = document.getElementById("themeToggle");
+        if (btn) {
+            btn.addEventListener("click", function () {
+                var isDark = document.body.classList.toggle("dark");
+                localStorage.setItem("wrc-theme", isDark ? "dark" : "light");
+            });
+        }
+    })();
+</script>
+</body>
+</html>

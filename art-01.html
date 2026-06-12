@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PRC #4 - Analiza przedsezonowa: Faworyci i czarne konie</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css" />
+    <link rel="stylesheet" href="css/archiwum.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="icon" href="assets/icon.jpg" />
+
+    <style>
+        /* ===== HELPERS ===== */
+        .no-transition * { transition: none !important; }
+        .icon-moon { display: none; }
+        body.dark .icon-sun  { display: none; }
+        body.dark .icon-moon { display: block; }
+
+        /* ===== HERO BG ===== */
+        .hero__bg {
+            position: absolute; inset: 0;
+            background-image: url("https://www.rallye-magazin.de/typo3temp/_processed_/c/0/csm_2025_Rallye_WRC_Saison_Vorschau_Rallye-Magazin_Header_1920x600_820941f894.jpg");
+            background-size: cover;
+            background-position: center 35%;
+            background-repeat: no-repeat;
+        }
+        .hero {
+            min-height: 50vh;
+        }
+        .hero__title-wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 44px;
+            position: relative;
+            z-index: 3;
+        }
+        .hero__title {
+            font-family: "WRCCleanBold", Arial, sans-serif;
+            font-size: 3.3rem;
+            line-height: 1.2;
+            color: white;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            margin-top: 80px;
+            margin-bottom: 20px;
+        }
+        .hero__title small {
+            font-size: 1.3rem;
+            display: block;
+            opacity: 0.9;
+            font-family: "SebinoMedium", Arial, sans-serif;
+        }
+
+        .driver-main {
+            background: var(--section-bg);
+            transition: background-color .38s ease;
+        }
+        body.dark .driver-main { background: #1a1a1a; }
+
+        .driver-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1px 44px 80px;
+        }
+
+        .driver-section-title {
+            font-family: "WRCCleanBold", Arial, sans-serif;
+            font-size: 28px;
+            margin: 44px 0 18px;
+            color: #26384b;
+            border-left: 4px solid #ff6b00;
+            padding-left: 15px;
+            transition: color .28s;
+        }
+        body.dark .driver-section-title { color: #f3f3f3; }
+
+        .stats-card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06);
+            margin-bottom: 32px;
+            transition: background .38s, box-shadow .32s;
+        }
+        body.dark .stats-card { background: #1e1e1e; box-shadow: 0 7px 18px rgba(0,0,0,.28); }
+
+        .stats-card__head--two {
+            background: #f2f3f3;
+            color: #67727f;
+            font-family: "SebinoSoft", Arial, sans-serif;
+            font-size: 11px;
+            letter-spacing: .03em;
+            text-transform: uppercase;
+            font-weight: 500;
+            padding: 0 18px;
+            min-height: 44px;
+            display: grid;
+            grid-template-columns: 1fr 200px;
+            align-items: center;
+        }
+        .stats-card__row--two {
+            display: grid;
+            grid-template-columns: 1fr 200px;
+            align-items: center;
+            padding: 0 18px;
+            min-height: 48px;
+            background: #fff;
+            font-family: "SebinoSoft", Arial, sans-serif;
+            font-size: 13px;
+            color: #26384b;
+            border-bottom: 1px solid rgba(225, 231, 238, 0.8);
+            transition: background .28s;
+        }
+        body.dark .stats-card__head--two { background: #2e2e2e; color: #9a9088; }
+        body.dark .stats-card__row--two { background: #1e1e1e; color: #c0c0c0; border-bottom-color: rgba(60,72,88,0.4); }
+        .stats-card__row--two:last-child { border-bottom: none; }
+        .stats-card__row--two:hover { background: #fcfdff; }
+        body.dark .stats-card__row--two:hover { background: #252525; }
+        .stats-card__row--two > div:last-child { text-align: right; font-weight: 600; color: #1a5da6; }
+        body.dark .stats-card__row--two > div:last-child { color: #5b9de0; }
+
+        .driver-bio p {
+            font-family: "SebinoMedium", Arial, sans-serif !important;
+            font-size: 16px;
+            line-height: 1.75;
+            color: #26384b;
+            margin-bottom: 16px;
+        }
+        body.dark .driver-bio p { color: #c0c0c0; }
+
+        .driver-img-wrap { margin: 28px 0 32px; }
+        .driver-img-wrap img { width: 100%; border-radius: 10px; display: block; max-height: 450px; object-fit: cover; }
+        .driver-img-caption { font-family: "SebinoSoft", Arial, sans-serif; font-size: 12px; color: #67727f; margin-top: 8px; margin-left: 5px;}
+        .driver-footer-img { width: 100%; border-radius: 10px; display: block; object-fit: cover; max-height: 420px; margin: 52px 0 20px; }
+
+        .animate-on-scroll { opacity: 0; transform: translateY(18px); transition: opacity .5s ease, transform .5s ease; }
+        .animate-on-scroll.visible { opacity: 1; transform: none; }
+
+        @media (max-width: 860px) {
+            .hero__title { font-size: 2.2rem; }
+        }
+
+        .highlight-box {
+            background: rgba(0,0,0,0.03);
+            border-left: 3px solid #ff6b00;
+            padding: 16px 24px;
+            margin: 24px 0;
+            border-radius: 8px;
+        }
+        body.dark .highlight-box { background: rgba(255,255,255,0.05); }
+        hr { margin: 32px 0; border: none; height: 1px; background: linear-gradient(to right, transparent, #ccc, transparent); }
+        body.dark hr { background: linear-gradient(to right, transparent, #444, transparent); }
+
+        .favorite-badge {
+            display: inline-block;
+            background: #ff6b00;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-left: 8px;
+            vertical-align: middle;
+            text-transform: uppercase;
+        }
+        .darkhorse-badge {
+            background: #2c3e66;
+        }
+        
+        /* usunięcie ewentualnych pozostałości po emotkach w ikonach */
+        .driver-section-title::before {
+            content: none;
+        }
+    </style>
+
+    <script>
+        if (localStorage.getItem("wrc-theme") === "dark")
+            document.documentElement.classList.add("wrc-dark");
+    </script>
+</head>
+<body>
+<a href="start.html" class="floating-logo" aria-label="Home">
+    <img src="assets/logo.png" alt="Logo" class="floating-logo__img" />
+</a>
+
+<div class="page">
+    <header class="hero">
+        <div class="hero__bg"></div>
+        <div class="hero__overlay"></div>
+        <div class="hero__content">
+            <nav class="topbar">
+                <div class="topbar__left"></div>
+                <div class="topbar__center">
+                    <a href="start.html" class="topbar__link">Start</a>
+                    <a href="kalendarz.html" class="topbar__link">Kalendarz</a>
+                    <a href="index.html" class="topbar__link">Wyniki i klasyfikacja</a>
+                    <a href="teams.html" class="topbar__link">Zespoły i kierowcy</a>
+                    <a href="archiwum.html" class="topbar__link">Archiwum</a>
+                </div>
+                <div class="topbar__right">
+                    <a href="#" class="rallytv-btn">PRC</a>
+                    <button class="theme-toggle-btn" id="themeToggle" aria-label="Przełącz motyw" type="button">
+                        <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                        <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    </button>
+                </div>
+            </nav>
+            <div class="hero__title-wrap">
+                <h1 class="hero__title">Analiza przedsezonowa: Kto jest faworytem w stawce? <br> <small>Rendi, Dombart i D4xan – eksperci wskazują triumwirat. Czy pojawi się czarny koń?</small></h1>
+            </div>
+        </div>
+    </header>
+    <main class="driver-main">
+        <div class="driver-content">
+            <!-- Wprowadzenie -->
+            <div class="driver-section-title animate-on-scroll">Bilans sił przed PRC #4</div>
+            <div class="driver-bio animate-on-scroll">
+                <p>Za nami trzy emocjonujące edycje Potato Rally Championship. Przed nami PRC #4 – turniej, który może zapisać się w historii jako jeden z najbardziej wyrównanych. Po raz pierwszy od dłuższego czasu mamy trzech wyraźnych kandydatów do tytułu, ale historia uczy, że w rajdach niespodzianki zdarzają się częściej niż myślimy. Eksperci przeanalizowali archiwalne wyniki, styl jazdy oraz przygotowania każdego z kierowców, by wyłonić faworytów oraz typować potencjalnego "czarnego konia", który może namieszać w stawce.</p>
+                <p>Regulamin PRC #4 wprowadza surowe limity dotyczące ustawień samochodów – zakazane są jakiekolwiek modyfikacje wykraczające poza podstawowe ustawienia. To może być kluczowy czynnik, który zbliży do siebie stawkę i postawi na piedestale czystą technikę oraz znajomość tras.</p>
+            </div>
+
+            <!-- GRAFIKA 1 -->
+            <div class="driver-img-wrap animate-on-scroll">
+                <img src="https://cdn-1.motorsport.com/images/amp/6d3vNzw2/s1000/m-sport-ford-world-rally-team-1.jpg" alt="Top contenders face-off" style="width:100%; border-radius:12px;">
+                <div class="driver-img-caption">Główne gwiazdy PRC szykują się do bitwy o mistrzostwo | © PRC Media</div>
+            </div>
+
+            <!-- Faworyci sekcja -->
+            <div class="driver-section-title animate-on-scroll">Złote trio – główni kandydaci do tytułu</div>
+            
+            <!-- 1. Rendi -->
+            <div class="stats-card animate-on-scroll">
+                <div class="stats-card__head--two"><div>Paweł "Rendi" Rajchel <span class="favorite-badge">faworyt numer 1</span></div><div>Bilans mistrzowski</div></div>
+                <div class="stats-card__row--two"><div>PRC #1 (Potato Rally Ch.)</div><div>1. miejsce</div></div>
+                <div class="stats-card__row--two"><div>PRC #2 (Potato Rally Ch.)</div><div>1. miejsce</div></div>
+                <div class="stats-card__row--two"><div>PRXC #1 (Rallycross)</div><div>1. miejsce</div></div>
+                <div class="stats-card__row--two"><div>PRC #3 (Potato Rally Ch.)</div><div>1. miejsce</div></div>
+                <div class="stats-card__row--two"><div>Wygrane odcinki specjalne (kariera PRC)</div><div>42</div></div>
+                <div class="stats-card__row--two"><div>Wygrane rajdy ogółem</div><div>16</div></div>
+            </div>
+            <div class="driver-bio animate-on-scroll">
+                <p><strong>Paweł Rajchel (Rendi)</strong> – panujący hegemon. Trzy tytuły z rzędu, komplet złotych medali we wszystkich dotychczasowych turniejach PRC. Jego statystyki są porażające: 42 wygrane OS, 16 wygranych rajdów i niesamowita regularność. Rendi to kierowca totalny – szybki na każdym rodzaju nawierzchni, a jego największym atutem jest brak słabych punktów. Jeśli ktoś ma zostać pokonany, musi zaryzykować wszystko. Eksperci są jednak zgodni: Rendi to faworyt numer jeden, ale presja obrony czterech tytułów może dać o sobie znać.</p>
+            </div>
+
+            <!-- 2. Dombart -->
+            <div class="stats-card animate-on-scroll">
+                <div class="stats-card__head--two"><div>Bartosz "Dombart" Stanisz <span class="favorite-badge">faworyt numer 2</span></div><div>Największy rywal mistrza</div></div>
+                <div class="stats-card__row--two"><div>PRC #1</div><div>4. miejsce</div></div>
+                <div class="stats-card__row--two"><div>PRC #2</div><div>2. miejsce</div></div>
+                <div class="stats-card__row--two"><div>PRXC #1 (Rallycross)</div><div>2. miejsce</div></div>
+                <div class="stats-card__row--two"><div>PRC #3</div><div>2. miejsce</div></div>
+                <div class="stats-card__row--two"><div>Podium w rajdach PRC</div><div>15</div></div>
+                <div class="stats-card__row--two"><div>Wygrane OS</div><div>6</div></div>
+            </div>
+            <div class="driver-bio animate-on-scroll">
+                <p><strong>Bartosz Stanisz (Dombart)</strong> – od dwóch sezonów najgroźniejszy konkurent Rajchela. Srebrny medalista PRC #2 i PRC #3, a do tego wicemistrz rallycrossu. Jego ewolucja jest imponująca – z czwartej lokaty w debiucie do regularnych starć o najwyższe laury. Dombart wyróżnia się inteligencją rajdową i umiejętnością zarządzania oponami na zmiennej nawierzchni. W PRC #4 ma realną szansę przerwać dominację Rendiego, zwłaszcza jeśli nowe ograniczenia regulaminowe wpłyną na psychikę mistrza.</p>
+            </div>
+
+            <!-- 3. D4xan -->
+            <div class="stats-card animate-on-scroll">
+                <div class="stats-card__head--two"><div>Damian "D4xan" Siemaszko <span class="favorite-badge">czarny koń wśród faworytów</span></div><div>Eksplozywny talent</div></div>
+                <div class="stats-card__row--two"><div>PRC #1</div><div>3. miejsce</div></div>
+                <div class="stats-card__row--two"><div>PRC #2</div><div>5. miejsce</div></div>
+                <div class="stats-card__row--two"><div>PRXC #1</div><div>5. miejsce</div></div>
+                <div class="stats-card__row--two"><div>PRC #3</div><div>3. miejsce</div></div>
+                <div class="stats-card__row--two"><div>Wygrane rajdy</div><div>2 (Monte Carlo, etc.)</div></div>
+                <div class="stats-card__row--two"><div>Podium w rajdach</div><div>5</div></div>
+            </div>
+            <div class="driver-bio animate-on-scroll">
+                <p><strong>Damian Siemaszko (D4xan)</strong> – gdy jest w formie, nie ma dla niego przeszkód. Dwa brązowe medale w klasyfikacjach generalnych i dwa wygrane rajdy (w tym prestiżowe Monte Carlo) pokazują, że D4xan potrafi pokonać każdego. Jego problemem jest nierówna dyspozycja – potrafi wygrać rajd, by w kolejnym zająć odległe miejsce. Jeśli uda mu się znaleźć regularność, może namieszać w walce o szczyt. W PRC #4, po wprowadzeniu zakazu tuningów, D4xan może zyskać – jego surowy talent i niesamowite wyczucie Lancii Delty staną się jego największym orężem.</p>
+            </div>
+
+            <!-- Grafika pomocnicza -->
+            <div class="driver-img-wrap animate-on-scroll">
+                <img src="https://www.rallyfish.co.uk/wp-content/uploads/2021/01/Colin-Mcrae-1995-Subaru-Impreza-555-1.jpg" alt="Rally intensity" style="width:100%; border-radius:12px;">
+                <div class="driver-img-caption">Emocje gwarantowane – PRC #4 zapowiada się na wojnę atomową | © Rally Archive</div>
+            </div>
+
+            <!-- SEKCJA: CZARNE KONIE -->
+            <div class="driver-section-title animate-on-scroll">Czarni koniowie – czy któryś z nich zdetronizuje faworytów?</div>
+            <div class="driver-bio animate-on-scroll">
+                <p>Do tej pory mówiło się głównie o wielkiej trójce, ale analiza archiwalnych wyników i przygotowań ujawnia co najmniej dwóch kierowców, którzy mogą sprawić niespodziankę. Eksperci typują przede wszystkim <strong>Krzysztofa "White" Drozda</strong> oraz <strong>Miłosza "beast" Litwina</strong> jako potencjalnych burzycieli układu sił.</p>
+            </div>
+
+            <!-- White -->
+            <div class="stats-card animate-on-scroll">
+                <div class="stats-card__head--two"><div>Krzysztof "White" Drozd <span class="favorite-badge darkhorse-badge">czarny koń #1</span></div><div>Stabilny punkt drużyny</div></div>
+                <div class="stats-card__row--two"><div>PRC #1</div><div>2. miejsce</div></div>
+                <div class="stats-card__row--two"><div>PRC #2</div><div>3. miejsce</div></div>
+                <div class="stats-card__row--two"><div>PRXC #1</div><div>4. miejsce</div></div>
+                <div class="stats-card__row--two"><div>PRC #3</div><div>5. miejsce</div></div>
+                <div class="stats-card__row--two"><div>Podium w rajdach PRC</div><div>8</div></div>
+            </div>
+            <div class="driver-bio animate-on-scroll">
+                <p><strong>Krzysztof Drozd (White)</strong> – srebro w PRC #1 i brąz w PRC #2 to dowody, że White potrafi regularnie lądować na podium. Spadek na piątą lokatę w PRC #3 był tylko wypadkiem przy pracy. Przed nowym sezonem spędził wiele godzin na symulatorze, poprawiając tempo na asfalcie. Jeśli odzyska pewność siebie, jego nazwisko może być głośne. Doświadczenie i brak presji bycia faworytem czynią go idealnym kandydatem do roli czarnego konia.</p>
+            </div>
+
+            <!-- Beast -->
+            <div class="stats-card animate-on-scroll">
+                <div class="stats-card__head--two"><div>Miłosz "beast" Litwin <span class="favorite-badge darkhorse-badge">czarny koń #2</span></div><div>Największa niewiadoma</div></div>
+                <div class="stats-card__row--two"><div>PRXC #1</div><div>6. miejsce</div></div>
+                <div class="stats-card__row--two"><div>PRC #3</div><div>4. miejsce</div></div>
+                <div class="stats-card__row--two"><div>Wygrane OS (krótka kariera)</div><div>5</div></div>
+                <div class="stats-card__row--two"><div>Podium w rajdach</div><div>3</div></div>
+                <div class="stats-card__row--two"><div>Debiut w PRC</div><div>PRC #3 (Monte Carlo)</div></div>
+            </div>
+            <div class="driver-bio animate-on-scroll">
+                <p><strong>Miłosz Litwin (beast)</strong> – prawdziwa rewelacja końcówki poprzedniego cyklu. W swoim debiutanckim rajdzie (PRC #3) od razu stanął na podium, a w klasyfikacji generalnej zajął czwarte miejsce, przegrywając tylko z czołową trójką. Jego styl jest agresywny, ale kontrolowany – w krótkim czasie zdobył już 5 wygranych OS. Jeśli beast utrzyma progres, może być czarnym koniem, który wjedzie do pierwszej trójki mistrzostw. Uwaga ekspertów skupiona jest na jego przygotowaniach – treningi na symetrycznych nawierzchniach dają mu przewagę.</p>
+            </div>
+
+            <!-- Dodatkowy akapit: inne zagrożenia -->
+            <div class="highlight-box animate-on-scroll">
+                <p><strong>Uwaga redakcji</strong> – Nie zapominajmy też o reszcie stawki: Bartłomiej Zając (stabilna piątka, 5 podium w rajdach), Piotr Kandefer (zwycięzca rajdu Finlandii, brąz w rallycrossie) oraz Emil Migdał (debiutant, który może być "jokerem") mają potencjał, by napsuć krwi faworytom. W rajdach nigdy nic nie jest pewne, a PRC #4 może być areną niespodzianek.</p>
+            </div>
+
+            <hr>
+
+            <!-- Podsumowanie eksperckie -->
+            <div class="driver-section-title animate-on-scroll">Werdykt redakcji</div>
+            <div class="driver-bio animate-on-scroll">
+                <p>Po dogłębnej analizie statystyk oraz dostępnych nagrań z testów, eksperci są zgodni: Rendi pozostaje murowanym faworytem do czwartego tytułu, ale jego dominacja nie jest już tak oczywista. Dombart jest w stanie wywrzeć presję, a D4xan na swoim ulubionym sprzęcie (Lancia Delta) może odnieść spektakularne zwycięstwa. Gdyby jednak miał zabraknąć któregoś z faworytów, to właśnie Krzysztof White lub Miłosz Litwin są gotowi przejąć pałeczkę. Oto jak przedstawia się potencjalny rozkład sił przed pierwszym rajdem sezonu – Rajdem Monte Carlo.</p>
+                <p>Jedno jest pewne – PRC #4 dostarczy ogromnych emocji. Kto ostatecznie sięgnie po tytuł? Odpowiedź poznamy za kilka tygodni. Śledźcie nasz portal, by nie przegapić żadnych newsów z serwisu!</p>
+            </div>
+
+            <!-- Zdjęcie kończące artykuł -->
+            <img src="https://cdn-5.motorsport.com/images/amp/2a2jn46G/s1000/wrc-estonia-2021-craig-breen-p-1.jpg" alt="Rally fight" class="driver-footer-img animate-on-scroll">
+            <div class="driver-img-caption animate-on-scroll">Bitwa o mistrzostwo PRC #4 rozpocznie się już wkrótce. Kto zostanie królem? | © PRC / Dirt Rally 2.0</div>
+        </div>
+    </main>
+</div>
+
+<footer class="site-footer">
+    <div class="site-footer__sponsors">
+        <div class="footer-photo"><img src="assets/sponsors/photo1.png" alt="" /></div>
+        <div class="footer-photo"><img src="assets/sponsors/photo2.png" alt="" /></div>
+        <div class="footer-photo"><img src="assets/sponsors/photo3.png" alt="" /></div>
+    </div>
+    <div class="footer-divider"></div>
+    <p class="footer-copyright">&copy; 2026 PRC. All rights reserved.</p>
+</footer>
+
+<script>
+    const logo = document.querySelector(".floating-logo");
+    const hero = document.querySelector(".hero");
+    window.addEventListener("scroll", () => {
+        if (hero.getBoundingClientRect().bottom <= 0) logo.classList.add("logo--dark");
+        else logo.classList.remove("logo--dark");
+    }, { passive: true });
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("visible"); observer.unobserve(e.target); } });
+    }, { threshold: 0.1 });
+    document.querySelectorAll(".animate-on-scroll").forEach(el => observer.observe(el));
+
+    (function () {
+        if (localStorage.getItem("wrc-theme") === "dark") document.body.classList.add("dark");
+        const btn = document.getElementById("themeToggle");
+        if (btn) {
+            btn.addEventListener("click", () => {
+                const isDark = document.body.classList.toggle("dark");
+                localStorage.setItem("wrc-theme", isDark ? "dark" : "light");
+            });
+        }
+    })();
+</script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+api.loadData(true).then(() => location.reload())

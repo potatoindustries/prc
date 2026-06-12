@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Start – PRC | Potato Rally Championship</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="assets/icon.jpg">
+
+  <style>
+    /* ===== HELPERS ===== */
+    .no-transition * { transition: none !important; }
+    .icon-moon { display: none; }
+    body.dark .icon-sun  { display: none; }
+    body.dark .icon-moon { display: block; }
+
+    /* ===== HERO BG ===== */
+    .hero__bg {
+      position: absolute;
+      inset: 0;
+      background-image: url("https://images.ctfassets.net/6d3s5ibvfz4n/2C7FniO3qn7c2pGwA16gDk/cf3fd9cc2222421253a722aa6da35af3/RAF_24_80.jpg");
+      background-size: cover;
+      background-position: center 35%;
+      background-repeat: no-repeat;
+    }
+
+    /* ===== LOADING ===== */
+    .loading-spinner {
+      text-align: center;
+      padding: 60px;
+      color: var(--text-muted);
+      font-size: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .loading-spinner::after {
+      content: "";
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba(128, 128, 128, 0.2);
+      border-top-color: #9e9e9e;
+      border-radius: 50%;
+      display: inline-block;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ===== START HERO ===== */
+    .hero__title-container {
+      display: flex;
+      gap: 2px;
+    }
+
+    /* ===== START SPECIFIC ===== */
+    .start-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* Sekcja powitalna */
+    .welcome-section {
+      background: var(--bg-white);
+      border-radius: 24px;
+      padding: 32px 40px;
+      margin: 40px 0 32px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    body.dark .welcome-section {
+      background: #2a2a2a;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    }
+    .welcome-title {
+      font-family: "WRCCleanBold", Arial, sans-serif;
+      font-size: 32px;
+      margin-bottom: 16px;
+      color: var(--text-dark);
+      border-left: 4px solid var(--orange);
+      padding-left: 20px;
+    }
+    body.dark .welcome-title {
+      color: #f3f3f3;
+    }
+    .welcome-text {
+      font-family: "SebinoMedium", Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--text-main);
+      margin-bottom: 24px;
+    }
+    body.dark .welcome-text {
+      color: #c0c0c0;
+    }
+    .welcome-highlight {
+      background: rgba(249, 115, 22, 0.12);
+      padding: 16px 20px;
+      border-radius: 16px;
+      border-left: 3px solid var(--orange);
+      font-family: "SebinoMedium", Arial, sans-serif;
+      font-size: 14px;
+      color: var(--text-main);
+    }
+    body.dark .welcome-highlight {
+      background: rgba(249, 115, 22, 0.08);
+    }
+
+    /* Siatka kart startowych */
+    .start-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 28px;
+      margin: 48px 0;
+    }
+    .start-card {
+      background: var(--bg-white);
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+      border: 1px solid rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    body.dark .start-card {
+      background: #2a2a2a;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+      border-color: rgba(255,255,255,0.05);
+    }
+    .start-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 30px -12px rgba(0,0,0,0.15);
+      border-color: var(--orange);
+    }
+    .start-card__icon {
+      width: 52px;
+      height: 52px;
+      background: rgba(249, 115, 22, 0.12);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--orange);
+      font-size: 26px;
+    }
+    .start-card__title {
+      font-family: "WRCCleanBold", Arial, sans-serif;
+      font-size: 22px;
+      margin: 0;
+      color: var(--text-dark);
+    }
+    body.dark .start-card__title {
+      color: #f3f3f3;
+    }
+    .start-card__desc {
+      font-family: "SebinoSoft", Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text-muted);
+      margin: 0;
+    }
+    .start-card__arrow {
+      margin-top: auto;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--orange);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Sekcja następny rajd */
+    .next-rally-section {
+      background: linear-gradient(135deg, rgba(249,115,22,0.08) 0%, rgba(249,115,22,0.02) 100%);
+      border-radius: 24px;
+      padding: 32px 40px;
+      margin: 32px 0;
+      transition: background 0.3s;
+    }
+    body.dark .next-rally-section {
+      background: linear-gradient(135deg, rgba(249,115,22,0.12) 0%, rgba(249,115,22,0.04) 100%);
+    }
+    .next-rally-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .next-rally-header i {
+      font-size: 28px;
+      color: var(--orange);
+    }
+    .next-rally-header h2 {
+      font-family: "WRCCleanBold", Arial, sans-serif;
+      font-size: 24px;
+      margin: 0;
+      color: var(--text-dark);
+    }
+    body.dark .next-rally-header h2 {
+      color: #f3f3f3;
+    }
+    .next-rally-card {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .next-rally-info {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .next-rally-flag {
+      font-size: 48px;
+    }
+    .next-rally-details h3 {
+      font-family: "WRCCleanBold", Arial, sans-serif;
+      font-size: 28px;
+      margin: 0 0 8px;
+      color: var(--text-dark);
+    }
+    body.dark .next-rally-details h3 {
+      color: #f3f3f3;
+    }
+    .next-rally-date {
+      font-family: "SebinoMedium", Arial, sans-serif;
+      font-size: 14px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .next-rally-status {
+      background: var(--orange);
+      color: white;
+      padding: 8px 20px;
+      border-radius: 40px;
+      font-family: "SebinoMedium", Arial, sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    /* Sekcja ostatni zwycięzca */
+    .last-winner-section {
+      background: var(--bg-white);
+      border-radius: 20px;
+      padding: 24px 32px;
+      margin: 32px 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    }
+    body.dark .last-winner-section {
+      background: #2a2a2a;
+    }
+    .last-winner-label {
+      font-family: "SebinoSoft", Arial, sans-serif;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+    }
+    .last-winner-name {
+      font-family: "WRCCleanBold", Arial, sans-serif;
+      font-size: 28px;
+      color: var(--orange);
+    }
+    .last-winner-rally {
+      font-family: "SebinoMedium", Arial, sans-serif;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* Regulamin snippet */
+    .regulations-snippet {
+      background: var(--section-bg);
+      border-radius: 20px;
+      padding: 28px 32px;
+      margin: 32px 0;
+    }
+    body.dark .regulations-snippet {
+      background: #1e1e1e;
+    }
+    .regulations-snippet h3 {
+      font-family: "WRCCleanBold", Arial, sans-serif;
+      font-size: 20px;
+      margin-bottom: 16px;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    body.dark .regulations-snippet h3 {
+      color: #f3f3f3;
+    }
+    .regulations-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .regulations-list li {
+      font-family: "SebinoSoft", Arial, sans-serif;
+      font-size: 14px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    body.dark .regulations-list li {
+      border-bottom-color: rgba(255,255,255,0.06);
+      color: #c0c0c0;
+    }
+    .regulations-list li i {
+      width: 20px;
+      color: var(--orange);
+    }
+    .regulations-link {
+      margin-top: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--orange);
+      text-decoration: none;
+      font-family: "SebinoMedium", Arial, sans-serif;
+      font-size: 14px;
+    }
+
+    /* Animacje */
+    .animate-on-scroll {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      will-change: opacity, transform;
+    }
+    .animate-on-scroll.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Responsywność */
+    @media (max-width: 860px) {
+      .start-content { padding: 0 16px 60px; }
+      .welcome-section { padding: 24px; }
+      .welcome-title { font-size: 26px; }
+      .next-rally-section { padding: 24px; }
+      .next-rally-details h3 { font-size: 22px; }
+      .last-winner-name { font-size: 22px; }
+    }
+    @media (max-width: 560px) {
+      .start-grid { gap: 16px; }
+      .start-card { padding: 20px; }
+      .last-winner-section { flex-direction: column; align-items: flex-start; }
+    }
+
+    /* Poprawki czcionek navbar */
+    .topbar__link {
+      font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+      font-weight: 550 !important;
+    }
+    .rallytv-btn {
+      font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+      font-weight: 500 !important;
+    }
+    .rallytv-status-label {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: .02em;
+      line-height: 1;
+    }
+  </style>
+
+  <script>
+    if(localStorage.getItem('wrc-theme')==='dark') document.documentElement.classList.add('wrc-dark');
+  </script>
+</head>
+<body>
+  <a href="start.html" class="floating-logo" aria-label="Home">
+    <img src="assets/logo.png" alt="Logo" class="floating-logo__img" />
+  </a>
+
+  <div class="page">
+    <header class="hero">
+      <div class="hero__bg"></div>
+      <div class="hero__overlay"></div>
+
+      <div class="hero__content">
+        <nav class="topbar">
+          <div class="topbar__left"></div>
+          <div class="topbar__center">
+            <a href="start.html" class="topbar__link active">Start</a>
+            <a href="kalendarz.html" class="topbar__link">Kalendarz</a>
+            <a href="index.html" class="topbar__link">Wyniki i klasyfikacja</a>
+            <a href="teams.html" class="topbar__link">Zespoły i kierowcy</a>
+            <a href="archiwum.html" class="topbar__link">Archiwum</a>
+          </div>
+          <div class="topbar__right">
+            <a href="#" class="rallytv-btn">
+              <span class="rallytv-status-label">PRC</span>
+            </a>
+            <button class="theme-toggle-btn" id="themeToggle" aria-label="Przełącz motyw" type="button">
+              <svg class="icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="5"/>
+                <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+              </svg>
+              <svg class="icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+              </svg>
+            </button>
+          </div>
+        </nav>
+
+        <div class="hero__title-wrap">
+          <div class="hero__title-container">
+            <h1 class="hero__title">Potato Rally Championship</h1>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="start-content">
+        <!-- Sekcja powitalna -->
+        <div class="welcome-section animate-on-scroll">
+          <div class="welcome-title">
+            <i class="fas fa-flag-checkered" style="margin-right: 12px; color: var(--orange);"></i>
+            Witaj w PRC 2026!
+          </div>
+          <div class="welcome-text">
+            Potato Rally Championship to emocjonująca liga simracingowa w grze DiRT Rally 2.0. 
+            Rywalizujemy w klasie Grupy A, na kultowych odcinkach specjalnych z całego świata. 
+            Dołącz do nas i sprawdź swoje umiejętności za kierownicą legendarnych rajdówek!
+          </div>
+          <div class="welcome-highlight">
+            <i class="fas fa-trophy" style="color: var(--orange); margin-right: 10px;"></i>
+            <strong>Aktualny sezon:</strong> PRC #4 · 9 etapów · Nowa formuła konstruktorów · Start: 10 czerwca 2026
+          </div>
+        </div>
+
+        <!-- Karty nawigacyjne -->
+        <div class="start-grid">
+          <a href="kalendarz.html" class="start-card animate-on-scroll">
+            <div class="start-card__icon"><i class="fas fa-calendar-alt"></i></div>
+            <h3 class="start-card__title">Kalendarz</h3>
+            <p class="start-card__desc">Sprawdź harmonogram nadchodzących rajdów, daty i lokalizacje poszczególnych rund PRC #4.</p>
+            <div class="start-card__arrow">Zobacz terminy <i class="fas fa-arrow-right"></i></div>
+          </a>
+
+          <a href="index.html" class="start-card animate-on-scroll">
+            <div class="start-card__icon"><i class="fas fa-chart-line"></i></div>
+            <h3 class="start-card__title">Wyniki i klasyfikacja</h3>
+            <p class="start-card__desc">Aktualne klasyfikacje kierowców, konstruktorów oraz szczegółowe wyniki Power Stage.</p>
+            <div class="start-card__arrow">Sprawdź tabelę <i class="fas fa-arrow-right"></i></div>
+          </a>
+
+          <a href="teams.html" class="start-card animate-on-scroll">
+            <div class="start-card__icon"><i class="fas fa-users"></i></div>
+            <h3 class="start-card__title">Zespoły i kierowcy</h3>
+            <p class="start-card__desc">Poznaj zawodników, ich zespoły, samochody oraz dotychczasowe osiągnięcia w PRC.</p>
+            <div class="start-card__arrow">Zobacz składy <i class="fas fa-arrow-right"></i></div>
+          </a>
+
+          <a href="archiwum.html" class="start-card animate-on-scroll">
+            <div class="start-card__icon"><i class="fas fa-archive"></i></div>
+            <h3 class="start-card__title">Archiwum</h3>
+            <p class="start-card__desc">Historia poprzednich edycji – PRC #1, #2, #3 oraz PRXC #1. Mistrzowie, statystyki i wspomnienia.</p>
+            <div class="start-card__arrow">Przeglądaj archiwum <i class="fas fa-arrow-right"></i></div>
+          </a>
+        </div>
+
+        <!-- Dynamiczny: Najbliższy rajd + Ostatni zwycięzca -->
+        <div id="dynamicContent" class="animate-on-scroll">
+          <div class="loading-spinner"></div>
+        </div>
+
+        <!-- Regulamin skrót -->
+        <div class="regulations-snippet animate-on-scroll">
+          <h3><i class="fas fa-file-alt" style="color: var(--orange);"></i> Kluczowe zasady PRC</h3>
+          <ul class="regulations-list">
+            <li><i class="fas fa-car"></i> Klasa pojazdów: Grupa A (Mitsubishi, Subaru, Ford, Lancia)</li>
+            <li><i class="fas fa-flag-checkered"></i> 9 etapów + Power Stage w każdym rajdzie</li>
+            <li><i class="fas fa-star"></i> Punkty dodatkowe za czyste przejazdy OS (+2 pkt / +1 pkt)</li>
+            <li><i class="fas fa-tachometer-alt"></i> System punktacji: 15-12-10-8-6-4-2-1 dla TOP8</li>
+            <li><i class="fas fa-hand-sparkles"></i> Punkty wyrównawcze za poprawę formy (+5 pkt)</li>
+          </ul>
+          <a href="reg.pdf" class="regulations-link" target="_blank">
+            Pełny regulamin <i class="fas fa-external-link-alt"></i>
+          </a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="footer-spacer"></div>
+
+  <footer class="site-footer">
+    <div class="site-footer__sponsors">
+      <div class="footer-photo"><img src="assets/sponsors/photo1.png" alt="" /></div>
+      <div class="footer-photo"><img src="assets/sponsors/photo2.png" alt="" /></div>
+      <div class="footer-photo"><img src="assets/sponsors/photo3.png" alt="" /></div>
+    </div>
+    <div class="site-footer__sponsors site-footer__sponsors--secondary">
+      <div class="footer-photo footer-photo--sm"><img src="assets/sponsors/photo4.png" alt="" /></div>
+      <div class="footer-photo footer-photo--sm"><img src="assets/sponsors/photo5.png" alt="" /></div>
+      <div class="footer-photo footer-photo--sm"><img src="assets/sponsors/photo6.png" alt="" /></div>
+    </div>
+    <div class="footer-divider"></div>
+    <p class="footer-copyright">&copy; 2026 PRC. All rights reserved.</p>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="api.js"></script>
+  <script>
+    // ============================================================
+    // START PAGE – DYNAMIC CONTENT (Next rally + Last winner)
+    // ============================================================
+
+    function getFlagEmoji(countryCode) {
+      if (!countryCode) return '🏁';
+      const specialFlags = {
+        'wls': '🏴󠁧󠁢󠁷󠁬󠁳󠁿', 'sct': '🏴󠁧󠁢󠁳󠁣󠁴󠁿', 'eng': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'gb': '🇬🇧',
+        'gb-eng': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'gb-sct': '🏴󠁧󠁢󠁳󠁣󠁴󠁿', 'gb-wls': '🏴󠁧󠁢󠁷󠁬󠁳󠁿'
+      };
+      const code = countryCode.toLowerCase();
+      if (specialFlags[code]) return specialFlags[code];
+      if (code.length === 2) {
+        try {
+          const codePoints = code.toUpperCase().split('').map(char => 127397 + char.charCodeAt());
+          return String.fromCodePoint(...codePoints);
+        } catch(e) { return '🏁'; }
+      }
+      return '🏁';
+    }
+
+    function formatDateRange(start, end) {
+      const startDate = new Date(start), endDate = new Date(end);
+      const monthNames = {
+        'sty': 'Stycznia', 'lut': 'Lutego', 'mar': 'Marca', 'kwi': 'Kwietnia',
+        'maj': 'Maja', 'cze': 'Czerwca', 'lip': 'Lipca', 'sie': 'Sierpnia',
+        'wrz': 'Września', 'paź': 'Października', 'lis': 'Listopada', 'gru': 'Grudnia'
+      };
+      function formatFull(date) {
+        const day = date.getDate();
+        const monthShort = date.toLocaleDateString('pl-PL', { month: 'short' }).replace('.', '').toLowerCase();
+        const month = monthNames[monthShort] || monthShort;
+        return `${day} ${month} ${date.getFullYear()}`;
+      }
+      function formatShort(date) {
+        const day = date.getDate();
+        const monthShort = date.toLocaleDateString('pl-PL', { month: 'short' }).replace('.', '').toLowerCase();
+        const month = monthNames[monthShort] || monthShort;
+        return `${day} ${month}`;
+      }
+      const sameDay = startDate.toDateString() === endDate.toDateString();
+      if (sameDay) return formatFull(startDate);
+      return `${formatShort(startDate)} – ${formatFull(endDate)}`;
+    }
+
+    function getStatusText(status) {
+      switch(status) {
+        case 'completed': return 'Zakończony';
+        case 'ongoing': return 'Trwa!';
+        default: return 'Nadchodzący';
+      }
+    }
+
+    // Główne ładowanie dynamicznej sekcji
+    async function loadStartDynamic() {
+      const container = document.getElementById('dynamicContent');
+      if (!container) return;
+
+      try {
+        await api.loadData();
+        let calendar = await api.getCalendar();
+        
+        // Sortowanie kalendarza (zgodne z adminem)
+        const rawData = api.data;
+        if (rawData && calendar) {
+          calendar = getSortedCalendar(calendar, rawData);
+        }
+        
+        if (!calendar || calendar.length === 0) {
+          container.innerHTML = '<div class="welcome-section" style="text-align:center;">Brak danych o rajdach</div>';
+          return;
+        }
+
+        // Znajdź najbliższy rajd (upcoming lub ongoing)
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        let nextRally = null;
+        let lastCompletedRally = null;
+        
+        for (const rally of calendar) {
+          const rallyStart = new Date(rally.startDate);
+          rallyStart.setHours(0, 0, 0, 0);
+          
+          if ((rally.status === 'upcoming' || rally.status === 'ongoing') && rallyStart >= today) {
+            if (!nextRally || rallyStart < new Date(nextRally.startDate)) {
+              nextRally = rally;
+            }
+          }
+          if (rally.status === 'completed') {
+            if (!lastCompletedRally || new Date(rally.endDate) > new Date(lastCompletedRally.endDate)) {
+              lastCompletedRally = rally;
+            }
+          }
+        }
+        
+        // Jeśli nie ma upcoming, weź pierwszy z przyszłością
+        if (!nextRally && calendar.length > 0) {
+          const futureRallies = calendar.filter(r => new Date(r.startDate) >= today);
+          if (futureRallies.length) nextRally = futureRallies[0];
+          else nextRally = calendar[0];
+        }
+
+        // Pobierz ostatniego zwycięzcę
+        let lastWinner = null;
+        let lastWinnerRallyName = '';
+        if (lastCompletedRally) {
+          const results = await api.calculateRallyResults(lastCompletedRally.id);
+          if (results && results.overall && results.overall.length) {
+            const firstPlace = results.overall.find(r => r.status !== 'DSQ' && r.status !== '—');
+            if (firstPlace) {
+              lastWinner = firstPlace.driverName;
+              lastWinnerRallyName = lastCompletedRally.name;
+            }
+          }
+        }
+
+        // Generuj HTML
+        let html = `
+          <!-- Sekcja następny rajd -->
+          <div class="next-rally-section">
+            <div class="next-rally-header">
+              <i class="fas fa-calendar-week"></i>
+              <h2>${nextRally?.status === 'ongoing' ? '🏁 Trwający rajd' : '📍 Najbliższy rajd'}</h2>
+            </div>
+            <div class="next-rally-card">
+              <div class="next-rally-info">
+                <div class="next-rally-flag">${getFlagEmoji(nextRally?.country)}</div>
+                <div class="next-rally-details">
+                  <h3>${escapeHtml(nextRally?.name || '—')}</h3>
+                  <div class="next-rally-date">
+                    <i class="far fa-calendar-alt"></i>
+                    ${nextRally ? formatDateRange(nextRally.startDate, nextRally.endDate) : '—'}
+                  </div>
+                </div>
+              </div>
+              <div class="next-rally-status">
+                ${nextRally ? getStatusText(nextRally.status) : '—'}
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Sekcja ostatni zwycięzca (jeśli istnieje)
+        if (lastWinner) {
+          html += `
+            <div class="last-winner-section">
+              <div>
+                <div class="last-winner-label">OSTATNI ZWYCIĘZCA</div>
+                <div class="last-winner-name">${escapeHtml(lastWinner)}</div>
+                <div class="last-winner-rally"><i class="fas fa-trophy" style="color: var(--orange);"></i> ${escapeHtml(lastWinnerRallyName)}</div>
+              </div>
+              <div style="font-size: 48px;">🏆</div>
+            </div>
+          `;
+        } else {
+          html += `
+            <div class="last-winner-section" style="justify-content: center; text-align: center;">
+              <div class="last-winner-label">Pierwszy rajd sezonu już wkrótce!</div>
+              <div style="font-size: 48px;">🔥</div>
+            </div>
+          `;
+        }
+
+        container.innerHTML = html;
+        
+        // Obserwacja animacji dla nowych elementów
+        document.querySelectorAll('#dynamicContent .animate-on-scroll, .next-rally-section, .last-winner-section').forEach(el => {
+          if (el.classList) el.classList.add('animate-on-scroll');
+          observer.observe(el);
+        });
+        
+      } catch (error) {
+        console.error('Błąd ładowania dynamicznej sekcji startowej:', error);
+        container.innerHTML = '<div class="welcome-section" style="text-align:center;">Nie udało się załadować danych. Odśwież stronę.</div>';
+      }
+    }
+
+    // Funkcje sortowania kalendarza (zgodne z admin.html)
+    function getCalendarGroupedByDate(calendar) {
+      const groups = {};
+      calendar.forEach(rally => {
+        const dateKey = rally.startDate;
+        if (!groups[dateKey]) groups[dateKey] = [];
+        groups[dateKey].push(rally);
+      });
+      const sortedDates = Object.keys(groups).sort();
+      return { groups, sortedDates };
+    }
+    
+    function getStoredOrderForDate(rawData, dateKey) {
+      const season = rawData?.seasons?.[rawData?.settings?.currentSeason];
+      const order = season?.calendarOrder || {};
+      return order[dateKey] || [];
+    }
+    
+    function getSortedCalendar(calendar, rawData) {
+      if (!calendar || calendar.length === 0) return [];
+      if (!rawData) return [...calendar];
+      
+      const { groups, sortedDates } = getCalendarGroupedByDate(calendar);
+      const result = [];
+      
+      for (const date of sortedDates) {
+        const rallies = groups[date];
+        const storedOrder = getStoredOrderForDate(rawData, date);
+        
+        if (storedOrder.length === rallies.length && storedOrder.every(id => rallies.some(r => r.id === id))) {
+          const ordered = [];
+          for (const id of storedOrder) {
+            const rally = rallies.find(r => r.id === id);
+            if (rally) ordered.push(rally);
+          }
+          for (const rally of rallies) {
+            if (!ordered.includes(rally)) ordered.push(rally);
+          }
+          result.push(...ordered);
+        } else {
+          result.push(...rallies.sort((a, b) => a.name.localeCompare(b.name)));
+        }
+      }
+      return result;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+    }
+
+    // Observer animacji
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: "0px 0px -30px 0px" });
+
+    // Obserwuj elementy z klasą animate-on-scroll
+    function observeAllAnimated() {
+      document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+    }
+
+    // Motyw i logo
+    (function(){
+      document.body.classList.add('no-transition');
+      if(localStorage.getItem('wrc-theme')==='dark') document.body.classList.add('dark');
+      document.documentElement.classList.remove('wrc-dark');
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){
+          document.body.classList.remove('no-transition');
+        });
+      });
+      
+      const btn = document.getElementById('themeToggle');
+      if(btn){
+        btn.addEventListener('click', function(){
+          document.body.classList.add('theme-animating');
+          const isDark = document.body.classList.toggle('dark');
+          localStorage.setItem('wrc-theme', isDark ? 'dark' : 'light');
+          setTimeout(function(){ document.body.classList.remove('theme-animating'); }, 420);
+          try{ const c = new BroadcastChannel('wrc-theme'); c.postMessage(isDark ? 'dark' : 'light'); c.close(); } catch(e){}
+        });
+      }
+      
+      try{
+        const ch = new BroadcastChannel('wrc-theme');
+        ch.onmessage = function(e){
+          document.body.classList.add('theme-animating');
+          if(e.data === 'dark') document.body.classList.add('dark');
+          else document.body.classList.remove('dark');
+          setTimeout(function(){ document.body.classList.remove('theme-animating'); }, 420);
+        };
+      } catch(e){}
+    })();
+
+    // Inicjalizacja
+    window.addEventListener('load', async () => {
+      observeAllAnimated();
+      await loadStartDynamic();
+      
+      // Dodatkowe obserwowanie po załadowaniu dynamicznej treści
+      setTimeout(() => {
+        document.querySelectorAll('#dynamicContent .animate-on-scroll').forEach(el => observer.observe(el));
+      }, 200);
+    });
+    
+    // Logo scroll
+    const logo = document.querySelector(".floating-logo");
+    const hero = document.querySelector(".hero");
+    function updateLogo() {
+      if (hero && logo) {
+        logo.classList.toggle("logo--dark", hero.getBoundingClientRect().bottom <= 0);
+      }
+    }
+    window.addEventListener("scroll", updateLogo, { passive: true });
+    updateLogo();
+
+    // Status dla przycisku Rally.TV/PRC
+    (function() {
+      const btn = document.querySelector('.rallytv-btn');
+      if (btn) btn.setAttribute('data-status', 'online');
+    })();
+  </script>
+</body>
+</html>

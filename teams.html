@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zespoły i Kierowcy – PRC 2026</title>
+
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"
+  />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="assets/icon.jpg">
+
+  <style>
+    html.wrc-dark,html.wrc-dark body,html.wrc-dark .page{background:#1a1a1a!important}
+    
+    .loading-spinner {
+      text-align: center;
+      padding: 60px;
+      color: var(--text-muted);
+      font-size: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .loading-spinner::after {
+      content: "";
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba(128, 128, 128, 0.2);
+      border-top-color: #9e9e9e;
+      border-radius: 50%;
+      display: inline-block;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .team-car-img {
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+    
+    .teams-list {
+      width: 100%;
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 32px 40px 0;
+    }
+    
+    .team-item {
+      margin-bottom: 48px;
+      background: transparent;
+      position: relative;
+    }
+    
+    .team-item::after {
+      content: "";
+      position: absolute;
+      bottom: -38px;
+      left: 45px;
+      right: 45px;
+      height: 1px;
+      background: rgba(225, 231, 238, 0.8);
+    }
+    
+    .team-item:last-child::after {
+      display: none;
+    }
+    
+    .team-stage {
+      display: grid;
+      grid-template-columns: 58% 42%;
+      gap: 64px;
+      align-items: center;
+    }
+    
+    .team-car-block {
+      position: relative;
+      border-radius: 10px;
+      background: transparent;
+    }
+    
+    .team-car-inner {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      position: relative;
+      overflow: hidden;
+      border-radius: 10px;
+      background-color: white;
+      box-shadow: 0 6px 28px rgba(18, 34, 56, 0.07), 0 1px 4px rgba(18, 34, 56, 0.04);
+    }
+    
+    .team-car--hyundai { background: radial-gradient(ellipse at 60% 60%, rgba(20, 100, 200, 0.09) 0%, #e8eaee 70%); }
+    .team-car--toyota  { background: radial-gradient(ellipse at 60% 60%, rgba(200, 30, 30, 0.08) 0%, #e8eaee 70%); }
+    .team-car--msport  { background: radial-gradient(ellipse at 60% 60%, rgba(0, 50, 140, 0.09) 0%, #e8eaee 70%); }
+    
+    .team-car-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+    }
+    
+    .team-info-col {
+      display: flex;
+      flex-direction: column;
+      gap: 44px;
+    }
+    
+    .team-info-wrap {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      margin-top: -20px;
+    }
+    
+    .team-info__category {
+      font-family: "SebinoSoft", Arial, sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      line-height: 1;
+      margin-bottom: 20px;
+      display: block;
+    }
+    
+    .team-info__name {
+      font-family: "WRCCleanBold", Arial, sans-serif;
+      font-size: 40px;
+      font-weight: 700;
+      color: var(--text-dark);
+      line-height: 1.08;
+      margin: 0 0 22px;
+      letter-spacing: -0.01em;
+    }
+    
+    .team-info__principal {
+      font-family: "Biotif", Arial, sans-serif;
+      font-size: 14.5px;
+      font-weight: 300;
+      color: var(--text-muted);
+      margin: 0;
+      line-height: 1.5;
+    }
+    
+    .team-info__principal strong {
+      font-weight: 500;
+      color: var(--text-main);
+    }
+    
+    .team-info__stats {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-top: 24px;
+    }
+    
+    .team-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding: 0 24px 0 0;
+    }
+    
+    .team-stat:first-child {
+      padding-left: 0;
+    }
+    
+    .team-stat__label {
+      font-family: "SebinoSoft", Arial, sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      line-height: 1;
+    }
+    
+    .team-stat__value {
+      font-family: "WRCCleanBold", Arial, sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text-dark);
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+    
+    .team-stat__divider {
+      width: 1px;
+      height: 40px;
+      background: rgba(26, 38, 53, 0.12);
+      margin: 0 24px 0 0;
+      flex-shrink: 0;
+      align-self: center;
+    }
+    
+    /* === POPRAWNIE DZIAŁAJĄCA SIATKA KIEROWCÓW – max 2 w wierszu === */
+    .drivers-section {
+      width: 100%;
+      margin-top: 20px;
+      padding-top: 0;
+    }
+    
+    .drivers-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      margin-top: 16px;
+    }
+    
+    /* Dla pojedynczego elementu - zajmuje tylko swoją kolumnę, nie rozciąga się na 2 */
+    .drivers-grid:has(> :only-child) {
+      grid-template-columns: 1fr;
+    }
+    
+    .driver-card-link {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      transition: transform 0.2s ease;
+      will-change: transform;
+    }
+    
+    .driver-card-link:hover {
+      transform: translateY(-3px);
+    }
+    
+    /* GŁÓWNY KONTENER KAFELKA */
+    .driver-card {
+      background: #ffffff;
+      border-radius: 16px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: stretch;
+      box-shadow: 0 4px 14px rgba(18, 34, 56, 0.06), 0 1px 3px rgba(18, 34, 56, 0.03);
+      min-height: 148px;
+      overflow: hidden;
+    }
+    
+    .driver-card__info {
+      padding: 16px 12px 16px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: 6px;
+      background: #ffffff;
+    }
+    
+    .driver-card__role {
+      display: inline-block;
+      font-family: "SebinoSoft", Arial, sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      background: #f2f3f3;
+      border-radius: 20px;
+      padding: 4px 10px;
+      line-height: 1;
+      align-self: flex-start;
+      margin-bottom: auto;
+    }
+    
+    .driver-card__name {
+      font-family: "WRCCleanBold", Arial, sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #1a2635;
+      margin: 0;
+      line-height: 1.1;
+    }
+    
+    .driver-card__country {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-family: "SebinoSoft", Arial, sans-serif;
+      font-size: 13px;
+      color: #67727f;
+      margin: 0;
+      line-height: 1;
+    }
+
+    .driver-card__car {
+      font-family: "SebinoSoft", Arial, sans-serif;
+      font-size: 11px;
+      color: #67727f;
+      margin: 0;
+      line-height: 1;
+      letter-spacing: 0.02em;
+    }
+
+    .driver-card__country .fi {
+      font-size: 12px;
+      border-radius: 2px;
+      box-shadow: 0 0 0 1px rgba(16, 30, 50, 0.08);
+      flex-shrink: 0;
+    }
+    
+    /* KONTENER ZDJĘCIA */
+    .driver-card__photo {
+      width: 148px;
+      flex-shrink: 0;
+      background: #ffffff;
+      overflow: hidden;
+      position: relative;
+      border-radius: 0;
+    }
+    
+    /* ZDJĘCIE - ZAOKRĄGLONE TYLKO Z PRAWEJ STRONY */
+    .driver-card__photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+      border-radius: 0 16px 16px 0;
+    }
+    
+    /* Dark mode */
+    body.dark .team-car-inner {
+      background: #242424;
+      box-shadow: 0 6px 28px rgba(0,0,0,0.3), 0 1px 4px rgba(0,0,0,0.2);
+    }
+    
+    body.dark .team-car--hyundai { background: radial-gradient(ellipse at 60% 60%, rgba(20, 100, 200, 0.14) 0%, #242424 70%); }
+    body.dark .team-car--toyota  { background: radial-gradient(ellipse at 60% 60%, rgba(200, 30, 30, 0.12) 0%, #242424 70%); }
+    body.dark .team-car--msport  { background: radial-gradient(ellipse at 60% 60%, rgba(0, 50, 140, 0.14) 0%, #242424 70%); }
+    
+    body.dark .team-info__category { color: #9a9088; }
+    body.dark .team-info__name { color: #f3f3f3; }
+    body.dark .team-info__principal { color: #9a9088; }
+    body.dark .team-info__principal strong { color: #d0c8bc; }
+    body.dark .team-stat__label { color: #9a9088; }
+    body.dark .team-stat__value { color: #f3f3f3; }
+    body.dark .team-stat__divider { background: rgba(255,255,255,0.1); }
+    body.dark .team-item::after { background: rgba(60, 72, 88, 0.5); }
+    
+    body.dark .driver-card {
+      background: #2a2a2a;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.28), 0 1px 3px rgba(0,0,0,0.18);
+    }
+    body.dark .driver-card__info {
+      background: #2a2a2a;
+    }
+    body.dark .driver-card__role {
+      background: #3a3a3a;
+      color: #9a9088;
+    }
+    body.dark .driver-card__name {
+      color: #f3f3f3;
+    }
+    body.dark .driver-card__country {
+      color: #9a9088;
+    }
+    body.dark .driver-card__car {
+      color: #7a7068;
+    }
+    body.dark .driver-card__photo {
+      background: #3a3a3a;
+    }
+    body.dark .driver-card__photo img {
+      border-radius: 0 16px 16px 0;
+    }
+
+    /* LAURY MISTRZOSTW */
+    .driver-card__name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .driver-laurels {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    
+    .laurel-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.15s ease;
+      cursor: default;
+      position: relative;
+    }
+    
+    .laurel-icon:hover {
+      transform: scale(1.15);
+    }
+    
+    .laurel-img {
+      width: 20px;
+      height: 20px;
+      display: block;
+      object-fit: contain;
+      filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+    }
+    
+    .laurel-icon--gold .laurel-img {
+      filter: brightness(0) saturate(100%) invert(67%) sepia(76%) saturate(1894%) hue-rotate(358deg) brightness(102%) contrast(89%) drop-shadow(0 1px 1px rgba(255, 215, 0, 0.25));
+    }
+    
+    .laurel-icon--silver .laurel-img {
+      filter: brightness(0) saturate(100%) invert(84%) sepia(13%) saturate(247%) hue-rotate(347deg) brightness(88%) contrast(87%) drop-shadow(0 1px 1px rgba(192, 192, 192, 0.3));
+    }
+    
+    .laurel-icon--bronze .laurel-img {
+      filter: brightness(0) saturate(100%) invert(35%) sepia(74%) saturate(1024%) hue-rotate(348deg) brightness(84%) contrast(82%) drop-shadow(0 1px 1px rgba(139, 69, 19, 0.3));
+    }
+    
+    .laurel-icon::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 60%, rgba(0,0,0,0.02) 100%);
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0.4;
+    }
+    
+    body.dark .laurel-icon--gold .laurel-img {
+      filter: brightness(0) saturate(100%) invert(77%) sepia(93%) saturate(1452%) hue-rotate(356deg) brightness(98%) contrast(92%) drop-shadow(0 1px 2px rgba(255, 215, 0, 0.35));
+    }
+    
+    body.dark .laurel-icon--silver .laurel-img {
+      filter: brightness(0) saturate(100%) invert(91%) sepia(12%) saturate(412%) hue-rotate(346deg) brightness(92%) contrast(89%) drop-shadow(0 1px 2px rgba(192, 192, 192, 0.4));
+    }
+    
+    body.dark .laurel-icon--bronze .laurel-img {
+      filter: brightness(0) saturate(100%) invert(40%) sepia(68%) saturate(892%) hue-rotate(346deg) brightness(86%) contrast(84%) drop-shadow(0 1px 2px rgba(139, 69, 19, 0.4));
+    }
+    
+    body.dark .laurel-icon::after {
+      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 60%, rgba(0,0,0,0.05) 100%);
+      opacity: 0.3;
+    }
+    
+    /* Responsywność */
+    @media (max-width: 1100px) {
+      .team-stage { grid-template-columns: 52% 48%; gap: 40px; }
+      .team-info__name { font-size: 32px; }
+      .team-item::after { left: 15px; right: 15px; }
+    }
+    
+    @media (max-width: 860px) {
+      .teams-list { padding: 20px 16px 0; }
+      .team-stage { grid-template-columns: 1fr; gap: 32px; }
+      .team-car-inner { aspect-ratio: 16 / 6; }
+      .team-info__name { font-size: 28px; }
+      .drivers-section { margin-top: 16px; }
+      .drivers-grid { margin-top: 12px; gap: 14px; }
+      .driver-card__photo { width: 110px; }
+      .driver-card__name { font-size: 17px; }
+      .team-item::after { bottom: -24px; left: 10px; right: 10px; }
+      .laurel-img { width: 18px; height: 18px; }
+      .driver-card__photo img { border-radius: 0 16px 16px 0; }
+    }
+    
+    @media (max-width: 560px) {
+      .team-info__name { font-size: 24px; }
+      .driver-card__photo { width: 100px; }
+      .drivers-section { margin-top: 12px; }
+      .drivers-grid { margin-top: 10px; gap: 12px; }
+      .team-item::after { bottom: -20px; left: 5px; right: 5px; }
+      .laurel-img { width: 16px; height: 16px; }
+      .driver-card__photo img { border-radius: 0 16px 16px 0; }
+    }
+
+    /* Poprawki czcionek - navbar i zakładki */
+    .topbar__link {
+      font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+      font-weight: 550 !important;
+    }
+    
+    .rallytv-btn {
+      font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+      font-weight: 500 !important;
+    }
+    
+    .driver-card__country,
+    .driver-card__role,
+    .driver-card__car,
+    .team-info__category,
+    .team-stat__label {
+      font-family: "SebinoSoft", Arial, sans-serif !important;
+    }
+    
+    .hero__bg {
+      background-image: url("https://www.goodwood.com/globalassets/.road--racing/event-coverage/fos/2023/07-july/-on-event-/friday/rally-stage/rally-stage-festival-of-speed-2023-36.jpg?rxy=0.5,0.5");
+    }
+
+    .team-info__name,
+    .team-stat__value {
+      font-family: "WRCCleanBold", Arial, sans-serif !important;
+    }
+    
+    .driver-card-link {
+      text-decoration: none;
+      color: inherit;
+    }
+  </style>
+  <script>
+    if(localStorage.getItem('wrc-theme')==='dark')document.documentElement.classList.add('wrc-dark');
+  </script>
+</head>
+<body>
+
+  <a href="start.html" class="floating-logo" aria-label="Home">
+    <img src="assets/logo.png" alt="WRC Logo" class="floating-logo__img" />
+  </a>
+
+  <div class="page">
+    <header class="hero">
+      <div class="hero__bg hero__bg--teams"></div>
+      <div class="hero__overlay"></div>
+
+      <div class="hero__content">
+        <nav class="topbar">
+          <div class="topbar__left"></div>
+          <div class="topbar__center">
+            <a href="start.html" class="topbar__link">Start</a>
+            <a href="kalendarz.html" class="topbar__link">Kalendarz</a>
+            <a href="index.html" class="topbar__link">Wyniki i klasyfikacja</a>
+            <a href="teams.html" class="topbar__link active">Zespoły i kierowcy</a>
+            <a href="archiwum.html" class="topbar__link">Archiwum</a>
+          </div>
+          <div class="topbar__right">
+            <a href="#" class="rallytv-btn">Rally.TV</a>
+            <button class="theme-toggle-btn" id="themeToggle" aria-label="Przełącz motyw" type="button">
+              <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+              <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+          </div>
+        </nav>
+
+        <div class="hero__title-wrap">
+          <h1 class="hero__title">Zespoły i Kierowcy</h1>
+        </div>
+      </div>
+    </header>
+
+    <main class="main teams-main">
+      <div class="teams-list" id="teamsList">
+        <div class="loading-spinner"></div>
+      </div>
+    </main>
+  </div>
+
+  <div class="footer-spacer"></div>
+
+  <footer class="site-footer">
+    <div class="site-footer__sponsors">
+      <div class="footer-photo"><img src="assets/sponsors/photo1.png" alt="" /></div>
+      <div class="footer-photo"><img src="assets/sponsors/photo2.png" alt="" /></div>
+      <div class="footer-photo"><img src="assets/sponsors/photo3.png" alt="" /></div>
+    </div>
+    <div class="site-footer__sponsors site-footer__sponsors--secondary">
+      <div class="footer-photo footer-photo--sm"><img src="assets/sponsors/photo4.png" alt="" /></div>
+      <div class="footer-photo footer-photo--sm"><img src="assets/sponsors/photo5.png" alt="" /></div>
+      <div class="footer-photo footer-photo--sm"><img src="assets/sponsors/photo6.png" alt="" /></div>
+    </div>
+    <div class="footer-divider"></div>
+    <p class="footer-copyright">&copy; 2026 WRC. All rights reserved.</p>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="api.js"></script>
+  <script>
+    const logo = document.querySelector(".floating-logo");
+    const hero = document.querySelector(".hero");
+    
+    function updateLogo() {
+      logo.classList.toggle("logo--dark", hero.getBoundingClientRect().bottom <= 0);
+    }
+    window.addEventListener("scroll", updateLogo, { passive: true });
+    updateLogo();
+
+    function getCountryName(code) {
+      const countries = {
+        'pl': 'Polska',         'gb': 'Wielka Brytania', 'se': 'Szwecja',
+        'fi': 'Finlandia',      'fr': 'Francja',          'be': 'Belgia',
+        'ee': 'Estonia',        'lv': 'Łotwa',            'ie': 'Irlandia',
+        'it': 'Włochy',         'es': 'Hiszpania',        'de': 'Niemcy',
+        'mc': 'Monako',         'pt': 'Portugalia',       'gr': 'Grecja',
+        'jp': 'Japonia',        'au': 'Australia',        'nz': 'Nowa Zelandia',
+        'us': 'USA',            'ca': 'Kanada',           'mx': 'Meksyk'
+      };
+      return countries[code] || code.toUpperCase();
+    }
+
+    function getDriverLink(driverName, driverId) {
+      let slug = driverName.toLowerCase()
+        .replace(/ł/g, 'l')
+        .replace(/ą/g, 'a')
+        .replace(/ć/g, 'c')
+        .replace(/ę/g, 'e')
+        .replace(/ń/g, 'n')
+        .replace(/ó/g, 'o')
+        .replace(/ś/g, 's')
+        .replace(/ź/g, 'z')
+        .replace(/ż/g, 'z')
+        .replace(/\s+/g, '_')
+        .replace(/[^a-z0-9_]/g, '');
+      
+      if (driverId) {
+        slug = driverId;
+      }
+      
+      return slug;
+    }
+
+    function laurelIMG() {
+      return `<img src="assets/laurel.png" class="laurel-img" alt="laurel" onerror="this.src='assets/laurel.png'">`;
+    }
+
+    async function loadTeamsData() {
+      try {
+        await api.loadData();
+
+        const [teamsData, driversData, constructors] = await Promise.all([
+          api.getTeams(),
+          api.getDrivers(),
+          api.calculateConstructors()
+        ]);
+
+        const laurels = api.data?.settings?.driverLaurels || {};
+
+        const sortedTeams = [...teamsData].sort((a, b) => {
+          const posA = constructors.find(c => c.teamId === a.id)?.position ?? Infinity;
+          const posB = constructors.find(c => c.teamId === b.id)?.position ?? Infinity;
+          return posA - posB;
+        });
+
+        renderTeams(sortedTeams, driversData, constructors, laurels);
+      } catch (error) {
+        console.error('Błąd ładowania danych:', error);
+        const container = document.getElementById('teamsList');
+        if (container) {
+          container.innerHTML = '<div style="text-align: center; padding: 60px; color: red;">Błąd ładowania danych. Spróbuj odświeżyć stronę.</div>';
+        }
+      }
+    }
+
+    function renderTeams(sortedTeams, driversData, constructors, laurels) {
+      const container = document.getElementById('teamsList');
+      
+      if (!sortedTeams || sortedTeams.length === 0) {
+        container.innerHTML = '<div class="loading-spinner">Brak danych zespołów</div>';
+        return;
+      }
+      
+      let html = '';
+      
+      for (const team of sortedTeams) {
+        const teamStanding = constructors.find(c => c.teamId === team.id);
+        const teamDrivers  = driversData.filter(d => d.teamId === team.id);
+        
+        let carBgClass = '';
+        if      (team.id === 'toyota')  carBgClass = 'team-car--toyota';
+        else if (team.id === 'hyundai') carBgClass = 'team-car--hyundai';
+        else if (team.id === 'msport')  carBgClass = 'team-car--msport';
+        
+        html += `
+          <div class="team-item">
+            <div class="team-stage">
+              <div class="team-car-block">
+                <div class="team-car-inner ${carBgClass}">
+                  <img class="team-car-img" src="${team.carImage || 'assets/cars/default.png'}" alt="${team.name}" onerror="this.src='assets/cars/default.png'" />
+                </div>
+              </div>
+              <div class="team-info-col">
+                <div class="team-info-wrap">
+                  <span class="team-info__category">Konstruktor PRC</span>
+                  <h2 class="team-info__name">${team.name.replace(/ /, '<br>')}</h2>
+                  <p class="team-info__principal">Lider zespołu: <strong>${team.principal || '—'}</strong></p>
+                  <div class="team-info__stats">
+                    <div class="team-stat">
+                      <span class="team-stat__label">Pozycja</span>
+                      <span class="team-stat__value">${teamStanding?.position || '—'}.</span>
+                    </div>
+                    <div class="team-stat__divider"></div>
+                    <div class="team-stat">
+                      <span class="team-stat__label">Punkty</span>
+                      <span class="team-stat__value">${teamStanding?.totalPoints || 0}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="drivers-section">
+              <div class="drivers-grid">
+        `;
+        
+        if (teamDrivers.length === 0) {
+          html += '<div class="driver-card" style="grid-column: 1/-1; text-align: center; padding: 40px;">— Brak kierowców —</div>';
+        } else {
+          // Każdy kierowca w osobnym kafelku – grid sam układa je w 2 kolumnach
+          teamDrivers.forEach(driver => {
+            const dl = laurels?.[driver.id] || { gold: 0, silver: 0, bronze: 0 };
+            let laurelHtml = '';
+            if (dl.gold > 0 || dl.silver > 0 || dl.bronze > 0) {
+              let parts = '';
+              for (let i = 0; i < dl.gold; i++) {
+                parts += `<span class="laurel-icon laurel-icon--gold" title="Zwycięstwo w turnieju – 1. miejsce">${laurelIMG()}</span>`;
+              }
+              for (let i = 0; i < dl.silver; i++) {
+                parts += `<span class="laurel-icon laurel-icon--silver" title="2. miejsce w turnieju">${laurelIMG()}</span>`;
+              }
+              for (let i = 0; i < dl.bronze; i++) {
+                parts += `<span class="laurel-icon laurel-icon--bronze" title="3. miejsce w turnieju">${laurelIMG()}</span>`;
+              }
+              laurelHtml = `<span class="driver-laurels">${parts}</span>`;
+            }
+
+            const driverLinkSlug = getDriverLink(driver.name, driver.id);
+            
+            html += `
+              <a href="${driverLinkSlug}.html" class="driver-card-link">
+                <div class="driver-card">
+                  <div class="driver-card__info">
+                    <span class="driver-card__role">Kierowca</span>
+                    <div class="driver-card__name-row">
+                      <h3 class="driver-card__name">${escapeHtml(driver.name)}</h3>
+                      ${laurelHtml}
+                    </div>
+                    <p class="driver-card__country"><span class="fi fi-${driver.country}"></span> ${getCountryName(driver.country)}</p>
+                    ${driver.carModel ? `<p class="driver-card__car">${escapeHtml(driver.carModel)}</p>` : ''}
+                  </div>
+                  <div class="driver-card__photo">
+                    <img src="${driver.photo || 'assets/drivers/default.jpg'}" alt="${escapeHtml(driver.name)}" onerror="this.src='assets/drivers/default.jpg'" />
+                  </div>
+                </div>
+              </a>
+            `;
+          });
+        }
+        
+        html += `
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      container.innerHTML = html;
+    }
+    
+    // prosty escape dla bezpieczeństwa
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+      });
+    }
+    
+    (function(){
+      document.body.classList.add('no-transition');
+      if(localStorage.getItem('wrc-theme')==='dark') document.body.classList.add('dark');
+      document.documentElement.classList.remove('wrc-dark');
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){
+          document.body.classList.remove('no-transition');
+        });
+      });
+      
+      var btn = document.getElementById('themeToggle');
+      if(btn){
+        btn.addEventListener('click', function(){
+          document.body.classList.add('theme-animating');
+          var isDark = document.body.classList.toggle('dark');
+          localStorage.setItem('wrc-theme', isDark ? 'dark' : 'light');
+          setTimeout(function(){ document.body.classList.remove('theme-animating'); }, 420);
+          try{var c=new BroadcastChannel('wrc-theme');c.postMessage(isDark?'dark':'light');c.close();}catch(e){}
+        });
+      }
+      
+      try{
+        var ch = new BroadcastChannel('wrc-theme');
+        ch.onmessage = function(e){
+          document.body.classList.add('theme-animating');
+          if(e.data==='dark') document.body.classList.add('dark');
+          else document.body.classList.remove('dark');
+          setTimeout(function(){ document.body.classList.remove('theme-animating'); }, 420);
+        };
+      }catch(e){}
+    })();
+    
+    loadTeamsData();
+  </script>
+</body>
+</html>

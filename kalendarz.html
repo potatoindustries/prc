@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kalendarz – PRC 2026</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="assets/icon.jpg">
+
+  <style>
+    @font-face {
+      font-family: "SebinoBold";
+      src: url("assets/fonts/sebino-bold.ttf") format("truetype");
+      font-weight: normal;
+      font-style: normal;
+    }
+    
+    .flag-emoji {
+      font-size: 1em;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 0px;
+    }
+    
+    .season-tabs .fi {
+      font-size: 14px;
+      vertical-align: middle;
+      margin-right: 0px;
+    }
+
+    html.wrc-dark,html.wrc-dark body,html.wrc-dark .page{background:#1a1a1a!important}
+    
+    .loading-spinner {
+      text-align: center;
+      padding: 60px;
+      color: var(--text-muted);
+      font-size: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .loading-spinner::after {
+      content: "";
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba(128, 128, 128, 0.2);
+      border-top-color: #9e9e9e;
+      border-radius: 50%;
+      display: inline-block;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .rally-card__status--happening { color: var(--orange); }
+    .rally-card__status--past { color: var(--text-muted); }
+    
+    .status-ongoing .rally-card__status { color: var(--orange); }
+    .status-completed .rally-card__status { color: var(--text-muted); }
+    .status-upcoming .rally-card__status { color: var(--text-muted); }
+
+    .topbar__link {
+      font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+      font-weight: 550 !important;
+    }
+    
+    .tab {
+      font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+      font-weight: 500 !important;
+    }
+    
+    .view-sub-tab {
+      font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+      font-weight: 500 !important;
+    }
+    
+    .rallytv-btn {
+      font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+      font-weight: 500 !important;
+    }
+    
+    .rally-card__date,
+    .rally-card__status,
+    .rally-card__country {
+      font-family: "SebinoSoft", Arial, sans-serif !important;
+      font-weight: 500 !important;
+    }
+
+    .rally-card__date{
+      font-size: 13.2px;
+    }
+
+    .rally-card__country{
+      font-size: 11px;
+    }
+    
+    .view-toggle-label {
+      font-family: "WRCCleanBold", Arial, sans-serif !important;
+      font-weight: 700 !important;
+    }
+
+    .rally-card {
+      transform: none !important;
+      will-change: auto !important;
+      transition: none !important;
+    }
+    .rally-card:hover {
+      transform: none !important;
+      box-shadow:
+        0 2px 12px rgba(18, 34, 56, 0.08),
+        0 1px 3px rgba(18, 34, 56, 0.04) !important;
+    }
+    body.dark .rally-card:hover {
+      box-shadow:
+        0 4px 16px rgba(0, 0, 0, 0.28),
+        0 1px 3px rgba(0, 0, 0, 0.18) !important;
+    }
+
+    .rally-card__photo img.rally-bg {
+      transition: transform 0.38s ease !important;
+      will-change: transform !important;
+    }
+    .rally-card:hover .rally-bg {
+      transform: scale(1.05) !important;
+    }
+
+    .rally-card__date svg,
+    .rally-card__status svg {
+      position: static !important;
+      top: auto !important;
+      transform: translateY(-0.55px) !important;
+      vertical-align: middle !important;
+    }
+    .rally-card__status-divider {
+      height: 1px !important;
+      transform: none !important;
+    }
+
+    .rally-card__name {
+      color: #070c13 !important;
+      font-family: "SebinoBold", Arial, sans-serif !important;
+      font-weight: normal !important;
+    }
+    .rally-card__date,
+    .rally-card__status {
+      font-family: "SebinoMedium", Arial, sans-serif !important;
+      color: black !important;
+      font-weight: 520 !important;
+    }
+    .rally-card__country {
+      color: #29292b !important;
+      font-size: 13.5px;
+      font-weight: 520 !important;
+    }
+    body.dark .rally-card__name {
+      color: #e8ddd5 !important;
+    }
+    body.dark .rally-card__date,
+    body.dark .rally-card__status {
+      color: #c8bdb5 !important;
+    }
+    body.dark .rally-card__country {
+      color: #a89d95 !important;
+    }
+
+    .hero__bg{
+      background-image: url('https://cdn-cpfgb.nitrocdn.com/dRxFEBZBvMUrSIsoXplluqPbGwZVXSCF/assets/images/optimized/rev-d89eba4/dirtfish-editorial.s3-accelerate.amazonaws.com/2020/05/06_990323P_Makinen_cm0049T.jpg');
+    }
+  </style>
+  <script>
+    if(localStorage.getItem('wrc-theme')==='dark')document.documentElement.classList.add('wrc-dark');
+  </script>
+</head>
+<body>
+  <a href="start.html" class="floating-logo" aria-label="Home">
+    <img src="assets/logo.png" alt="Logo" class="floating-logo__img" />
+  </a>
+
+  <div class="page">
+    <header class="hero">
+      <div class="hero__bg"></div>
+      <div class="hero__overlay"></div>
+
+      <div class="hero__content">
+        <nav class="topbar">
+          <div class="topbar__left"></div>
+          <div class="topbar__center">
+            <a href="start.html" class="topbar__link">Start</a>
+            <a href="kalendarz.html" class="topbar__link active">Kalendarz</a>
+            <a href="index.html" class="topbar__link">Wyniki i klasyfikacja</a>
+            <a href="teams.html" class="topbar__link">Zespoły i kierowcy</a>
+            <a href="archiwum.html" class="topbar__link">Archiwum</a>
+          </div>
+          <div class="topbar__right">
+            <a href="#" class="rallytv-btn">Rally.TV</a>
+            <button class="theme-toggle-btn" id="themeToggle" aria-label="Przełącz motyw" type="button">
+              <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+              <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+          </div>
+        </nav>
+
+        <div class="hero__title-wrap">
+          <h1 class="hero__title">PRC Kalendarz</h1>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="tabs-section">
+        <div class="tabs season-tabs">
+          <button class="tab active" type="button" data-cal-tab="wrc2026" data-load-on-show="true">PRC #4</button>
+          <button class="tab" type="button" data-cal-tab="wrxc2026">PRXC #2</button>
+          <button class="tab" type="button" data-tab="archive" onclick="location.href='archiwum.html';">Archiwum</button>
+        </div>
+      </section>
+
+      <div class="cal-panel active" data-cal-panel="wrc2026">
+        <section class="calendar-filters">
+          <div class="view-toggle-wrap">
+            <div class="view-toggle-left">
+              <span class="view-toggle-label">Siatka</span>
+              <div class="view-sub-tabs">
+                <button class="view-sub-tab active" type="button" data-sub="upcoming">Nadchodzące</button>
+                <button class="view-sub-tab" type="button" data-sub="past">Zakończone</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="calendar-grid-section cal-sub-panel active" data-sub-panel="upcoming">
+          <div class="calendar-grid-wrap">
+            <div class="calendar-grid" id="upcomingGrid">
+              <div class="loading-spinner"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="calendar-grid-section cal-sub-panel" data-sub-panel="past">
+          <div class="calendar-grid-wrap">
+            <div class="calendar-grid" id="pastGrid">
+              <div class="loading-spinner"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="cal-panel" data-cal-panel="wrxc2026">
+        <section class="calendar-grid-section">
+          <div class="calendar-grid-wrap">
+            <div class="placeholder-cal">PRXC 2026 – ⌛︎</div>
+          </div>
+        </section>
+      </div>
+
+      <div class="cal-panel" data-cal-panel="archive">
+        <section class="calendar-grid-section">
+          <div class="calendar-grid-wrap">
+            <div class="placeholder-cal">Season Archive</div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="footer-spacer"></div>
+
+  <footer class="site-footer">
+    <div class="site-footer__sponsors">
+      <div class="footer-photo"><img src="assets/sponsors/photo1.png" alt="" /></div>
+      <div class="footer-photo"><img src="assets/sponsors/photo2.png" alt="" /></div>
+      <div class="footer-photo"><img src="assets/sponsors/photo3.png" alt="" /></div>
+    </div>
+    <div class="site-footer__sponsors site-footer__sponsors--secondary">
+      <div class="footer-photo footer-photo--sm"><img src="assets/sponsors/photo4.png" alt="" /></div>
+      <div class="footer-photo footer-photo--sm"><img src="assets/sponsors/photo5.png" alt="" /></div>
+      <div class="footer-photo footer-photo--sm"><img src="assets/sponsors/photo6.png" alt="" /></div>
+    </div>
+    <div class="footer-divider"></div>
+    <p class="footer-copyright">&copy; 2026 PRC. All rights reserved.</p>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="api.js"></script>
+  <script>
+    // ============================================================
+    // OPTYMALIZACJA KALENDARZA - TYLKO JEDNO ŻĄDANIE NA SESJĘ
+    // ============================================================
+    
+    // Cache danych
+    let cachedCalendar = null;
+    let dataLoaded = false;
+    let loadingPromise = null;
+    let currentPanel = 'wrc2026';
+    
+    function getFlagEmoji(countryCode) {
+      if (!countryCode) return '🏁';
+      
+      const specialFlags = {
+        'wls': '🏴󠁧󠁢󠁷󠁬󠁳󠁿',
+        'sct': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+        'eng': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+        'gb': '🇬🇧',
+        'gb-eng': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+        'gb-sct': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+        'gb-wls': '🏴󠁧󠁢󠁷󠁬󠁳󠁿'
+      };
+      
+      const code = countryCode.toLowerCase();
+      if (specialFlags[code]) return specialFlags[code];
+      
+      if (code.length === 2) {
+        try {
+          const codePoints = code.toUpperCase().split('').map(char => 127397 + char.charCodeAt());
+          return String.fromCodePoint(...codePoints);
+        } catch(e) {
+          return '🏁';
+        }
+      }
+      return '🏁';
+    }
+
+    // Główna funkcja ładująca dane - tylko RAZ
+    async function loadCalendarData() {
+      if (loadingPromise) return loadingPromise;
+      if (dataLoaded && cachedCalendar) return cachedCalendar;
+      
+      loadingPromise = (async () => {
+        try {
+          // Pokaż loading tylko w aktywnym panelu
+          const activePanel = document.querySelector('.cal-panel.active');
+          if (activePanel && activePanel.dataset.calPanel === 'wrc2026') {
+            const upcomingGrid = document.getElementById('upcomingGrid');
+            const pastGrid = document.getElementById('pastGrid');
+            if (upcomingGrid) upcomingGrid.innerHTML = '<div class="loading-spinner"></div>';
+            if (pastGrid) pastGrid.innerHTML = '<div class="loading-spinner"></div>';
+          }
+          
+          await api.loadData();
+          const rawData = api.data;
+          let calendar = await api.getCalendar();
+          
+          if (!calendar || calendar.length === 0) {
+            throw new Error('Brak danych');
+          }
+          
+          // Zastosuj sortowanie
+          calendar = getSortedCalendar(calendar, rawData);
+          
+          cachedCalendar = calendar;
+          dataLoaded = true;
+          return cachedCalendar;
+        } catch (error) {
+          console.error('Error loading calendar:', error);
+          throw error;
+        } finally {
+          loadingPromise = null;
+        }
+      })();
+      
+      return loadingPromise;
+    }
+    
+    // Renderowanie kalendarza (tylko gdy dane są już załadowane)
+    async function renderCalendar() {
+      const calendar = await loadCalendarData();
+      
+      if (!calendar || calendar.length === 0) {
+        document.getElementById('upcomingGrid').innerHTML = '<div class="placeholder-cal">Brak rajdów w kalendarzu</div>';
+        document.getElementById('pastGrid').innerHTML = '<div class="placeholder-cal">Brak zakończonych rajdów</div>';
+        return;
+      }
+      
+      const past = calendar.filter(rally => rally.status === 'completed');
+      const upcoming = calendar.filter(rally => rally.status === 'upcoming' || rally.status === 'ongoing');
+      
+      renderRallyGrid('upcomingGrid', upcoming);
+      renderRallyGrid('pastGrid', past);
+    }
+    
+    // Odświeżenie tylko aktywnego widoku (po zmianie kolejności w adminie)
+    async function refreshActiveView() {
+      // Unieważnij cache
+      dataLoaded = false;
+      cachedCalendar = null;
+      if (api) {
+        if (typeof api._invalidateStorage === 'function') api._invalidateStorage();
+        api.data = null;
+        api._l1 = {};
+        api._l1Time = 0;
+        api._etag = null;
+      }
+      await renderCalendar();
+    }
+    
+// ============================================================
+// AUTO-ODŚWIEŻANIE - TYLKO PRZY RĘCZNYCH ZMIANACH LUB DŁUGIEJ NIEAKTYWNOŚCI
+// ============================================================
+
+let lastFullRefresh = Date.now();
+const MIN_REFRESH_INTERVAL = 300000; // 5 minut (zmień na 600000 dla 10 minut)
+
+function setupAutoRefresh() {
+  // 1. NASŁUCHIWANIE NA ZMIANY Z ADMINA - to jest najważniejsze
+  try {
+    const channel = new BroadcastChannel('wrc-data-invalidate');
+    channel.onmessage = async (e) => {
+      if (e.data?.action === 'invalidate') {
+        console.log('[Calendar] Wykryto zmianę w adminie - natychmiastowe odświeżenie');
+        await refreshActiveView();
+      }
+    };
+  } catch(e) { console.warn('BroadcastChannel not supported', e); }
+  
+  // 2. OŚWIEŻANIE PO POWROCIE DO ZAKŁADKI - tylko jeśli dane są stare
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && currentPanel === 'wrc2026') {
+      const now = Date.now();
+      // Odśwież tylko jeśli minęło więcej niż MIN_REFRESH_INTERVAL od ostatniego pełnego odświeżenia
+      if (now - lastFullRefresh > MIN_REFRESH_INTERVAL) {
+        console.log('[Calendar] Powrót do zakładki po dłuższej nieobecności - odświeżenie');
+        lastFullRefresh = now;
+        refreshActiveView();
+      } else {
+        console.log('[Calendar] Powrót do zakładki - pomijam odświeżenie (za wcześnie)');
+      }
+    }
+  });
+  
+  // 3. OPCJONALNIE: bardzo rzadkie odświeżanie w tle (co 15 minut)
+  // To jest opcjonalne - możesz to zakomentować jeśli nie potrzebujesz
+  setInterval(() => {
+    if (document.visibilityState === 'visible' && currentPanel === 'wrc2026') {
+      const now = Date.now();
+      if (now - lastFullRefresh > 900000) { // 15 minut
+        console.log('[Calendar] Okresowe odświeżenie tła');
+        lastFullRefresh = now;
+        refreshActiveView();
+      }
+    }
+  }, 600000); // sprawdzaj co 10 minut
+}
+
+// Funkcja odświeżająca - unieważnia cache i ładuje nowe dane
+async function refreshActiveView() {
+  // Unieważnij cache
+  dataLoaded = false;
+  cachedCalendar = null;
+  if (api) {
+    if (typeof api._invalidateStorage === 'function') api._invalidateStorage();
+    api.data = null;
+    api._l1 = {};
+    api._l1Time = 0;
+    api._etag = null;
+  }
+  await renderCalendar();
+}
+    
+    // Funkcje sortowania (kopiowane z admin.html)
+    function getCalendarGroupedByDate(calendar) {
+      const groups = {};
+      calendar.forEach(rally => {
+        const dateKey = rally.startDate;
+        if (!groups[dateKey]) groups[dateKey] = [];
+        groups[dateKey].push(rally);
+      });
+      const sortedDates = Object.keys(groups).sort();
+      return { groups, sortedDates };
+    }
+    
+    function getStoredOrderForDate(rawData, dateKey) {
+      const season = rawData?.seasons?.[rawData?.settings?.currentSeason];
+      const order = season?.calendarOrder || {};
+      return order[dateKey] || [];
+    }
+    
+    function getSortedCalendar(calendar, rawData) {
+      if (!calendar || calendar.length === 0) return [];
+      if (!rawData) return [...calendar];
+      
+      const { groups, sortedDates } = getCalendarGroupedByDate(calendar);
+      const result = [];
+      
+      for (const date of sortedDates) {
+        const rallies = groups[date];
+        const storedOrder = getStoredOrderForDate(rawData, date);
+        
+        if (storedOrder.length === rallies.length && storedOrder.every(id => rallies.some(r => r.id === id))) {
+          const ordered = [];
+          for (const id of storedOrder) {
+            const rally = rallies.find(r => r.id === id);
+            if (rally) ordered.push(rally);
+          }
+          for (const rally of rallies) {
+            if (!ordered.includes(rally)) ordered.push(rally);
+          }
+          result.push(...ordered);
+        } else {
+          result.push(...rallies.sort((a, b) => a.name.localeCompare(b.name)));
+        }
+      }
+      return result;
+    }
+
+    function formatDateRange(start, end) {
+      const startDate = new Date(start);
+      const endDate   = new Date(end);
+      
+      const monthNames = {
+        'sty': 'Stycznia', 'lut': 'Lutego',    'mar': 'Marca',
+        'kwi': 'Kwietnia','maj': 'Maja',      'cze': 'Czerwca',
+        'lip': 'Lipca',  'sie': 'Sierpnia', 'wrz': 'Września',
+        'paź': 'Października', 'lis': 'Listopada', 'gru': 'Grudnia'
+      };
+      
+      function formatDate(date) {
+        const day        = date.getDate();
+        const monthShort = date.toLocaleDateString('pl-PL', { month: 'short' }).replace('.', '').toLowerCase();
+        const month      = monthNames[monthShort] || monthShort;
+        return `${day} ${month} ${date.getFullYear()}`;
+      }
+      
+      function formatShortDate(date) {
+        const day        = date.getDate();
+        const monthShort = date.toLocaleDateString('pl-PL', { month: 'short' }).replace('.', '').toLowerCase();
+        const month      = monthNames[monthShort] || monthShort;
+        return `${day} ${month}`;
+      }
+      
+      const sameDay = startDate.toDateString() === endDate.toDateString();
+      if (sameDay) return formatDate(startDate);
+      return `${formatShortDate(startDate)} – ${formatDate(endDate)}`;
+    }
+
+    function getStatusText(status) {
+      switch(status) {
+        case 'completed': return 'Minione wydarzenie';
+        case 'ongoing':   return 'Trwa';
+        default:          return 'Nadchodzące wydarzenie';
+      }
+    }
+
+    function getStatusIcon(status) {
+      if (status === 'ongoing') {
+        return `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><circle cx="7" cy="7" r="2.2" fill="currentColor"/></svg>`;
+      } else if (status === 'completed') {
+        return `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="7" cy="7" r="5.8" stroke="currentColor" stroke-width="1.25"/><line x1="7" y1="7" x2="7" y2="3.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/><line x1="7" y1="7" x2="9.8" y2="8.6" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>`;
+      } else {
+        return `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="7" cy="7" r="5.8" stroke="currentColor" stroke-width="1.25"/><line x1="7" y1="7" x2="7" y2="3.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/><line x1="7" y1="7" x2="9.8" y2="8.6" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>`;
+      }
+    }
+    
+    function renderRallyGrid(containerId, rallies) {
+      const container = document.getElementById(containerId);
+      
+      if (!rallies || rallies.length === 0) {
+        container.innerHTML = '<div class="placeholder-cal">- ⌛︎ -</div>';
+        return;
+      }
+      
+      let html = '';
+      rallies.forEach(rally => {
+        const statusText  = getStatusText(rally.status);
+        const statusClass = rally.status === 'ongoing' ? 'status-ongoing' : 
+                           (rally.status === 'completed' ? 'status-completed' : 'status-upcoming');
+        const statusIcon  = getStatusIcon(rally.status);
+        const hasResults  = rally.status === 'completed' || rally.status === 'ongoing';
+        const tag         = hasResults ? `a href="wyniki.html?rally=${rally.id}"` : 'div';
+        const tagClose    = hasResults ? 'a' : 'div';
+        
+        const flagEmoji = getFlagEmoji(rally.country);
+        
+        html += `
+          <${tag} class="rally-card">
+            <div class="rally-card__photo rally-card__photo--${rally.id}">
+              <img class="rally-bg" src="${rally.heroImage || 'assets/default-rally.jpg'}" alt="${rally.name}" onerror="this.style.display='none'" />
+              <div class="rally-card__photo-overlay"></div>
+              <div class="rally-card__logo-wrap">
+                <img class="rally-card__logo" src="${rally.logo || 'assets/default-logo.png'}" alt="${rally.name}" onerror="this.style.display='none'" />
+              </div>
+            </div>
+            <div class="rally-card__info">
+              <p class="rally-card__name">${escapeHtml(rally.name)}</p>
+              <div class="rally-card__meta">
+                <span class="rally-card__date">
+                  <svg width="13" height="14" viewBox="0 0 13 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="0.75" y="1.65" width="11.5" height="10" rx="1.4" stroke="currentColor" stroke-width="1.3"/>
+                    <path d="M0.75 5.75h11.5" stroke="currentColor" stroke-width="1.3"/>
+                    <path d="M3.75 0.75v3M9.25 0.75v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                  </svg>
+                  ${formatDateRange(rally.startDate, rally.endDate)}
+                </span>
+                <span class="rally-card__country">
+                  <span class="flag-emoji">${flagEmoji}</span>
+                  ${escapeHtml(rally.countryName)}
+                </span>
+                <div class="rally-card__status-divider"></div>
+                <span class="rally-card__status ${statusClass}">
+                  ${statusIcon}
+                  ${statusText}
+                </span>
+              </div>
+            </div>
+          </${tagClose}>
+        `;
+      });
+      
+      container.innerHTML = html;
+    }
+    
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+    }
+    
+    // Obsługa przełączania zakładek kalendarza
+    const calTabs = document.querySelectorAll("[data-cal-tab]");
+    const calPanels = document.querySelectorAll("[data-cal-panel]");
+    
+    calTabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        const target = tab.dataset.calTab;
+        currentPanel = target;
+        
+        calTabs.forEach(t => t.classList.remove("active"));
+        calPanels.forEach(p => p.classList.remove("active"));
+        tab.classList.add("active");
+        document.querySelector(`[data-cal-panel="${target}"]`).classList.add("active");
+        
+        // Jeśli to panel PRC #4 i dane nie są jeszcze załadowane - załaduj
+        if (target === 'wrc2026' && !dataLoaded) {
+          renderCalendar();
+        }
+      });
+    });
+    
+    // Obsługa przełączania widoków (nadchodzące/zakończone) - bez przeładowania danych
+    const subTabs = document.querySelectorAll(".view-sub-tab");
+    const subPanels = document.querySelectorAll(".cal-sub-panel");
+    
+    subTabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        const target = tab.dataset.sub;
+        subTabs.forEach(t => t.classList.remove("active"));
+        subPanels.forEach(p => p.classList.remove("active"));
+        tab.classList.add("active");
+        document.querySelector(`[data-sub-panel="${target}"]`).classList.add("active");
+      });
+    });
+    
+    // Motyw
+    (function(){
+      document.body.classList.add('no-transition');
+      if(localStorage.getItem('wrc-theme')==='dark') document.body.classList.add('dark');
+      document.documentElement.classList.remove('wrc-dark');
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){
+          document.body.classList.remove('no-transition');
+        });
+      });
+      
+      var btn = document.getElementById('themeToggle');
+      if(btn){
+        btn.addEventListener('click', function(){
+          document.body.classList.add('theme-animating');
+          var isDark = document.body.classList.toggle('dark');
+          localStorage.setItem('wrc-theme', isDark ? 'dark' : 'light');
+          setTimeout(function(){ document.body.classList.remove('theme-animating'); }, 420);
+          try{var c=new BroadcastChannel('wrc-theme');c.postMessage(isDark?'dark':'light');c.close();}catch(e){}
+        });
+      }
+      
+      try{
+        var ch = new BroadcastChannel('wrc-theme');
+        ch.onmessage = function(e){
+          document.body.classList.add('theme-animating');
+          if(e.data==='dark') document.body.classList.add('dark');
+          else document.body.classList.remove('dark');
+          setTimeout(function(){ document.body.classList.remove('theme-animating'); }, 420);
+        };
+      }catch(e){}
+    })();
+    
+    // Inicjalizacja - ładujemy dane tylko dla aktywnego panelu
+    window._lastCalendarLoad = Date.now();
+    renderCalendar();
+    setupAutoRefresh();
+    
+    const logo = document.querySelector(".floating-logo");
+    const hero = document.querySelector(".hero");
+    function updateLogo() { logo.classList.toggle("logo--dark", hero.getBoundingClientRect().bottom <= 0); }
+    window.addEventListener("scroll", updateLogo, { passive: true });
+    updateLogo();
+  </script>
+</body>
+</html>
