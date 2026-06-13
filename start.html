@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Start – PRC 2026</title>
+  <title>Strona Startowa - PRC</title>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css" />
   <link rel="stylesheet" href="css/style.css" />
@@ -574,6 +574,7 @@
       height: 100%; 
       object-fit: cover; 
       transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      transform-origin: center center;
       will-change: transform;
     }
     .constructor-card:hover .constructor-card__photo img {
@@ -643,7 +644,7 @@
       line-height: 1.5; margin: 0;
     }
 
-    /* ===== SEKCJA ARTYKUŁÓW - ŁATWA EDYCJA W HTML ===== */
+    /* ===== SEKCJA ARTYKUŁÓW ===== */
     .start-section--articles {
       background: #f4f5f6;
       padding: 40px 0 56px;
@@ -669,9 +670,9 @@
       text-decoration: none;
       transition: opacity 0.2s ease;
     }
-    .article-item:hover { opacity: 0.85; }
+    .article-item:hover { opacity: 0.99; }
     .article-item__img {
-      width: 130px;
+      width: 140px;
       height: 90px;
       flex-shrink: 0;
       background: #d4dce4;
@@ -682,6 +683,12 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transition: transform 0.2s ease-out;
+      transform-origin: center center;
+      will-change: transform;
+    }
+    .article-item:hover .article-item__img img {
+      transform: scale(1.04);
     }
     .article-item__content {
       flex: 1;
@@ -697,66 +704,61 @@
     }
     body.dark .article-item__title { color: #eef2f8; }
 
-    .featured-article {
-      background: #fff;
-      border-radius: 11px;
-      overflow: hidden;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.04);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      text-decoration: none;
+    .article-right-card {
+      position: relative;
       display: block;
-    }
-    body.dark .featured-article {
-      background: #1e1e1e;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-    }
-    .featured-article:hover { transform: translateY(-3px); box-shadow: 0 12px 24px rgba(0,0,0,0.08); }
-    .featured-article__img {
-      width: 100%;
-      aspect-ratio: 16/9;
+      text-decoration: none;
+      border-radius: 12px;
       overflow: hidden;
-      border-radius: 12px 12px 0 0;
+      background: #fff;
+      max-width: 94%;
+      margin-left: auto;
     }
-    .featured-article__img img {
+    body.dark .article-right-card {
+      background: #1e1e1e;
+    }
+    .article-right-card__img {
       width: 100%;
-      height: 100%;
+      height: auto;
+      display: block;
       object-fit: cover;
+      transition: transform 0.2s ease-out;
+      transform-origin: center center;
+      will-change: transform;
     }
-    .featured-article__content {
-      padding: 18px 20px 22px;
+    .article-right-card:hover .article-right-card__img {
+      transform: scale(1.02);
     }
-    .featured-article__label {
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--orange);
-      margin-bottom: 8px;
+    .article-right-card__overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 50%, transparent 100%);
+      padding: 32px 24px 28px 24px;
+      pointer-events: none;
+      z-index: 2;
     }
-    .featured-article__title {
-      font-family: "SebinoBold", "WRCCleanBold", Arial, sans-serif;
-      font-size: 20px;
-      line-height: 1.25;
-      color: #131a24;
-      margin-bottom: 10px;
+    .article-right-card__title {
+      font-family: "WRCCleanBold", Arial, sans-serif;
+      font-size: 26px;
+      line-height: 1.3;
+      color: #ffffff;
+      margin: 0;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.4);
     }
-    body.dark .featured-article__title { color: #f0f4f9; }
-    .featured-article__desc {
-      font-size: 13px;
-      color: #4e5c6e;
-      font-family: "SebinoSoft", Arial, sans-serif;
-      line-height: 1.45;
-    }
-    body.dark .featured-article__desc { color: #b0c0ce; }
 
     @media (max-width: 1024px) {
       .articles-layout { grid-template-columns: 1fr; gap: 32px; }
       .article-item__img { width: 110px; height: 80px; }
+      .article-right-card__title { font-size: 22px; }
+      .article-right-card__overlay { padding: 24px 20px 20px 20px; }
     }
     @media (max-width: 768px) {
       .article-item { gap: 14px; }
-      .featured-article__title { font-size: 18px; }
       .article-item__title { font-size: 15px; }
+      .article-right-card__title { font-size: 18px; }
+      .article-right-card__overlay { padding: 18px 16px 16px 16px; }
     }
 
     .loading-spinner {
@@ -833,6 +835,7 @@
 
     .rally-card__photo img.rally-bg {
       transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+      transform-origin: center center !important;
       will-change: transform !important;
     }
     .rally-card:hover .rally-bg {
@@ -900,7 +903,6 @@
   <div class="page">
 
     <header class="hero hero--start" id="heroStart">
-      <!-- ===== ZDJĘCIA W KARUZELI - EDYTUJ BEZPOŚREDNIO W HTML ===== -->
       <div class="hero-slide active" style="background-image:url('https://hoypyspace.sfo2.cdn.digitaloceanspaces.com/imagenes/FIA.jpg')"></div>
       <div class="hero-slide"        style="background-image:url('https://cdn-cpfgb.nitrocdn.com/dRxFEBZBvMUrSIsoXplluqPbGwZVXSCF/assets/images/optimized/rev-d89eba4/dirtfish-editorial.s3-accelerate.amazonaws.com/2020/05/06_990323P_Makinen_cm0049T.jpg')"></div>
       <div class="hero-slide"        style="background-image:url('https://dirtfish-editorial.s3-accelerate.amazonaws.com/2020/11/07_9610_Sanremo02T.jpg')"></div>
@@ -930,7 +932,6 @@
 
         <div class="hero-start__bottom">
           <div class="hero-slide-texts">
-            <!-- ===== NAPISY W KARUZELI - EDYTUJ BEZPOŚREDNIO ===== -->
             <div class="hero-slide-text active" id="slide-text-0">
               <h1 class="hero-slide-text__title">FIA PRC startuje 29 czerwca wszystko gotowe na wielkie ściganie</h1>
               <p class="hero-slide-text__desc">Organizatorzy potwierdzili harmonogram: 9 etapów - kultowe odcinki i zacięta rywalizacja.</p>
@@ -966,20 +967,14 @@
     <main class="main main--start">
       <section class="start-section--upcoming"><div class="start-container"><div class="start-section-heading"><h2>Nadchodzące rajdy</h2></div><div class="upcoming-grid--start calendar-grid" id="upcomingGrid"><div class="loading-spinner" style="grid-column:1/-1"></div></div></div></section>
       <section class="start-section--standings"><div class="start-container"><div class="start-section-heading"><h2>Top 5 Klasyfikacji kierowców</h2></div><div class="results-card--start"><div class="standings-table standings-table--start-top5"><div class="standings-table__head"><div>POZ.</div><div>KIEROWCA</div><div>ZESPÓŁ</div><div>PKT</div></div><div class="standings-table__body" id="standingsBody"><div class="loading-spinner"></div></div></div></div></div></section>
-      <section class="start-section--constructors"><div class="start-container"><div class="start-section-heading"><h2>Konstruktorzy</h2></div><div class="constructors-grid" id="constructorsGrid"><div class="loading-spinner" style="grid-column:1/-1"></div></div></div></section>
       
-      <!-- ===== SEKCJA ARTYKUŁÓW - DANE WCZYTANE ZE STATYCZNYCH ELEMENTÓW HTML ===== -->
+      <!-- ===== SEKCJA ARTYKUŁÓW ===== -->
       <section class="start-section--articles">
         <div class="start-container">
           <div class="start-section-heading"><h2>Artykuły</h2></div>
           
-          <!-- 
-            ================================================================
-            EDYTUJ ARTYKUŁY TUTAJ - ZMIENIAJ ZDJĘCIA, TYTUŁY I LINKI
-            ================================================================
-          -->
           <div class="articles-layout" id="articlesLayoutStatic">
-            <!-- LEWA KOLUMNA - LISTA MNIEJSZYCH ARTYKUŁÓW (max 4) -->
+            <!-- LEWA KOLUMNA - LISTA MNIEJSZYCH ARTYKUŁÓW -->
             <div class="articles-list">
               <a href="kalendarz.html" class="article-item">
                 <div class="article-item__img"><img src="https://hoypyspace.sfo2.cdn.digitaloceanspaces.com/imagenes/FIA.jpg" alt="Rendi mistrzem"></div>
@@ -990,7 +985,7 @@
               <a href="index.html" class="article-item">
                 <div class="article-item__img"><img src="https://cdn-cpfgb.nitrocdn.com/dRxFEBZBvMUrSIsoXplluqPbGwZVXSCF/assets/images/optimized/rev-d89eba4/dirtfish-editorial.s3-accelerate.amazonaws.com/2020/05/06_990323P_Makinen_cm0049T.jpg" alt="Nowy Ford"></div>
                 <div class="article-item__content">
-                  <div class="article-item__title">Analiza przedsezonowa: Kto jest zdecydowanym faworytem w stawce?</div>
+                  <div class="article-item__title">Nowi kierowcy w stawce - kto jest faworytem do wygrania tytułu?</div>
                 </div>
               </a>
               <a href="regulamin.pdf" class="article-item">
@@ -1007,12 +1002,18 @@
               </a>
             </div>
             
-            <!-- PRAWA KOLUMNA - DUŻY, WYRÓŻNIONY ARTYKUŁ -->
-          <!-- ===== KONIEC SEKCJI ARTYKUŁÓW ===== -->
-          
+            <!-- PRAWA KOLUMNA - DUŻY KAFELEK Z NAPISEM NA OBRAZKU -->
+            <a href="art-05.html" class="article-right-card">
+              <img src="https://racemarket.net/oc-content/uploads/43/68267.jpg" alt="Analiza pojazdów" class="article-right-card__img" />
+              <div class="article-right-card__overlay">
+                <div class="article-right-card__title">Mitsubishi, Subaru, Ford, Lancia – które auto zdominuje PRC #4?</div>
+              </div>
+            </a>
+          </div>
         </div>
       </section>
-
+      
+      <section class="start-section--constructors"><div class="start-container"><div class="start-section-heading"><h2>Konstruktorzy</h2></div><div class="constructors-grid" id="constructorsGrid"><div class="loading-spinner" style="grid-column:1/-1"></div></div></div></section>
       <section class="start-section--banner"><div class="start-container"><div class="banner-inner"><img src="assets/rally.jpg" alt="PRC Rally" class="banner-img" /><div class="banner-overlay"><div class="banner-text"><p class="banner-text__label">FIA PRC 2026</p><h2 class="banner-text__title">Potato Rally<br>Championship</h2><p class="banner-text__sub">Pełna adrenalina, najszybsi kierowcy i niesamowite odcinki specjalne przez cały sezon.</p></div></div></div></div></section>
     </main>
   </div>
@@ -1048,24 +1049,18 @@
       if (code.length === 2) try { return String.fromCodePoint(...code.toUpperCase().split('').map(c => 127397 + c.charCodeAt())); } catch(e) { return '🏁'; }
       return '🏁';
     }
-    async function loadUpcomingRallies() {
-      const grid = document.getElementById('upcomingGrid');
-      if (!grid) return;
-      try {
-        await api.loadData();
-        let calendar = await api.getCalendar();
-        if (!calendar?.length) { grid.innerHTML = '<div class="placeholder-cal">Brak rajdów w kalendarzu</div>'; return; }
-        let upcoming = calendar.filter(r => r.status === 'upcoming' || r.status === 'ongoing').slice(0, 4);
-        if (!upcoming.length) upcoming = calendar.slice(0, 4);
-        renderRallyGrid('upcomingGrid', upcoming);
-      } catch(e) { grid.innerHTML = '<p style="color:#8fa0b0;padding:20px">Błąd ładowania danych</p>'; }
-    }
+    
+    // POPRAWA: funkcja renderująca rajdy z zachowaniem kolejności z calendar.json (według daty)
     function renderRallyGrid(containerId, rallies) {
       const container = document.getElementById(containerId);
       if (!container) return;
       if (!rallies?.length) { container.innerHTML = '<div class="placeholder-cal">- ⌛︎ -</div>'; return; }
+      
+      // Sortowanie według daty startu (od najwcześniejszej)
+      const sorted = [...rallies].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+      
       let html = '';
-      rallies.forEach(rally => {
+      sorted.forEach(rally => {
         const hasResults = rally.status === 'completed' || rally.status === 'ongoing';
         const tag = hasResults ? `a href="wyniki.html?rally=${rally.id}"` : 'div';
         const tagClose = hasResults ? 'a' : 'div';
@@ -1074,6 +1069,31 @@
       });
       container.innerHTML = html;
     }
+    
+    async function loadUpcomingRallies() {
+      const grid = document.getElementById('upcomingGrid');
+      if (!grid) return;
+      try {
+        await api.loadData();
+        let calendar = await api.getCalendar();
+        if (!calendar?.length) { grid.innerHTML = '<div class="placeholder-cal">Brak rajdów w kalendarzu</div>'; return; }
+        
+        // Pobierz rajdy z statusem 'upcoming' lub 'ongoing'
+        let upcoming = calendar.filter(r => r.status === 'upcoming' || r.status === 'ongoing');
+        
+        // Jeśli nie ma nadchodzących, pokaż pierwsze 4 rajdy z kalendarza
+        if (!upcoming.length) upcoming = calendar.slice(0, 4);
+        
+        // Ogranicz do 4 i zachowaj kolejność według daty
+        upcoming = upcoming.slice(0, 4);
+        
+        renderRallyGrid('upcomingGrid', upcoming);
+      } catch(e) {
+        console.error('Błąd ładowania rajdów:', e);
+        grid.innerHTML = '<p style="color:#8fa0b0;padding:20px">Błąd ładowania danych</p>';
+      }
+    }
+    
     async function loadStandings() {
       const body = document.getElementById('standingsBody');
       try {
