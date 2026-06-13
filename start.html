@@ -51,7 +51,7 @@
     }
     
     .start-section-heading h2 {
-      font-size: 24px !important;
+      font-size: 30px !important;
     }
     
     .start-section-heading a {
@@ -128,28 +128,21 @@
       transition: opacity 1s ease-in-out;
     }
 
-    /* Aktywny slajd – widoczny + płynne powiększanie */
     .hero-slide.active {
       opacity: 1;
       animation: kenBurnsZoom 8s ease-out forwards;
     }
 
-    /* Wyjeżdżający slajd – znika, ale zachowuje animację powiększania by obraz nie skakał */
     .hero-slide.exiting {
       opacity: 0;
       animation: kenBurnsZoom 8s ease-out forwards;
     }
 
     @keyframes kenBurnsZoom {
-      0% {
-        transform: scale(1);
-      }
-      100% {
-        transform: scale(1.05);
-      }
+      0% { transform: scale(1); }
+      100% { transform: scale(1.05); }
     }
 
-    /* Nakładka */
     .hero-overlay--start {
       position: absolute;
       inset: 0;
@@ -180,9 +173,6 @@
       transform: translateX(-50%);
     }
 
-    /* ===================================================
-       NAVBAR
-       =================================================== */
     .hero--start .rallytv-btn {
       background: rgba(255,255,255,0.15);
       color: #fff;
@@ -222,21 +212,14 @@
       color: #fff;
     }
     
-    /* ANIMACJA NAPISÓW - Z PRAWEJ DO LEWEJ */
     .hero-slide-text.active { 
       display: block; 
       animation: slideTextInRight 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
     }
 
     @keyframes slideTextInRight {
-      0% { 
-        opacity: 0; 
-        transform: translateX(40px); 
-      }
-      100% { 
-        opacity: 1; 
-        transform: translateX(0); 
-      }
+      0% { opacity: 0; transform: translateX(40px); }
+      100% { opacity: 1; transform: translateX(0); }
     }
 
     .hero-slide-text__label {
@@ -326,15 +309,12 @@
       to   { width: 100%; }
     }
 
-    /* ===================================================
-       RESZTA STYLÓW
-       =================================================== */
     .main--start {
       background: #f4f5f6;
       padding-bottom: 0;
     }
     html.wrc-dark, html.wrc-dark body, html.wrc-dark .page { background: #1a1a1a !important; }
-    body.dark .main--start { background: #1a1a1a; }
+    body.dark .main--start { background: #121212; }
 
     body.theme-animating .page,
     body.theme-animating .main--start,
@@ -342,6 +322,7 @@
     body.theme-animating .start-section--standings,
     body.theme-animating .start-section--constructors,
     body.theme-animating .start-section--banner,
+    body.theme-animating .start-section--articles,
     body.theme-animating .results-card--start,
     body.theme-animating .standings-table--start-top5 .standings-table__head,
     body.theme-animating .standings-table--start-top5 .standings-row,
@@ -350,7 +331,10 @@
     body.theme-animating .start-section-heading h2,
     body.theme-animating .rally-card,
     body.theme-animating .rally-card__info,
-    body.theme-animating .rally-card__name {
+    body.theme-animating .rally-card__name,
+    body.theme-animating .articles-list,
+    body.theme-animating .featured-article,
+    body.theme-animating .article-item {
       transition:
         background-color 0.38s ease,
         color 0.28s ease,
@@ -376,7 +360,7 @@
       content: "";
       display: block;
       width: 4px;
-      height: 22px;
+      height: 30px;
       background: var(--orange);
       border-radius: 2px;
       flex-shrink: 0;
@@ -412,7 +396,7 @@
       background: #f4f5f6;
       padding: 48px 0 40px;
     }
-    body.dark .start-section--upcoming { background: #1a1a1a; }
+    body.dark .start-section--upcoming { background: #121212; }
 
     .upcoming-grid--start {
       display: grid;
@@ -432,7 +416,7 @@
       background: #f4f5f6;
       padding: 40px 0 44px;
     }
-    body.dark .start-section--standings { background: #1a1a1a; }
+    body.dark .start-section--standings { background: #121212; }
 
     .results-card--start {
       background: #ffffff;
@@ -465,7 +449,7 @@
       border-bottom: 1px solid rgba(225,231,238,0.625);
     }
     body.dark .standings-table--start-top5 .standings-table__head {
-      background: #2e2e2e;
+      background: #2a2a2a;
       color: #beb3ab;
       border-color: rgba(60,72,88,0.5);
     }
@@ -561,7 +545,7 @@
       background: #f4f5f6;
       padding: 40px 0 48px;
     }
-    body.dark .start-section--constructors { background: #1a1a1a; }
+    body.dark .start-section--constructors { background: #121212; }
 
     .constructors-grid {
       display: grid;
@@ -628,7 +612,7 @@
       background: #f4f5f6;
       padding: 40px 0 56px;
     }
-    body.dark .start-section--banner { background: #1a1a1a; }
+    body.dark .start-section--banner { background: #121212; }
 
     .banner-inner {
       width: 100%;
@@ -657,6 +641,122 @@
       font-size: 15px; color: rgba(255,255,255,0.85);
       font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
       line-height: 1.5; margin: 0;
+    }
+
+    /* ===== SEKCJA ARTYKUŁÓW - ŁATWA EDYCJA W HTML ===== */
+    .start-section--articles {
+      background: #f4f5f6;
+      padding: 40px 0 56px;
+    }
+    body.dark .start-section--articles { background: #121212; }
+
+    .articles-layout {
+      display: grid;
+      grid-template-columns: 1fr 0.95fr;
+      gap: 28px;
+    }
+    .articles-list {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .article-item {
+      display: flex;
+      align-items: flex-start;
+      background: transparent;
+      border-radius: 0;
+      gap: 18px;
+      text-decoration: none;
+      transition: opacity 0.2s ease;
+    }
+    .article-item:hover { opacity: 0.85; }
+    .article-item__img {
+      width: 130px;
+      height: 90px;
+      flex-shrink: 0;
+      background: #d4dce4;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .article-item__img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .article-item__content {
+      flex: 1;
+      padding-top: 0;
+    }
+    .article-item__title {
+      font-family: "WRCCleanBold", Arial, sans-serif;
+      font-size: 20px;
+      line-height: 1.3;
+      color: #121826;
+      margin: 0 0 4px 0;
+      font-weight: 600;
+    }
+    body.dark .article-item__title { color: #eef2f8; }
+
+    .featured-article {
+      background: #fff;
+      border-radius: 11px;
+      overflow: hidden;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.04);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      text-decoration: none;
+      display: block;
+    }
+    body.dark .featured-article {
+      background: #1e1e1e;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    }
+    .featured-article:hover { transform: translateY(-3px); box-shadow: 0 12px 24px rgba(0,0,0,0.08); }
+    .featured-article__img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      border-radius: 12px 12px 0 0;
+    }
+    .featured-article__img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .featured-article__content {
+      padding: 18px 20px 22px;
+    }
+    .featured-article__label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--orange);
+      margin-bottom: 8px;
+    }
+    .featured-article__title {
+      font-family: "SebinoBold", "WRCCleanBold", Arial, sans-serif;
+      font-size: 20px;
+      line-height: 1.25;
+      color: #131a24;
+      margin-bottom: 10px;
+    }
+    body.dark .featured-article__title { color: #f0f4f9; }
+    .featured-article__desc {
+      font-size: 13px;
+      color: #4e5c6e;
+      font-family: "SebinoSoft", Arial, sans-serif;
+      line-height: 1.45;
+    }
+    body.dark .featured-article__desc { color: #b0c0ce; }
+
+    @media (max-width: 1024px) {
+      .articles-layout { grid-template-columns: 1fr; gap: 32px; }
+      .article-item__img { width: 110px; height: 80px; }
+    }
+    @media (max-width: 768px) {
+      .article-item { gap: 14px; }
+      .featured-article__title { font-size: 18px; }
+      .article-item__title { font-size: 15px; }
     }
 
     .loading-spinner {
@@ -800,6 +900,7 @@
   <div class="page">
 
     <header class="hero hero--start" id="heroStart">
+      <!-- ===== ZDJĘCIA W KARUZELI - EDYTUJ BEZPOŚREDNIO W HTML ===== -->
       <div class="hero-slide active" style="background-image:url('https://hoypyspace.sfo2.cdn.digitaloceanspaces.com/imagenes/FIA.jpg')"></div>
       <div class="hero-slide"        style="background-image:url('https://cdn-cpfgb.nitrocdn.com/dRxFEBZBvMUrSIsoXplluqPbGwZVXSCF/assets/images/optimized/rev-d89eba4/dirtfish-editorial.s3-accelerate.amazonaws.com/2020/05/06_990323P_Makinen_cm0049T.jpg')"></div>
       <div class="hero-slide"        style="background-image:url('https://dirtfish-editorial.s3-accelerate.amazonaws.com/2020/11/07_9610_Sanremo02T.jpg')"></div>
@@ -829,131 +930,97 @@
 
         <div class="hero-start__bottom">
           <div class="hero-slide-texts">
+            <!-- ===== NAPISY W KARUZELI - EDYTUJ BEZPOŚREDNIO ===== -->
             <div class="hero-slide-text active" id="slide-text-0">
               <h1 class="hero-slide-text__title">FIA PRC startuje 29 czerwca wszystko gotowe na wielkie ściganie</h1>
               <p class="hero-slide-text__desc">Organizatorzy potwierdzili harmonogram: 9 etapów - kultowe odcinki i zacięta rywalizacja.</p>
-              <div class="hero-slide-text__actions">
-                <a href="kalendarz.html" class="hero-btn hero-btn--primary">Zobacz kalendarz</a>
-              </div>
+              <div class="hero-slide-text__actions"><a href="kalendarz.html" class="hero-btn hero-btn--primary">Zobacz kalendarz</a></div>
             </div>
-
             <div class="hero-slide-text" id="slide-text-1">
               <h1 class="hero-slide-text__title">Analiza przedsezonowa: Kto jest faworytem w stawce?</h1>
-              <p class="hero-slide-text__desc">Rendi, Dombart i D4xan – to oni według ekspertów powinni walczyć o mistrzostwo. Ale czy pojawi się czarny koń turnieju?</p>
-              <div class="hero-slide-text__actions">
-                <a href="index.html"  class="hero-btn hero-btn--primary">Zobacz klasyfikację</a>
-              </div>
+              <p class="hero-slide-text__desc">Rendi, Dombart i D4xan – to oni według ekspertów powinni walczyć o mistrzostwo.</p>
+              <div class="hero-slide-text__actions"><a href="index.html" class="hero-btn hero-btn--primary">Zobacz klasyfikację</a></div>
             </div>
-
             <div class="hero-slide-text" id="slide-text-2">
               <h1 class="hero-slide-text__title">Zmiany w regulaminie PRC – co nowego?</h1>
-              <p class="hero-slide-text__desc">Brak tuningów, zmiany w punktach za czyste przejazdy oraz nowa formuła Power Stage. Sprawdź, co się zmieniło.</p>
-              <div class="hero-slide-text__actions">
-                <a href="regulamin.pdf" class="hero-btn hero-btn--primary">Regulamin sportowy</a>
-              </div>
+              <p class="hero-slide-text__desc">Brak tuningów, zmiany w punktach za czyste przejazdy oraz nowa formuła Power Stage.</p>
+              <div class="hero-slide-text__actions"><a href="regulamin.pdf" class="hero-btn hero-btn--primary">Regulamin sportowy</a></div>
             </div>
-
             <div class="hero-slide-text" id="slide-text-3">
               <h1 class="hero-slide-text__title">Za kierownicą Lancii – jak Dyxan przygotowuje się do sezonu</h1>
-              <p class="hero-slide-text__desc">Damian Siemaszko zabiera nas na swój przejazd po trasie w Monte Carlo. Zobacz, jak wygląda jego rutyna przed turniejem.</p>
-              <div class="hero-slide-text__actions">
-                <a href="art-02.html" class="hero-btn hero-btn--primary">Przeczytaj artykuł</a>
-              </div>
+              <p class="hero-slide-text__desc">Damian Siemaszko zabiera nas na swój przejazd po trasie w Monte Carlo.</p>
+              <div class="hero-slide-text__actions"><a href="art-02.html" class="hero-btn hero-btn--primary">Przeczytaj artykuł</a></div>
             </div>
-
             <div class="hero-slide-text" id="slide-text-4">
               <p class="hero-slide-text__label">PRC 2026 · Konstruktorzy</p>
               <h1 class="hero-slide-text__title">Mitsubishi, Subaru, Ford, Lancia – które auto zdominuje PRC #4?</h1>
-              <p class="hero-slide-text__desc">Analiza osiągów każdej marki w grze DiRT Rally 2.0. Który samochód daje największą przewagę?</p>
-              <div class="hero-slide-text__actions">
-               <a href="teams.html" class="hero-btn hero-btn--primary">Zespoły i kierowcy</a>
-              </div>
+              <p class="hero-slide-text__desc">Analiza osiągów każdej marki w grze DiRT Rally 2.0.</p>
+              <div class="hero-slide-text__actions"><a href="art-05.html" class="hero-btn hero-btn--primary">Przeczytaj artykuł</a></div>
             </div>
           </div>
         </div>
       </div>
-      
       <div class="hero-controls" id="heroDots"></div>
     </header>
 
     <main class="main main--start">
-
-      <section class="start-section--upcoming">
+      <section class="start-section--upcoming"><div class="start-container"><div class="start-section-heading"><h2>Nadchodzące rajdy</h2></div><div class="upcoming-grid--start calendar-grid" id="upcomingGrid"><div class="loading-spinner" style="grid-column:1/-1"></div></div></div></section>
+      <section class="start-section--standings"><div class="start-container"><div class="start-section-heading"><h2>Top 5 Klasyfikacji kierowców</h2></div><div class="results-card--start"><div class="standings-table standings-table--start-top5"><div class="standings-table__head"><div>POZ.</div><div>KIEROWCA</div><div>ZESPÓŁ</div><div>PKT</div></div><div class="standings-table__body" id="standingsBody"><div class="loading-spinner"></div></div></div></div></div></section>
+      <section class="start-section--constructors"><div class="start-container"><div class="start-section-heading"><h2>Konstruktorzy</h2></div><div class="constructors-grid" id="constructorsGrid"><div class="loading-spinner" style="grid-column:1/-1"></div></div></div></section>
+      
+      <!-- ===== SEKCJA ARTYKUŁÓW - DANE WCZYTANE ZE STATYCZNYCH ELEMENTÓW HTML ===== -->
+      <section class="start-section--articles">
         <div class="start-container">
-          <div class="start-section-heading">
-            <h2>Nadchodzące rajdy</h2>
-           <!-- <a href="kalendarz.html">Zobacz wszystkie </a> -->
-          </div>
-          <div class="upcoming-grid--start calendar-grid" id="upcomingGrid">
-            <div class="loading-spinner" style="grid-column:1/-1"></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="start-section--standings">
-        <div class="start-container">
-          <div class="start-section-heading">
-            <h2>Top 5 Klasyfikacji kierowców</h2>
-            <!-- <a href="index.html">Pełna klasyfikacja </a> -->
-          </div>
-          <div class="results-card--start">
-            <div class="standings-table standings-table--start-top5">
-              <div class="standings-table__head">
-                <div>POZ.</div>
-                <div>KIEROWCA</div>
-                <div>ZESPÓŁ</div>
-                <div>PKT</div>
-              </div>
-              <div class="standings-table__body" id="standingsBody">
-                <div class="loading-spinner"></div>
-              </div>
+          <div class="start-section-heading"><h2>Artykuły</h2></div>
+          
+          <!-- 
+            ================================================================
+            EDYTUJ ARTYKUŁY TUTAJ - ZMIENIAJ ZDJĘCIA, TYTUŁY I LINKI
+            ================================================================
+          -->
+          <div class="articles-layout" id="articlesLayoutStatic">
+            <!-- LEWA KOLUMNA - LISTA MNIEJSZYCH ARTYKUŁÓW (max 4) -->
+            <div class="articles-list">
+              <a href="kalendarz.html" class="article-item">
+                <div class="article-item__img"><img src="https://hoypyspace.sfo2.cdn.digitaloceanspaces.com/imagenes/FIA.jpg" alt="Rendi mistrzem"></div>
+                <div class="article-item__content">
+                  <div class="article-item__title">FIA PRC startuje 29 czerwca - wszystko gotowe na wielkie ściganie</div>
+                </div>
+              </a>
+              <a href="index.html" class="article-item">
+                <div class="article-item__img"><img src="https://cdn-cpfgb.nitrocdn.com/dRxFEBZBvMUrSIsoXplluqPbGwZVXSCF/assets/images/optimized/rev-d89eba4/dirtfish-editorial.s3-accelerate.amazonaws.com/2020/05/06_990323P_Makinen_cm0049T.jpg" alt="Nowy Ford"></div>
+                <div class="article-item__content">
+                  <div class="article-item__title">Analiza przedsezonowa: Kto jest zdecydowanym faworytem w stawce?</div>
+                </div>
+              </a>
+              <a href="regulamin.pdf" class="article-item">
+                <div class="article-item__img"><img src="https://dirtfish-editorial.s3-accelerate.amazonaws.com/2020/11/07_9610_Sanremo02T.jpg" alt="Subaru powraca"></div>
+                <div class="article-item__content">
+                  <div class="article-item__title">Zmiany w regulaminie PRC – co nowego?</div>
+                </div>
+              </a>
+              <a href="art-02.html" class="article-item">
+                <div class="article-item__img"><img src="https://rallypl.com/wp-content/uploads/2024/12/350d8451085e551844c32e3f08c23e732f86b021.jpg" alt="Zapisy"></div>
+                <div class="article-item__content">
+                  <div class="article-item__title">Za kierownicą Lancii – jak Dyxan przygotowuje się do sezonu</div>
+                </div>
+              </a>
             </div>
-          </div>
+            
+            <!-- PRAWA KOLUMNA - DUŻY, WYRÓŻNIONY ARTYKUŁ -->
+          <!-- ===== KONIEC SEKCJI ARTYKUŁÓW ===== -->
+          
         </div>
       </section>
 
-      <section class="start-section--constructors">
-        <div class="start-container">
-          <div class="start-section-heading">
-            <h2>Konstruktorzy</h2>
-           <!-- <a href="teams.html">Wszystkie zespoły </a> -->
-          </div>
-          <div class="constructors-grid" id="constructorsGrid">
-            <div class="loading-spinner" style="grid-column:1/-1"></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="start-section--banner">
-        <div class="start-container">
-          <div class="banner-inner">
-            <img src="assets/rally.jpg" alt="PRC Rally" class="banner-img" />
-            <div class="banner-overlay">
-              <div class="banner-text">
-                <p class="banner-text__label">FIA PRC 2026</p>
-                <h2 class="banner-text__title">Potato Rally<br>Championship</h2>
-                <p class="banner-text__sub">Pełna adrenalina, najszybsi kierowcy i niesamowite odcinki specjalne przez cały sezon.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
+      <section class="start-section--banner"><div class="start-container"><div class="banner-inner"><img src="assets/rally.jpg" alt="PRC Rally" class="banner-img" /><div class="banner-overlay"><div class="banner-text"><p class="banner-text__label">FIA PRC 2026</p><h2 class="banner-text__title">Potato Rally<br>Championship</h2><p class="banner-text__sub">Pełna adrenalina, najszybsi kierowcy i niesamowite odcinki specjalne przez cały sezon.</p></div></div></div></div></section>
     </main>
   </div>
 
   <div class="footer-spacer"></div>
   <footer class="site-footer">
-    <div class="site-footer__sponsors">
-      <div class="footer-photo"><img src="https://i.imgur.com/JSWXXPK.png" alt="" /></div>
-      <div class="footer-photo"><img src="https://i.imgur.com/3e0jqkQ.png" alt="" /></div>
-      <div class="footer-photo"><img src="https://i.imgur.com/BQ7N4GM.png" alt="" /></div>
-    </div>
-    <div class="site-footer__sponsors site-footer__sponsors--secondary">
-      <div class="footer-photo footer-photo--sm"><img src="https://i.imgur.com/pAroXd5.png" alt="" /></div>
-      <div class="footer-photo footer-photo--sm"><img src="https://i.imgur.com/vUDesth.png" alt="" /></div>
-      <div class="footer-photo footer-photo--sm"><img src="https://i.imgur.com/hG0ISSY.png" alt="" /></div>
-    </div>
+    <div class="site-footer__sponsors"><div class="footer-photo"><img src="https://i.imgur.com/JSWXXPK.png" alt="" /></div><div class="footer-photo"><img src="https://i.imgur.com/3e0jqkQ.png" alt="" /></div><div class="footer-photo"><img src="https://i.imgur.com/BQ7N4GM.png" alt="" /></div></div>
+    <div class="site-footer__sponsors site-footer__sponsors--secondary"><div class="footer-photo footer-photo--sm"><img src="https://i.imgur.com/pAroXd5.png" alt="" /></div><div class="footer-photo footer-photo--sm"><img src="https://i.imgur.com/vUDesth.png" alt="" /></div><div class="footer-photo footer-photo--sm"><img src="https://i.imgur.com/hG0ISSY.png" alt="" /></div></div>
     <div class="footer-divider"></div>
     <p class="footer-copyright">&copy; 2026 PRC. All rights reserved.</p>
   </footer>
@@ -961,187 +1028,38 @@
   <script src="config.js"></script>
   <script src="api.js"></script>
   <script>
-    /* ================================================
-       HERO KARUZELA – PŁYNNA ANIMACJA
-       ================================================ */
-    const SLIDE_DURATION = 6500;
-    const FADE_DURATION  = 1000;
-    const TOTAL_SLIDES   = 5;
-    let currentSlide     = 0;
-    let slideTimer       = null;
-    let isTransitioning  = false;
+    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
     
-    const slideBgs   = document.querySelectorAll('.hero-slide');
-    const slideTexts = Array.from({length: TOTAL_SLIDES}, (_, i) => document.getElementById(`slide-text-${i}`));
-
-    function buildDots() {
-      const container = document.getElementById('heroDots');
-      if (!container) return;
-      container.innerHTML = Array.from({length: TOTAL_SLIDES}, (_, i) =>
-        `<span class="hero-dot${i === 0 ? ' active' : ''}" data-index="${i}"><span class="hero-dot-fill"></span></span>`
-      ).join('');
-      container.querySelectorAll('.hero-dot').forEach(dot =>
-        dot.addEventListener('click', () => {
-          if (!isTransitioning) goToSlide(parseInt(dot.dataset.index));
-        })
-      );
-    }
-
-    function goToSlide(index) {
-      if (index === currentSlide || isTransitioning) return;
-      
-      isTransitioning = true;
-      const prevIndex = currentSlide;
-      const newIndex = index;
-      
-      // Przygotuj nowy slajd – ustaw skalę na początkową przed animacją
-      slideBgs[newIndex].style.transform = 'scale(1)';
-      slideBgs[newIndex].style.animation = 'none';
-      void slideBgs[newIndex].offsetHeight; // wymuś reflow
-      
-      // Ukryj tekst poprzedniego slajdu
-      if (slideTexts[prevIndex]) {
-        slideTexts[prevIndex].style.animation = 'none';
-        slideTexts[prevIndex].classList.remove('active');
-        void slideTexts[prevIndex].offsetHeight;
-      }
-      
-      // Zakończ poprzedni slajd (zniknie)
-      slideBgs[prevIndex].classList.remove('active');
-      slideBgs[prevIndex].classList.add('exiting');
-      
-      // Pokaż nowy slajd (będzie miał animację zoomu od skali 1)
-      slideBgs[newIndex].classList.remove('exiting');
-      slideBgs[newIndex].classList.add('active');
-      slideBgs[newIndex].style.animation = '';
-      slideBgs[newIndex].style.transform = '';
-      
-      // Pokaż tekst nowego slajdu z animacją
-      if (slideTexts[newIndex]) {
-        slideTexts[newIndex].style.animation = 'none';
-        slideTexts[newIndex].classList.remove('active');
-        void slideTexts[newIndex].offsetHeight;
-        slideTexts[newIndex].classList.add('active');
-        slideTexts[newIndex].style.animation = '';
-      }
-      
-      currentSlide = newIndex;
-      updateDots();
-      
-      // Po czasie FADE_DURATION posprzątaj
-      setTimeout(() => {
-        slideBgs[prevIndex].classList.remove('exiting');
-        isTransitioning = false;
-      }, FADE_DURATION);
-      
-      resetTimer();
-    }
-
-    function updateDots() {
-      document.querySelectorAll('.hero-dot').forEach((dot, i) => {
-        dot.classList.toggle('active', i === currentSlide);
-        dot.style.setProperty('--dot-duration', `${SLIDE_DURATION}ms`);
-        
-        const fill = dot.querySelector('.hero-dot-fill');
-        if (fill) {
-          fill.style.animation = 'none';
-          fill.offsetHeight;
-          fill.style.animation = '';
-        }
-      });
-    }
-
-    function resetTimer() {
-      if (slideTimer) clearInterval(slideTimer);
-      slideTimer = setInterval(() => {
-        if (!isTransitioning) {
-          goToSlide((currentSlide + 1) % TOTAL_SLIDES);
-        }
-      }, SLIDE_DURATION);
-    }
-
-    buildDots();
-    updateDots();
-    resetTimer();
-
-    /* Logo scroll */
-    const logo   = document.querySelector('.floating-logo');
-    const heroEl = document.getElementById('heroStart');
-    function updateLogo() {
-      if (logo && heroEl) logo.classList.toggle('logo--dark', heroEl.getBoundingClientRect().bottom <= 0);
-    }
-    window.addEventListener('scroll', updateLogo, { passive: true });
-    updateLogo();
-
-    /* ================================================
-       FORMATOWANIE DATY (reszta kodu bez zmian)
-       ================================================ */
-    function formatDateRange(start, end) {
+    function formatDateRange(start, end) { 
       if (!start) return '—';
       const startDate = new Date(start);
       const endDate   = end ? new Date(end) : null;
-      
-      const monthNames = {
-        'sty': 'Stycznia', 'lut': 'Lutego', 'mar': 'Marca',
-        'kwi': 'Kwietnia', 'maj': 'Maja', 'cze': 'Czerwca',
-        'lip': 'Lipca', 'sie': 'Sierpnia', 'wrz': 'Września',
-        'paź': 'Października', 'lis': 'Listopada', 'gru': 'Grudnia'
-      };
-      
-      function formatDate(date) {
-        const day = date.getDate();
-        const monthShort = date.toLocaleDateString('pl-PL', { month: 'short' }).replace('.', '').toLowerCase();
-        const month = monthNames[monthShort] || monthShort;
-        return `${day} ${month} ${date.getFullYear()}`;
-      }
-      
-      function formatShortDate(date) {
-        const day = date.getDate();
-        const monthShort = date.toLocaleDateString('pl-PL', { month: 'short' }).replace('.', '').toLowerCase();
-        const month = monthNames[monthShort] || monthShort;
-        return `${day} ${month}`;
-      }
-      
-      if (!endDate || startDate.toDateString() === endDate.toDateString()) {
-        return formatDate(startDate);
-      }
+      const monthNames = {'sty':'Stycznia','lut':'Lutego','mar':'Marca','kwi':'Kwietnia','maj':'Maja','cze':'Czerwca','lip':'Lipca','sie':'Sierpnia','wrz':'Września','paź':'Października','lis':'Listopada','gru':'Grudnia'};
+      function formatDate(date){ const day = date.getDate(); const monthShort = date.toLocaleDateString('pl-PL', { month: 'short' }).replace('.', '').toLowerCase(); const month = monthNames[monthShort] || monthShort; return `${day} ${month} ${date.getFullYear()}`; }
+      function formatShortDate(date){ const day = date.getDate(); const monthShort = date.toLocaleDateString('pl-PL', { month: 'short' }).replace('.', '').toLowerCase(); const month = monthNames[monthShort] || monthShort; return `${day} ${month}`; }
+      if (!endDate || startDate.toDateString() === endDate.toDateString()) return formatDate(startDate);
       return `${formatShortDate(startDate)} – ${formatDate(endDate)}`;
     }
-
     function getFlagEmoji(countryCode) {
       if (!countryCode) return '🏁';
-      const special = { 'wls':'🏴󠁧󠁢󠁷󠁬󠁳󠁿','sct':'🏴󠁧󠁢󠁳󠁣󠁴󠁿','eng':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','gb':'🇬🇧','gb-eng':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','gb-sct':'🏴󠁧󠁢󠁳󠁣󠁴󠁿','gb-wls':'🏴󠁧󠁢󠁷󠁬󠁳󠁿' };
+      const special = { 'wls':'🏴󠁧󠁢󠁷󠁬󠁳󠁿','sct':'🏴󠁧󠁢󠁳󠁣󠁴󠁿','eng':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','gb':'🇬🇧' };
       const code = countryCode.toLowerCase();
       if (special[code]) return special[code];
       if (code.length === 2) try { return String.fromCodePoint(...code.toUpperCase().split('').map(c => 127397 + c.charCodeAt())); } catch(e) { return '🏁'; }
       return '🏁';
     }
-    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
-
-    function getCalendarGroupedByDate(calendar) {
-      const groups = {};
-      calendar.forEach(rally => { const key = rally.startDate; if (!groups[key]) groups[key] = []; groups[key].push(rally); });
-      const sortedDates = Object.keys(groups).sort();
-      return { groups, sortedDates };
+    async function loadUpcomingRallies() {
+      const grid = document.getElementById('upcomingGrid');
+      if (!grid) return;
+      try {
+        await api.loadData();
+        let calendar = await api.getCalendar();
+        if (!calendar?.length) { grid.innerHTML = '<div class="placeholder-cal">Brak rajdów w kalendarzu</div>'; return; }
+        let upcoming = calendar.filter(r => r.status === 'upcoming' || r.status === 'ongoing').slice(0, 4);
+        if (!upcoming.length) upcoming = calendar.slice(0, 4);
+        renderRallyGrid('upcomingGrid', upcoming);
+      } catch(e) { grid.innerHTML = '<p style="color:#8fa0b0;padding:20px">Błąd ładowania danych</p>'; }
     }
-    function getStoredOrderForDate(rawData, dateKey) { return rawData?.seasons?.[rawData?.settings?.currentSeason]?.calendarOrder?.[dateKey] || []; }
-    function getSortedCalendar(calendar, rawData) {
-      if (!calendar?.length) return [];
-      if (!rawData) return [...calendar];
-      const { groups, sortedDates } = getCalendarGroupedByDate(calendar);
-      const result = [];
-      for (const date of sortedDates) {
-        const rallies = groups[date];
-        const storedOrder = getStoredOrderForDate(rawData, date);
-        if (storedOrder.length === rallies.length && storedOrder.every(id => rallies.some(r => r.id === id))) {
-          const ordered = []; for (const id of storedOrder) { const rally = rallies.find(r => r.id === id); if (rally) ordered.push(rally); }
-          for (const rally of rallies) if (!ordered.includes(rally)) ordered.push(rally);
-          result.push(...ordered);
-        } else result.push(...rallies.sort((a, b) => a.name.localeCompare(b.name)));
-      }
-      return result;
-    }
-
     function renderRallyGrid(containerId, rallies) {
       const container = document.getElementById(containerId);
       if (!container) return;
@@ -1156,22 +1074,6 @@
       });
       container.innerHTML = html;
     }
-
-    async function loadUpcomingRallies() {
-      const grid = document.getElementById('upcomingGrid');
-      if (!grid) return;
-      try {
-        await api.loadData();
-        const rawData = api.data;
-        let calendar = await api.getCalendar();
-        if (!calendar?.length) { grid.innerHTML = '<div class="placeholder-cal">Brak rajdów w kalendarzu</div>'; return; }
-        const sortedCalendar = getSortedCalendar(calendar, rawData);
-        let upcoming = sortedCalendar.filter(r => r.status === 'upcoming' || r.status === 'ongoing').slice(0, 4);
-        if (!upcoming.length) upcoming = sortedCalendar.slice(0, 4);
-        renderRallyGrid('upcomingGrid', upcoming);
-      } catch(e) { grid.innerHTML = '<p style="color:#8fa0b0;padding:20px">Błąd ładowania danych</p>'; }
-    }
-
     async function loadStandings() {
       const body = document.getElementById('standingsBody');
       try {
@@ -1185,7 +1087,6 @@
         }).join('');
       } catch(e) { body.innerHTML = '<p style="padding:20px;color:#8fa0b0">Błąd ładowania klasyfikacji</p>'; }
     }
-
     async function loadConstructors() {
       const grid = document.getElementById('constructorsGrid');
       try {
@@ -1198,9 +1099,8 @@
         }).join('');
       } catch(e) { grid.innerHTML = '<p style="color:#8fa0b0;padding:20px">Błąd ładowania zespołów</p>'; }
     }
-
-    /* Motyw */
-    (function(){
+    
+    (function themeAndInit(){
       document.body.classList.add('no-transition');
       if (localStorage.getItem('wrc-theme') === 'dark') document.body.classList.add('dark');
       document.documentElement.classList.remove('wrc-dark');
@@ -1213,21 +1113,23 @@
         setTimeout(() => document.body.classList.remove('theme-animating'), 420);
         try { const c = new BroadcastChannel('wrc-theme'); c.postMessage(isDark ? 'dark' : 'light'); c.close(); } catch(_) {}
       });
-      try {
-        const ch = new BroadcastChannel('wrc-theme');
-        ch.onmessage = function(e) {
-          document.body.classList.add('theme-animating');
-          if (e.data === 'dark') document.body.classList.add('dark');
-          else document.body.classList.remove('dark');
-          setTimeout(() => document.body.classList.remove('theme-animating'), 420);
-        };
-      } catch(_) {}
+      try { const ch = new BroadcastChannel('wrc-theme'); ch.onmessage = function(e) { document.body.classList.add('theme-animating'); if (e.data === 'dark') document.body.classList.add('dark'); else document.body.classList.remove('dark'); setTimeout(() => document.body.classList.remove('theme-animating'), 420); }; } catch(_) {}
+      Promise.all([api.loadData(), loadUpcomingRallies(), loadStandings(), loadConstructors()]);
     })();
-
-    (async function(){
-      await api.loadData();
-      await Promise.all([loadUpcomingRallies(), loadStandings(), loadConstructors()]);
-    })();
+    
+    // Hero karuzela
+    const SLIDE_DURATION = 6500, FADE_DURATION = 1000, TOTAL_SLIDES = 5;
+    let currentSlide = 0, slideTimer = null, isTransitioning = false;
+    const slideBgs = document.querySelectorAll('.hero-slide');
+    const slideTexts = Array.from({length: TOTAL_SLIDES}, (_, i) => document.getElementById(`slide-text-${i}`));
+    function buildDots() { const container = document.getElementById('heroDots'); if (!container) return; container.innerHTML = Array.from({length: TOTAL_SLIDES}, (_, i) => `<span class="hero-dot${i === 0 ? ' active' : ''}" data-index="${i}"><span class="hero-dot-fill"></span></span>`).join(''); container.querySelectorAll('.hero-dot').forEach(dot => dot.addEventListener('click', () => { if (!isTransitioning) goToSlide(parseInt(dot.dataset.index)); })); }
+    function goToSlide(index) { if (index === currentSlide || isTransitioning) return; isTransitioning = true; const prevIndex = currentSlide, newIndex = index; slideBgs[newIndex].style.transform = 'scale(1)'; slideBgs[newIndex].style.animation = 'none'; void slideBgs[newIndex].offsetHeight; if (slideTexts[prevIndex]) { slideTexts[prevIndex].style.animation = 'none'; slideTexts[prevIndex].classList.remove('active'); void slideTexts[prevIndex].offsetHeight; } slideBgs[prevIndex].classList.remove('active'); slideBgs[prevIndex].classList.add('exiting'); slideBgs[newIndex].classList.remove('exiting'); slideBgs[newIndex].classList.add('active'); slideBgs[newIndex].style.animation = ''; slideBgs[newIndex].style.transform = ''; if (slideTexts[newIndex]) { slideTexts[newIndex].style.animation = 'none'; slideTexts[newIndex].classList.remove('active'); void slideTexts[newIndex].offsetHeight; slideTexts[newIndex].classList.add('active'); slideTexts[newIndex].style.animation = ''; } currentSlide = newIndex; updateDots(); setTimeout(() => { slideBgs[prevIndex].classList.remove('exiting'); isTransitioning = false; }, FADE_DURATION); resetTimer(); }
+    function updateDots() { document.querySelectorAll('.hero-dot').forEach((dot, i) => { dot.classList.toggle('active', i === currentSlide); dot.style.setProperty('--dot-duration', `${SLIDE_DURATION}ms`); const fill = dot.querySelector('.hero-dot-fill'); if (fill) { fill.style.animation = 'none'; fill.offsetHeight; fill.style.animation = ''; } }); }
+    function resetTimer() { if (slideTimer) clearInterval(slideTimer); slideTimer = setInterval(() => { if (!isTransitioning) goToSlide((currentSlide + 1) % TOTAL_SLIDES); }, SLIDE_DURATION); }
+    buildDots(); updateDots(); resetTimer();
+    const logo = document.querySelector('.floating-logo'), heroEl = document.getElementById('heroStart');
+    function updateLogo() { if (logo && heroEl) logo.classList.toggle('logo--dark', heroEl.getBoundingClientRect().bottom <= 0); }
+    window.addEventListener('scroll', updateLogo, { passive: true }); updateLogo();
   </script>
 </body>
 </html>
