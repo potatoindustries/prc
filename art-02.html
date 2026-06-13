@@ -239,6 +239,74 @@
         body.dark hr {
             background: linear-gradient(to right, transparent, #444, transparent);
         }
+        /* ===== PROGRESS BAR ===== */
+.progress-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: rgba(0, 0, 0, 0.1);
+    z-index: 10000;
+}
+.progress-bar {
+    height: 4px;
+    background: #ff6b00;
+    width: 0%;
+    transition: width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+body.dark .progress-container {
+    background: rgba(255, 255, 255, 0.1);
+}
+/* ===== CYTAT ===== */
+.article-quote {
+    margin: 10px 0 10px;
+    padding: 18px 22px 14px;
+    background: #f3f4f5;
+    border-radius: 20px;
+    text-align: center;
+}
+body.dark .article-quote {
+    background: #222;
+}
+.article-quote__mark {
+    display: block;
+    width: 48px;
+    height: auto;
+    margin: 0 auto 20px auto;
+}
+.article-quote__text {
+    font-family: "WRCCleanBold", Arial, sans-serif !important;
+    font-size: 50px !important;
+    line-height: 1.25 !important;
+    color: #1a2635 !important;
+    margin: 0 0 15px !important;
+}
+body.dark .article-quote__text {
+    color: #e8eef4 !important;
+}
+.article-quote__author {
+    display: inline-block;
+    font-family: "WRCCleanBold", Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #26384b;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(38,56,75,0.3);
+    transition: color 0.2s, border-color 0.2s;
+}
+.article-quote__author:hover {
+    color: #ff6b00;
+    border-color: #ff6b00;
+}
+body.dark .article-quote__author {
+    color: #c0c0c0;
+    border-color: rgba(192,192,192,0.3);
+}
+body.dark .article-quote__author:hover {
+    color: #ff6b00;
+    border-color: #ff6b00;
+}
     </style>
 
     <script>
@@ -248,6 +316,9 @@
     <script src="theme.js"></script>
 </head>
 <body>
+    <div class="progress-container">
+    <div class="progress-bar" id="scrollProgressBar"></div>
+</div>
 <a href="index.html" class="floating-logo" aria-label="Home">
     <img src="assets/logo.png" alt="Logo" class="floating-logo__img" />
 </a>
@@ -298,8 +369,8 @@
                 <!-- Wprowadzenie -->
                 <div class="driver-section-title animate-on-scroll">Przygotowania przedsezonowe</div>
                 <div class="driver-bio animate-on-scroll">
-                    <p>Damian „Dyxan” Siemaszko spędził ostatnie dni na intensywnych treningach przed zbliżającym się turniejem PRC. Jego główny cel to dopracowanie techniki jazdy w swojej Lancii, bez ingerowania w  tuningi pojazdu. Nowe przepisy FIA PRC mocno ograniczyły możliwość modyfikacji samochodów, co wymusiło na kierowcach powrót do podstaw i skupienie się na czystej technice jazdy.</p>
-                    <p>Mocno zabolało to młodego kierowcę, ponieważ większość swojego potencjału odblokowywał właśnie dzięki odpowiednim konfiguracjom pojazdu. „Walić Pana Cenzure za brak tuningów” – komentuje Dyxan. </p>
+                    <p>Damian „Dyxan” Siemaszko ostatnie tygodnie spędził na wyczerpujących sesjach treningowych, dopinając swój program przed startem nowego sezonu PRC. Cel jest jasny: wydobyć maksimum z Lancii, nie ruszając przy tym setupów. Tegoroczne przepisy FIA PRC znacząco ograniczyły możliwość ingerencji w regulacje pojazdów – żadnych zaawansowanych tuningów, żadnych eksperymentów konfiguracją maszyny. Dla Dyxana jest to szczególny cios...</p>
+                    <p>Tragicznie się jeździ, gdy twój największy atak zostaje wyjęty spod nóg. Damian nie kryje frustracji, bo to właśnie w konfiguracjach odblokowywał często sekretne tempo. Dziś musi polegać wyłącznie na swoim wyczuciu i doskonałej współpracy z Lancią. <br>„Walić Pana Cenzure za brak tuningów” – dodał Dyxan, ale w jego głosie nie słychać determinacji, a rezygnację.</p>
                 </div>
 
                 <!-- Grafika 1 -->
@@ -308,32 +379,38 @@
                 </div>
 
                 <!-- Sekcja Trening w Monte Carlo -->
-                <div class="driver-section-title animate-on-scroll">Treningi w Monte Carlo</div>
+                <div class="driver-section-title animate-on-scroll">Monte Carlo – poligon mistrzów</div>
                 <div class="driver-bio animate-on-scroll">
-                    <p>Rajd Monte Carlo to bez wątpienia wizytówka całego sezonu. Dyxan od dawna pokazuje, że to jego ulubiona runda, a na dodatek Lancia Delta HF Integrale, którą aktualnie prowadzi, jest zdecydowanym faworytem pod względem tempa w całej stawce. Wszystko to sprawia, że Dyxan czuje się w niej wyjątkowo pewnie.</p>
+                    <p>Rajd Monte Carlo to nie tylko legenda, ale i największy test zimowej techniki. Dyxan od zawsze przyznawał, że to jego ulubiona runda – zmienna przyczepność i kapryśna pogoda nie stanowią dla niego żadnej przeszkody. Lancia Delta HF Integrale, którą aktualnie pilotuje, pasuje do tych wymagających warunków najbardziej z całej stawki. Już w przedsezonowych testach na monakijskich odcinkach okazała się jednym z najszybszych aut w stawce – nawet przy domyślnych ustawieniach, a mimo to w młodym kierowcy nie brakuje frustracji...</p>
                 </div>
 
                 <!-- Film -->
                 <div class="animate-on-scroll">
-                              <img src="assets/dx1.png" alt="Rally action" class="driver-footer-img animate-on-scroll" style="object-position: center 66%; max-height: 1000px;" />
+                              <img src="assets/dx3.png" alt="Rally action" class="driver-footer-img animate-on-scroll" style="object-position: center 66%; max-height: 1000px;" />
                 </div>
                 <br>
                 <!-- Cytat -->
-                <div class="driver-section-title animate-on-scroll" style="margin-bottom: 12px; margin-top: 0px;"><small><em>„No nie da się jeździć bez tych tuningów... Prosze wstawić tu kręcące się zdjęcie maFIA”</em><br><small> <i>~ Damian Siemaszko</i></small></small></div>
-
+                <div class="article-quote animate-on-scroll">
+                    <img src="assets/cudz.png" alt="" class="article-quote__mark" />
+                    <p class="article-quote__text">No nie da się jeździć bez tych tuningów... Proszę wstawić tu kręcące się zdjęcie maFIA</p>
+                    <a href="d4xan.html" class="article-quote__author">Damian Siemaszko</a>
+                </div>
 
                 <!-- Druga grafika -->
                 <div class="driver-img-wrap animate-on-scroll">
                 </div>
 
                 <!-- Plan taktyczny -->
-                <div class="driver-section-title animate-on-scroll">Plan na turniej</div>
+                <div class="driver-section-title animate-on-scroll">Strategia na cały turniej – cel: podium</div>
                 <div class="driver-bio animate-on-scroll">
-                    <p>Dyxan zdradził nam, że kluczowym elementem jego strategii będzie wykorzystanie wszystkich możliwości auta. <br>Dawno nie miał aż tak dobrych możliwości sięgnięcia po tytuł mistrzowski.</p>
-                    <p>Jego głównym celem jest jak najwyższe miejsce w rajdzie Monte Carlo, które jest jego koronną rundą, a także walka o czołową lokatę w całym turnieju.</p>
+                    <p>W rozmowie z nami Dyxan uchylił rąbka taktyki: kluczem będzie pełne wykorzystanie charakterystyki Lancii bez kombinowania przy setupie. „Nie mam teraz szafy z częściami tuningowymi – muszę myśleć o linii jazdy, hamowania i balansie auta jak za dawnych lat” – tłumaczy. Jego sztab przygotował intensywny harmonogram treningów na różnych nawierzchniach, by zminimalizować wady fabrycznego zawieszenia i maksymalnie wyeksponować mocne strony delty.</p>
+                    <p>Dyxan dodaje z charakterystycznym dla siebie uśmiechem: „Dawno nie miałem aż tak klarownej ścieżki do mistrzostwa. Bez tuningu wszyscy startujemy z tego samego poziomu, a ja wierzę, że w czystej jeździe mogę ograć każdego”. Głównym celem pozostaje jak najwyższa lokata w rajdzie Monte Carlo – jego koronnej rundzie – a potem walka o czołową pozycję w generalce turnieju. Zapowiada się emocjonujący sezon, w którym surowe przepisy mogą paradoksalnie wyłonić najlepszego kierowcę, a nie najlepszego inżyniera.</p>
                 </div>
 
-                <!-- Podsumowanie -->
+                <!-- Podsumowanie / dodatkowy akapit -->
+                <div class="driver-bio animate-on-scroll">
+                    <p>Przed nami jedne z najbardziej wymagających odcinków w kalendarzu. Jeśli komuś uda się zamienić frustrację w wiatr w żaglach – to właśnie Damianowi. Czy Dyxan bez własnych tuningów sięgnie po laury? Przekonamy się już podczas pierwszej sobotniej superoesu. Jedno jest pewne: Lancia ryczy zdrowo, a kierowca pali się do boju.</p>
+                </div>
             </div>
         </div>
     </main>
@@ -350,6 +427,12 @@
 </footer>
 
 <script>
+    window.addEventListener('scroll', function() {
+    const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const scrolled = (winScroll / height) * 100;
+    document.getElementById('scrollProgressBar').style.width = scrolled + '%';
+});
     const logo = document.querySelector(".floating-logo");
     const hero = document.querySelector(".hero");
     window.addEventListener("scroll", () => {
