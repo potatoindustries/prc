@@ -1050,17 +1050,65 @@
       return '🏁';
     }
     
-    // POPRAWA: funkcja renderująca rajdy z zachowaniem kolejności z calendar.json (według daty)
+    // GŁÓWNA FUNKCJA ŁADUJĄCA NADCHODZĄCE RAJDY - POPRAWIONE SORTOWANIE
+    async function loadUpcomingRallies() {
+      const grid = document.getElementById('upcomingGrid');
+      if (!grid) return;
+      try {
+        await api.loadData();
+        let calendar = await api.getCalendar();
+        if (!calendar?.length) { 
+          grid.innerHTML = '<div class="placeholder-cal">Brak rajdów w kalendarzu</div>'; 
+          return; 
+        }
+        
+        // Pobierz dzisiejszą datę (bez czasu)
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // Filtruj rajdy: przyszłe (startDate >= dzisiaj) LUB aktualnie trwające (ongoing)
+        let upcoming = calendar.filter(rally => {
+          const startDate = new Date(rally.startDate);
+          startDate.setHours(0, 0, 0, 0);
+          // upcoming - rajdy które jeszcze się nie rozpoczęły
+          // ongoing - rajdy które już trwają (startDate <= dzisiaj <= endDate)
+          if (rally.status === 'ongoing') return true;
+          if (rally.status === 'upcoming') return startDate >= today;
+          return false;
+        });
+        
+        // Sortuj według daty startu (od najbliższego do najdalszego)
+        upcoming.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+        
+        // Jeśli nie ma nadchodzących, pokaż najbliższe 4 rajdy z całego kalendarza (przyszłe lub aktualne)
+        if (upcoming.length === 0) {
+          upcoming = calendar
+            .filter(rally => new Date(rally.startDate) >= today || rally.status === 'ongoing')
+            .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
+            .slice(0, 4);
+        }
+        
+        // Ogranicz do 4
+        upcoming = upcoming.slice(0, 4);
+        
+        // Renderuj
+        renderRallyGrid('upcomingGrid', upcoming);
+      } catch(e) {
+        console.error('Błąd ładowania rajdów:', e);
+        grid.innerHTML = '<p style="color:#8fa0b0;padding:20px">Błąd ładowania danych</p>';
+      }
+    }
+    
     function renderRallyGrid(containerId, rallies) {
       const container = document.getElementById(containerId);
       if (!container) return;
-      if (!rallies?.length) { container.innerHTML = '<div class="placeholder-cal">- ⌛︎ -</div>'; return; }
-      
-      // Sortowanie według daty startu (od najwcześniejszej)
-      const sorted = [...rallies].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+      if (!rallies?.length) { 
+        container.innerHTML = '<div class="placeholder-cal">- ⌛︎ -</div>'; 
+        return; 
+      }
       
       let html = '';
-      sorted.forEach(rally => {
+      rallies.forEach(rally => {
         const hasResults = rally.status === 'completed' || rally.status === 'ongoing';
         const tag = hasResults ? `a href="wyniki.html?rally=${rally.id}"` : 'div';
         const tagClose = hasResults ? 'a' : 'div';
@@ -1068,30 +1116,6 @@
         html += `<${tag} class="rally-card"><div class="rally-card__photo rally-card__photo--${rally.id}"><img class="rally-bg" src="${rally.heroImage || 'assets/default-rally.jpg'}" alt="${escapeHtml(rally.name)}" onerror="this.style.display='none'" /><div class="rally-card__photo-overlay"></div><div class="rally-card__logo-wrap"><img class="rally-card__logo" src="${rally.logo || 'assets/default-logo.png'}" alt="${escapeHtml(rally.name)}" onerror="this.style.display='none'" /></div></div><div class="rally-card__info"><p class="rally-card__name">${escapeHtml(rally.name)}</p><div class="rally-card__meta"><span class="rally-card__date"><svg width="13" height="14" viewBox="0 0 13 14" fill="none"><rect x="0.75" y="1.65" width="11.5" height="10" rx="1.4" stroke="currentColor" stroke-width="1.3"/><path d="M0.75 5.75h11.5" stroke="currentColor" stroke-width="1.3"/><path d="M3.75 0.75v3M9.25 0.75v3" stroke="currentColor" stroke-width="1.3"/></svg>${formatDateRange(rally.startDate, rally.endDate)}</span><span class="rally-card__country"><span class="flag-emoji">${flagEmoji}</span>${escapeHtml(rally.countryName)}</span></div></div></${tagClose}>`;
       });
       container.innerHTML = html;
-    }
-    
-    async function loadUpcomingRallies() {
-      const grid = document.getElementById('upcomingGrid');
-      if (!grid) return;
-      try {
-        await api.loadData();
-        let calendar = await api.getCalendar();
-        if (!calendar?.length) { grid.innerHTML = '<div class="placeholder-cal">Brak rajdów w kalendarzu</div>'; return; }
-        
-        // Pobierz rajdy z statusem 'upcoming' lub 'ongoing'
-        let upcoming = calendar.filter(r => r.status === 'upcoming' || r.status === 'ongoing');
-        
-        // Jeśli nie ma nadchodzących, pokaż pierwsze 4 rajdy z kalendarza
-        if (!upcoming.length) upcoming = calendar.slice(0, 4);
-        
-        // Ogranicz do 4 i zachowaj kolejność według daty
-        upcoming = upcoming.slice(0, 4);
-        
-        renderRallyGrid('upcomingGrid', upcoming);
-      } catch(e) {
-        console.error('Błąd ładowania rajdów:', e);
-        grid.innerHTML = '<p style="color:#8fa0b0;padding:20px">Błąd ładowania danych</p>';
-      }
     }
     
     async function loadStandings() {
@@ -1107,6 +1131,7 @@
         }).join('');
       } catch(e) { body.innerHTML = '<p style="padding:20px;color:#8fa0b0">Błąd ładowania klasyfikacji</p>'; }
     }
+    
     async function loadConstructors() {
       const grid = document.getElementById('constructorsGrid');
       try {
