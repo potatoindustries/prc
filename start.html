@@ -974,7 +974,6 @@
           <div class="start-section-heading"><h2>Artykuły</h2></div>
           
           <div class="articles-layout" id="articlesLayoutStatic">
-            <!-- LEWA KOLUMNA - LISTA MNIEJSZYCH ARTYKUŁÓW -->
             <div class="articles-list">
               <a href="kalendarz.html" class="article-item">
                 <div class="article-item__img"><img src="https://hoypyspace.sfo2.cdn.digitaloceanspaces.com/imagenes/FIA.jpg" alt="Rendi mistrzem"></div>
@@ -1002,7 +1001,6 @@
               </a>
             </div>
             
-            <!-- PRAWA KOLUMNA - DUŻY KAFELEK Z NAPISEM NA OBRAZKU -->
             <a href="art-05.html" class="article-right-card">
               <img src="https://racemarket.net/oc-content/uploads/43/68267.jpg" alt="Analiza pojazdów" class="article-right-card__img" />
               <div class="article-right-card__overlay">
@@ -1041,6 +1039,7 @@
       if (!endDate || startDate.toDateString() === endDate.toDateString()) return formatDate(startDate);
       return `${formatShortDate(startDate)} – ${formatDate(endDate)}`;
     }
+    
     function getFlagEmoji(countryCode) {
       if (!countryCode) return '🏁';
       const special = { 'wls':'🏴󠁧󠁢󠁷󠁬󠁳󠁿','sct':'🏴󠁧󠁢󠁳󠁣󠁴󠁿','eng':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','gb':'🇬🇧' };
@@ -1050,7 +1049,50 @@
       return '🏁';
     }
     
-    // GŁÓWNA FUNKCJA ŁADUJĄCA NADCHODZĄCE RAJDY - POPRAWIONE SORTOWANIE
+    // Pobiera zapisaną kolejność rajdów z API (calendarOrder)
+    function getStoredOrderForDate(dateKey) {
+      const data = api.data;
+      if (!data) return [];
+      const season = data?.seasons?.[data?.settings?.currentSeason];
+      const order = season?.calendarOrder || {};
+      return order[dateKey] || [];
+    }
+    
+    // Sortuje rajdy według zapisanej kolejności w obrębie tej samej daty
+    function getSortedCalendar(calendar) {
+      if (!calendar || !calendar.length) return [];
+      
+      const groups = {};
+      for (const rally of calendar) {
+        const dateKey = rally.startDate;
+        if (!groups[dateKey]) groups[dateKey] = [];
+        groups[dateKey].push(rally);
+      }
+      
+      const sortedDates = Object.keys(groups).sort();
+      const result = [];
+      
+      for (const date of sortedDates) {
+        const rallies = groups[date];
+        const storedOrder = getStoredOrderForDate(date);
+        
+        if (storedOrder.length === rallies.length && storedOrder.every(id => rallies.some(r => r.id === id))) {
+          const ordered = [];
+          for (const id of storedOrder) {
+            const rally = rallies.find(r => r.id === id);
+            if (rally) ordered.push(rally);
+          }
+          for (const rally of rallies) {
+            if (!ordered.includes(rally)) ordered.push(rally);
+          }
+          result.push(...ordered);
+        } else {
+          result.push(...rallies.sort((a, b) => a.name.localeCompare(b.name)));
+        }
+      }
+      return result;
+    }
+    
     async function loadUpcomingRallies() {
       const grid = document.getElementById('upcomingGrid');
       if (!grid) return;
@@ -1062,36 +1104,29 @@
           return; 
         }
         
-        // Pobierz dzisiejszą datę (bez czasu)
+        // Posortuj według kolejności z admina (calendarOrder)
+        const sortedCalendar = getSortedCalendar(calendar);
+        
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         
-        // Filtruj rajdy: przyszłe (startDate >= dzisiaj) LUB aktualnie trwające (ongoing)
-        let upcoming = calendar.filter(rally => {
+        // Filtruj rajdy: upcoming (przyszłe) lub ongoing (trwające)
+        let upcoming = sortedCalendar.filter(rally => {
           const startDate = new Date(rally.startDate);
           startDate.setHours(0, 0, 0, 0);
-          // upcoming - rajdy które jeszcze się nie rozpoczęły
-          // ongoing - rajdy które już trwają (startDate <= dzisiaj <= endDate)
           if (rally.status === 'ongoing') return true;
           if (rally.status === 'upcoming') return startDate >= today;
           return false;
         });
         
-        // Sortuj według daty startu (od najbliższego do najdalszego)
-        upcoming.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-        
-        // Jeśli nie ma nadchodzących, pokaż najbliższe 4 rajdy z całego kalendarza (przyszłe lub aktualne)
+        // Jeśli nie ma nadchodzących, pokaż pierwsze 4 rajdy z posortowanej listy
         if (upcoming.length === 0) {
-          upcoming = calendar
-            .filter(rally => new Date(rally.startDate) >= today || rally.status === 'ongoing')
-            .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
-            .slice(0, 4);
+          upcoming = sortedCalendar.slice(0, 4);
         }
         
         // Ogranicz do 4
         upcoming = upcoming.slice(0, 4);
         
-        // Renderuj
         renderRallyGrid('upcomingGrid', upcoming);
       } catch(e) {
         console.error('Błąd ładowania rajdów:', e);
