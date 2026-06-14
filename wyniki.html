@@ -931,7 +931,7 @@ function getDriverLink(driverName, driverId) {
       if (!results?.stages?.[stageName] || results.stages[stageName].length === 0) {
         let stagePanel = document.querySelector(`.tab-panel[data-panel="stage_${stageIndex}"]`);
         if (!stagePanel) { stagePanel = document.createElement('div'); stagePanel.className = 'tab-panel'; stagePanel.setAttribute('data-panel', `stage_${stageIndex}`); document.querySelector('.table-section').appendChild(stagePanel); }
-        stagePanel.innerHTML = '<div class="results-card"><div class="placeholder-panel">Brak danych dla tego odcinka</div></div>';
+        stagePanel.innerHTML = '<div class="results-card"><div class="placeholder-panel">- ⌛︎ -</div></div>';
         return;
       }
       const stageResults  = results.stages[stageName];
