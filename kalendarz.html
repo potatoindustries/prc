@@ -172,6 +172,67 @@
     .hero__bg{
       background-image: url('https://cdn-cpfgb.nitrocdn.com/dRxFEBZBvMUrSIsoXplluqPbGwZVXSCF/assets/images/optimized/rev-d89eba4/dirtfish-editorial.s3-accelerate.amazonaws.com/2020/05/06_990323P_Makinen_cm0049T.jpg');
     }
+      /* POPRAWA KOLORÓW KAFELKÓW - ZMIEŃ TE WARTOŚCI */
+.rally-card__photo {
+  background: #0f1724 !important; /* tło bazowe kafelka */
+}
+
+.rally-card__photo-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(15, 23, 36, 0.2) 0%,
+    rgba(15, 23, 36, 0.5) 60%,
+    rgba(15, 23, 36, 0.85) 100%
+  ) !important;
+}
+
+/* Dla jaśniejszego overlay */
+.rally-card__photo-overlay-light {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.05) 0%,
+    rgba(0, 0, 0, 0.3) 60%,
+    rgba(0, 0, 0, 0.7) 100%
+  ) !important;
+}
+
+/* Całkowicie przezroczysty overlay */
+.rally-card__photo-overlay-transparent {
+  background: transparent !important;
+}
+
+/* Tryb ciemny */
+body.dark .rally-card__photo {
+  background: #080c14 !important;
+}
+
+body.dark .rally-card__photo-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(8, 12, 20, 0.3) 0%,
+    rgba(8, 12, 20, 0.6) 60%,
+    rgba(8, 12, 20, 0.9) 100%
+  ) !important;
+}
+    /* Zmniejszenie przyciemnienia na kafelkach kalendarza */
+.rally-card__photo-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.05) 0%,
+    rgba(0, 0, 0, 0.12) 50%,
+    rgba(0, 0, 0, 0.25) 100%
+  ) !important;
+}
+
+/* Tryb ciemny - trochę ciemniejsze ale nadal jasne */
+body.dark .rally-card__photo-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.1) 0%,
+    rgba(0, 0, 0, 0.2) 50%,
+    rgba(0, 0, 0, 0.4) 100%
+  ) !important;
+}
   </style>
   <script>
     if(localStorage.getItem('wrc-theme')==='dark')document.documentElement.classList.add('wrc-dark');
