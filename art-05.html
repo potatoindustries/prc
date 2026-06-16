@@ -4,14 +4,27 @@
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PRC • Analiza PRC #4 - Które auto zdominuje? DiRT Rally 2.0</title>
+    <title>Analiza PRC #4 - Które auto zdominuje? DiRT Rally 2.0</title>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css" />
     <link rel="stylesheet" href="css/archiwum.css" />
     <link rel="stylesheet" href="css/style.css" />
-    <link rel="icon" href="https://i.imgur.com/CqBPD1t.png" />
+    <link rel="icon" href="assets/icon.jpg" />
 
     <style>
+        @font-face {
+    font-family: "SebinoRegular";
+    src: url("assets/fonts/Sebino Regular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+        @font-face {
+    font-family: "WRCCleanRoman";
+    src: url("assets/fonts/WRCCleanRoman.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
         /* ===== PROGRESS BAR ===== */
         .progress-container {
             position: fixed;
@@ -41,86 +54,14 @@
         /* ===== HERO BG ===== */
         .hero__bg {
             position: absolute; inset: 0;
-            background-image: url("https://scontent-waw2-1.xx.fbcdn.net/v/t39.30808-6/623688098_1587935366134232_1178493197412670186_n.jpg?stp=dst-jpg_tt6&cstp=mx1500x1001&ctp=s1500x1001&_nc_cat=104&ccb=1-7&_nc_sid=833d8c&_nc_ohc=hM0MFJdWbVoQ7kNvwHH6_Ty&_nc_oc=AdqAjhw0GA-DaD6yMHeCYUT1ZTgVeGw0kWcQVbbqN1mPRGA2-KsL_ofyI7ysGjGHQyY&_nc_zt=23&_nc_ht=scontent-waw2-1.xx&_nc_gid=a-CQAFhHOkUnFbw4OXAuRQ&_nc_ss=7b2a8&oh=00_Af8zTnfrx1-k8LKG1FCP7DYjN7uFhMJvaNfXMPrtphOXBg&oe=6A3457D6");
+            background-image: url("https://racemarket.net/oc-content/uploads/43/68267.jpg");
             background-size: cover;
             background-position: center 30%;
             background-repeat: no-repeat;
         }
 
         .hero {
-            min-height: 50vh;
-        }
-
-        .driver-hero-bottom {
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            padding: 0 44px 36px;
-            display: flex;
-            align-items: center;
-            gap: 24px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .driver-hero-bottom__socials {
-            display: flex;
-            gap: 10px;
-            margin-left: auto;
-            flex-shrink: 0;
-            align-self: flex-end;
-            margin-right: 40px;
-            padding-bottom: 4px;
-        }
-        .driver-social-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(15, 20, 30, 0.55);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255,255,255,0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #e8eaf0;
-            text-decoration: none;
-            transition: background .22s, transform .18s, border-color .22s;
-        }
-        .driver-social-icon:hover {
-            background: rgba(255, 255, 255, 0.18);
-        }
-        .driver-social-icon svg {
-            width: 18px;
-            height: 18px;
-            fill: currentColor;
-            flex-shrink: 0;
-        }
-        .driver-hero-bottom__avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid rgba(255,255,255,.45);
-            flex-shrink: 0;
-            display: block;
-        }
-        .driver-hero-bottom__text {
-            flex: 1;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: baseline;
-            gap: 24px;
-            row-gap: 12px;
-        }
-        .driver-hero-bottom__name {
-            font-family: "WRCCleanBold", Arial, sans-serif;
-            font-size: 48px;
-            line-height: 1.05;
-            color: #fff;
-            text-shadow: 0 2px 14px rgba(0,0,0,.5);
-            margin: 0;
-            display: flex;
-            flex-direction: column;
+            min-height: 70vh;
         }
 
         .driver-main {
@@ -130,15 +71,44 @@
         body.dark .driver-main { background: #1a1a1a; }
 
         .driver-content {
-            max-width: 1100px;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 1px 44px 80px;
+            padding: 1px 0 80px;
         }
+
+        /* ===== ARTICLE INTRO (jak na zdjęciu) ===== */
+        .article-intro {
+            padding: 0 44px;
+        }
+
+        .article-lead {
+            font-family: "WRCCleanBold", Arial, sans-serif;
+            font-size: 22.5px;
+            line-height: 1.5;
+            color: #1a2635;
+            font-weight: 700;
+            margin: 32px 0 12px;
+        }
+        body.dark .article-lead { color: #e8eef4; }
+
+        .article-meta {
+            font-family: "SebinoRegular", Arial, sans-serif;
+            font-size: 13px;
+            color: #67727f;
+            margin-bottom: 36px;
+            line-height: 1.6;
+        }
+        body.dark .article-meta { color: #888; }
+        .article-meta strong {
+            display: block;
+            color: #26384b;
+        }
+        body.dark .article-meta strong { color: #aaa; }
 
         .driver-section-title {
             font-family: "WRCCleanBold", Arial, sans-serif;
-            font-size: 30px;
-            margin: 44px 0 18px;
+            font-size: 32px;
+            margin: 44px 44px 18px;
             color: #26384b;
             border-left: 4px solid var(--orange);
             padding-left: 15px;
@@ -148,10 +118,10 @@
 
         .stats-card {
             background: #fff;
-            border-radius: 12px;
+            border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 2px 10px rgba(0,0,0,.06);
-            margin-bottom: 32px;
+            margin: 0 44px 32px;
             transition: background .38s, box-shadow .32s;
             box-sizing: border-box;
         }
@@ -163,7 +133,7 @@
         .stats-card__head--two {
             background: #f2f3f3;
             color: #67727f;
-            font-family: "SebinoSoft", Arial, sans-serif;
+            font-family: "SebinoRegular", Arial, sans-serif;
             font-size: 11px;
             letter-spacing: .03em;
             text-transform: uppercase;
@@ -183,7 +153,8 @@
             padding: 0 18px;
             min-height: 48px;
             background: #fff;
-            font-family: "SebinoSoft", Arial, sans-serif;
+            font-family: "SebinoRegular", Arial, sans-serif;
+            
             font-size: 13px;
             color: #26384b;
             border-bottom: 1px solid rgba(225, 231, 238, 0.8);
@@ -217,21 +188,55 @@
             display: block;
         }
 
+        .driver-bio {
+            padding: 0 44px;
+        }
+
         .driver-bio p {
-            font-family: "SebinoMedium", Arial, sans-serif !important;
-            font-size: 16px;
+            font-family: "SebinoRegular", Arial, sans-serif !important;
+            font-size: 18.5px;
             line-height: 1.75;
             color: #26384b;
             margin-bottom: 16px;
         }
         body.dark .driver-bio p { color: #c0c0c0; }
 
-        .driver-img-wrap { margin: 28px 0 32px; }
-        .driver-img-wrap img { width: 100%; border-radius: 10px; display: block; max-height: 450px; object-fit: cover; }
-        .driver-img-caption { font-family: "SebinoSoft", Arial, sans-serif; font-size: 12px; color: #67727f; margin-top: 8px; margin-left: 5px;}
-        .driver-img-copyright { display: block; font-size: 10px; color: #aaa; margin-top: 2px; }
+        /* ===== ZDJĘCIA – wyrównane do lewej krawędzi contentu, wychodzą w prawo ===== */
+        .driver-img-wrap {
+            margin: 28px 0 0;
+            padding-left: 44px;
+            overflow: visible;
+        }
+        .driver-img-wrap img {
+            display: block;
+            width: 1098px;
+            max-width: none;
+            height: 731.84px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .driver-img-caption {
+            font-family: "SebinoRegular", Arial, sans-serif;
+            font-size: 12px;
+            color: #67727f;
+            margin-top: 15px;
+            margin-left: 2px;
+        }
+        .driver-img-copyright {
+            display: block;
+            font-size: 11px;
+            color: #aaa;
+            margin-top: 2px;
+        }
 
-        .driver-footer-img { width: 100%; border-radius: 10px; display: block; object-fit: cover; max-height: 500px; margin-top: 52px; }
+        .driver-footer-img {
+            display: block;
+            width: 1098px;
+            max-width: none;
+            height: 731.84px;
+            object-fit: cover;
+            border-radius: 0;
+        }
 
         .animate-on-scroll { opacity: 0; transform: translateY(18px); transition: opacity .5s ease, transform .5s ease; }
         .animate-on-scroll.visible { opacity: 1; transform: none; }
@@ -244,14 +249,14 @@
             background: rgba(0,0,0,0.03);
             border-left: 3px solid #ff6b00;
             padding: 16px 24px;
-            margin: 24px 0;
+            margin: 24px 44px;
             border-radius: 8px;
         }
         body.dark .highlight-box {
             background: rgba(255,255,255,0.05);
         }
         hr {
-            margin: 32px 0;
+            margin: 32px 44px;
             border: none;
             height: 1px;
             background: linear-gradient(to right, transparent, #ccc, transparent);
@@ -259,71 +264,85 @@
         body.dark hr {
             background: linear-gradient(to right, transparent, #444, transparent);
         }
-        .specs-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin: 30px 0;
-        }
-        .spec-card {
-            flex: 1;
-            min-width: 200px;
-            background: rgba(0,0,0,0.02);
-            border-radius: 12px;
-            padding: 18px;
+        .article-quote {
+            margin: 10px 44px 10px;
+            padding: 18px 22px 14px;
+            border-radius: 20px;
             text-align: center;
-            border: 1px solid rgba(0,0,0,0.05);
         }
-        body.dark .spec-card {
-            background: rgba(255,255,255,0.03);
-            border-color: rgba(255,255,255,0.08);
+
+        body.dark .article-quote {
+            background: #222;
         }
-        .spec-card h4 {
-            margin: 0 0 12px 0;
+        .article-quote__mark {
+            display: block;
+            width: 48px;
+            height: auto;
+            margin: 0 auto 20px auto;
+        }
+        .article-quote__text {
+            font-family: "WRCCleanBold", Arial, sans-serif !important;
+            font-size: 50px !important;
+            line-height: 1.25 !important;
+            color: #1a2635 !important;
+            margin: 0 0 15px !important;
+        }
+        body.dark .article-quote__text {
+            color: #e8eef4 !important;
+        }
+        .article-quote__author {
+            display: inline-block;
             font-family: "WRCCleanBold", Arial, sans-serif;
             font-size: 20px;
+            font-weight: 600;
+            color: #26384b;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(38,56,75,0.3);
+            transition: color 0.2s, border-color 0.2s;
         }
-        .spec-value {
-            font-size: 28px;
-            font-weight: bold;
+        .article-quote__author:hover {
             color: #ff6b00;
+            border-color: #ff6b00;
         }
-        .verdict {
+        body.dark .article-quote__author {
+            color: #c0c0c0;
+            border-color: rgba(192,192,192,0.3);
+        }
+        body.dark .article-quote__author:hover {
+            color: #ff6b00;
+            border-color: #ff6b00;
+        }
+        .verdict-badge {
             background: #0a2a3b;
             color: white;
             padding: 24px 32px;
             border-radius: 20px;
-            margin: 48px 0 24px;
+            margin: 48px 44px 24px;
         }
-        body.dark .verdict {
+        body.dark .verdict-badge {
             background: #0f212e;
         }
-        .verdict h3 {
+        .verdict-badge h3 {
             margin-top: 0;
             font-size: 28px;
         }
-        .car-gallery-img {
-            margin: 20px 0 10px;
+        .driver-bio p strong,
+        .driver-bio strong {
+
         }
-        .legacy-note {
-            background: rgba(0,0,0,0.03);
-            border-left: 3px solid #ff6b00;
-            padding: 12px 20px;
-            margin: 20px 0 10px;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-        body.dark .legacy-note {
-            background: rgba(255,255,255,0.05);
-        }
-        .subaru-double-card {
-            display: flex;
-            flex-direction: column;
-            gap: 0px;
-            margin-bottom: 0px;
+        .hero__title-wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 44px;
+}
+.hero__title {
+    font-size: 57px;
+}
+        .topbar__link {
+            font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+            font-weight: 550 !important;
         }
     </style>
-
     <script>
         if (localStorage.getItem("wrc-theme") === "dark")
             document.documentElement.classList.add("wrc-dark");
@@ -331,7 +350,6 @@
     <script src="theme.js"></script>
 </head>
 <body>
-<!-- PROGRESS BAR -->
 <div class="progress-container">
     <div class="progress-bar" id="scrollProgressBar"></div>
 </div>
@@ -375,33 +393,47 @@
                 </div>
             </nav>
             <div class="hero__title-wrap">
-                <h1 class="hero__title">Mitsubishi, Subaru, Ford, Lancia <br> <small>Które auto zdominuje PRC #4?</small></h1>
+                <h1 class="hero__title">Mitsubishi, Subaru, Ford, Lancia<br> <small>Które auto zdominuje PRC #4?</small></h1>
             </div>
         </div>
     </header>
     <main class="driver-main">
         <div class="driver-content">
             <div id="panel-prc1" class="archive-panel active">
-                
+
+                <!-- Lead + meta -->
+                <div class="article-intro animate-on-scroll">
+                    <p class="article-lead">Przed nami PRC #4 – starcie legendarnych aut Grupy A. Analizujemy Mitsubishi Evo VI, Subaru Impreza, Legacy RS, Ford Escort RS Cosworth i Lancię Deltę, by wskazać faworyta.</p>
+                    <p class="article-meta">
+                        5 min czytania • Opublikowano 16.06.2026 • 09:00 GMT+2
+                    </p>
+                </div>
+
                 <!-- Wprowadzenie -->
                 <div class="driver-section-title animate-on-scroll">Rywalizacja legendarnej Grupy A</div>
                 <div class="driver-bio animate-on-scroll">
-                    <p>Przed nami długo wyczekiwany turniej PRC #4, który ponownie rozgrzeje emocje wśród symracerzy. W tym sezonie przepisy PRC postawiły na klasykę Grupy A, eliminując zaawansowane tuningi i zmuszając kierowców do powrotu do korzeni – liczy się czysta fabryczna charakterystyka i umiejętności za kierownicą. W centrum uwagi znajdują się ikony takie jak: Mitsubishi Lancer Evo VI, Subaru Impreza 1995, Subaru Legacy RS, Ford Escort RS Cosworth oraz Lancia Delta HF Integrale. Która z tych maszyn ma największy potencjał, by zapisać się w historii PRC? Przyjrzeliśmy się szczegółowym danym z DiRT Rally 2.0 oraz opiniom ekspertów, aby rozwiać wątpliwości.</p>
+                    <p>Przed nami długo wyczekiwany turniej PRC #4, który ponownie rozgrzeje emocje wśród kierowców. W tym sezonie przepisy PRC postawiły na klasykę Grupy A, eliminując zaawansowane tuningi i zmuszając kierowców do powrotu do korzeni – liczy się czysta fabryczna charakterystyka i umiejętności za kierownicą. W centrum uwagi znajdują się ikony takie jak: Mitsubishi Lancer Evo VI, Subaru Impreza 1995, Subaru Legacy RS, Ford Escort RS Cosworth oraz Lancia Delta HF Integrale. Która z tych maszyn ma największy potencjał, by zapisać się w historii PRC? Przyjrzeliśmy się szczegółowym danym z DiRT Rally 2.0 oraz opiniom ekspertów, aby rozwiać wątpliwości.</p>
                     <p>Nowe regulacje oznaczają, że nie ma miejsca na eksperymenty z zawieszeniem czy przełożeniami skrzyni biegów poza podstawowe ustawienia. To sprawia, że charakterystyka fabryczna każdego auta staje się kluczowa. Pora sprawdzić, która marka ma największe szanse na triumf w nadchodzącym PRC #4.</p>
                 </div>
-                                                   <div class="driver-img-wrap animate-on-scroll car-gallery-img">
-                    <img src="https://japanesenostalgiccar.com/wordpress/wp-content/uploads/2018/04/Mitsubishi-Lancer-Evo3-1600GSR-2000EX-Turbo.jpg" alt="Subaru Legacy RS" class="driver-footer-img" style="max-height: 420px; margin-top: 0; object-position: center 70%;" />
+
+                <div class="driver-img-wrap animate-on-scroll">
+                    <img src="https://japanesenostalgiccar.com/wordpress/wp-content/uploads/2018/04/Mitsubishi-Lancer-Evo3-1600GSR-2000EX-Turbo.jpg" alt="Mitsubishi Lancer Evo" style="object-position: center 70%;" />
+                    <p class="driver-img-caption">© Potato Rally Championship</p>
                 </div>
+
                 <!-- SEKCJA MITSUBISHI -->
                 <div class="driver-section-title animate-on-scroll">Mitsubishi Lancer Evolution VI</div>
                 <div class="driver-bio animate-on-scroll">
                     <p>Mitsubishi Lancer Evo VI to kwintesencja japońskiej precyzji. W DiRT Rally 2.0 samochód ten wyróżnia się niesamowitą stabilnością, szczególnie przy wjeździe w szybkie łuki. Dane telemetryczne wskazują na jego neutralne zachowanie przy standardowej konfiguracji zawieszenia. W przeciwieństwie do niektórych rywali, Evo VI rzadko zaskakuje kierowcę nagłym atakiem nadsterowności. To sprawia, że jest to jedno z najbardziej przewidywalnych aut w całej stawce – kierowca może skupić się na linii przejazdu, zamiast walczyć z nieprzewidywalnym zachowaniem tyłu pojazdu.</p>
                     <p>Mocne strony tego auta to przede wszystkim genialny dyferencjał centralny oraz możliwość agresywnego wciskania gazu na wyjściach z zakrętów. Na nawierzchniach mieszanych, które często gościły w poprzednich edycjach PRC, Mitsubishi pozwala na utrzymanie bardzo stałego tempa bez ryzyka kosztownej utraty kontroli. Dodatkowo, układ hamulcowy Evo VI charakteryzuje się doskonałą responsywnością, co pozwala na bardzo późne hamowanie przed nawrotami – przewaga szczególnie cenna na ciasnych, technicznych odcinkach. W kontekście całej stawki, Mitsubishi oferuje jeden z najlepszych kompromisów pomiędzy osiągami a przewidywalnością – kierowca może naciskać na limity auta z większym marginesem błędu niż w przypadku bardziej nerwowej Lancii, co w długim sezonie PRC #4 może przełożyć się na mniejszą liczbę kosztownych wypadnięć. To idealny wybór dla kierowców stawiających na regularność i punktowanie w każdym rajdzie.</p>
                 </div>
-                                <div class="driver-img-wrap animate-on-scroll car-gallery-img">
-                    <img src="https://scontent-waw2-2.xx.fbcdn.net/v/t39.30808-6/623218352_1587940199467082_6866371624807808789_n.jpg?stp=dst-jpg_tt6&cstp=mx1500x1001&ctp=s1500x1001&_nc_cat=100&ccb=1-7&_nc_sid=833d8c&_nc_ohc=2IaUgjeKzsIQ7kNvwEi73lp&_nc_oc=AdoyrBiqXCA_UiQ0qfGJ2ejtp1MtlI_HmqIlbaMTNnWqNMp36eW729Op9YcyrFDIuM0&_nc_zt=23&_nc_ht=scontent-waw2-2.xx&_nc_gid=3JceQidzLe97w_YfL_D_Gw&_nc_ss=7b2a8&oh=00_Af_jwnUwfMTsy3lFmnbML202RrrbCl6q1hN70tKQ91nAXg&oe=6A3343CB" alt="Mitsubishi Lancer Evo VI w akcji" class="driver-footer-img" style="max-height: 420px; margin-top: 0; object-position: center 40%;" />
-                </div><br>
-                <div class="stats-card animate-on-scroll">
+
+                <div class="driver-img-wrap animate-on-scroll">
+                    <img src="https://scontent-waw2-2.xx.fbcdn.net/v/t39.30808-6/623218352_1587940199467082_6866371624807808789_n.jpg?stp=dst-jpg_tt6&cstp=mx1500x1001&ctp=s1500x1001&_nc_cat=100&ccb=1-7&_nc_sid=833d8c&_nc_ohc=2IaUgjeKzsIQ7kNvwEi73lp&_nc_oc=AdoyrBiqXCA_UiQ0qfGJ2ejtp1MtlI_HmqIlbaMTNnWqNMp36eW729Op9YcyrFDIuM0&_nc_zt=23&_nc_ht=scontent-waw2-2.xx&_nc_gid=3JceQidzLe97w_YfL_D_Gw&_nc_ss=7b2a8&oh=00_Af_jwnUwfMTsy3lFmnbML202RrrbCl6q1hN70tKQ91nAXg&oe=6A3343CB" alt="Mitsubishi Lancer Evo VI w akcji" style="object-position: center 40%;" />
+                    <p class="driver-img-caption">© PRC</p>
+                </div>
+
+                <div class="stats-card animate-on-scroll" style="margin-top: 32px;">
                     <div class="stats-card__head--two"><span>Mitsubishi Evo VI</span><span>Wartość / Ocena</span></div>
                     <div class="stats-card__row--two"><span>Napęd / Typ</span><span>AWD (4x4)</span></div>
                     <div class="stats-card__row--two"><span>Moc maks. (KM)</span><span>~300 KM @ 6000 obr.</span></div>
@@ -410,18 +442,20 @@
                     <div class="stats-card__row--two"><span>Moment obrotowy</span><span>~373 Nm</span></div>
                 </div>
 
-
-                <!-- SEKCJA SUBARU (dwie tabele: Impreza + Legacy) -->
+                <!-- SEKCJA SUBARU -->
                 <div class="driver-section-title animate-on-scroll">Subaru Impreza 1995 & Legacy RS</div>
                 <div class="driver-bio animate-on-scroll">
-                    <p>Subaru Impreza 555 to pojazd legenda, który w 1995 roku zapewnił tytuł mistrzowski Colinowi McRae oraz tytuł konstruktorów dla zespołu Subaru. W DiRT Rally 2.0 auto to wyróżnia się charakterystyczną, bardziej miękką charakterystyką zawieszenia. W porównaniu do rywali Impreza wykazuje naturalną tendencję do podsterowności, co wymusza na kierowcy stosowanie techniki przenoszenia masy (tzw. "pendulum"), aby skutecznie skręcać w ciasne zakręty – technika doskonale znana fanom Colina McRae. To auto wymaga od kierowcy aktywnego stylu jazdy i umiejętności płynnego przenoszenia ciężaru pojazdu.</p>
-                    <p>Z danych telemetrycznych wynika, że Subaru radzi sobie znakomicie na nierównych odcinkach, np. w Szkocji czy Argentynie, dzięki większemu skokowi zawieszenia. Społeczność graczy często podkreśla, że Impreza ma najlepszą przyczepność boczną na żwirze, co czyni ją maszyną do zadań specjalnych na odcinkach leśnych. Na szybkich, asfaltowych odcinkach może jednak tracić do bardziej sztywno zawieszonej Lancii lub Forda – miękkie zawieszenie powoduje większe przechyły nadwozia, co przy wysokich prędkościach na twardej nawierzchni przekłada się na mniejszą precyzję. W porównaniu do reszty stawki, Subaru wyróżnia się charakterystycznym rozkładem masy i miękkim zawieszeniem, które na nierównych nawierzchniach pozwala utrzymać lepszy kontakt z drogą niż sztywne europejskie konstrukcje, co może być kluczowym atutem w szutrowych rundach PRC. To auto dla kierowców, którzy potrafią wykorzystać jego unikalne właściwości i nie boją się agresywnego stylu jazdy.</p>
-                    <p>W zespole Subaru warto również wspomnieć o Subaru Legacy RS – nieco starszej, ale wciąż groźnej konstrukcji dostępnej w ramach dodatku Flat Out Pack. Legacy RS oferuje dłuższy rozstaw osi, co przekłada się na lepszą stabilność na szybkich prostych. Jego silnik o pojemności 2.0L generuje około 280 KM, a masa 1220 kg sprawia, że jest nieco bardziej ospały od Imprezy. Mimo to, Legacy RS bywa wybierane przez kierowców ceniących sobie przewidywalność i mniej agresywną charakterystykę na nawierzchniach szutrowych. W DiRT Rally 2.0 Legacy RS ustępuje Imprezie w ciasnych zakrętach – wynika to głównie z dłuższego rozstawu osi, który zwiększa promień skrętu i utrudnia manewrowanie na ciasnych nawrotach. Jednak na odcinkach szybkich, takich jak Finlandia, gdzie dominują długie, płynne łuki i szybkie proste, Legacy RS potrafi zaskoczyć tempem. Dłuższa baza zapewnia większą stabilność przy wysokich prędkościach, a kierowca może z większą pewnością utrzymać auto na limicie bez obawy o nagłe utraty kontroli. To sprawia, że Legacy RS jest ciekawą alternatywą dla kierowców preferujących stabilność nad zwrotnością.</p>    
+                    <p>Subaru Impreza 555 to pojazd-legenda, który w 1995 roku zapewnił tytuł mistrzowski Colinowi McRae oraz tytuł konstruktorów dla zespołu Subaru. W DiRT Rally 2.0 auto to wyróżnia się charakterystyczną, bardziej miękką charakterystyką zawieszenia. W porównaniu do rywali Impreza wykazuje naturalną tendencję do podsterowności, co wymusza na kierowcy stosowanie techniki przenoszenia masy (tzw. "pendulum"), aby skutecznie skręcać w ciasne zakręty – technika doskonale znana fanom Colina McRae. To auto wymaga od kierowcy aktywnego stylu jazdy i umiejętności płynnego przenoszenia ciężaru pojazdu.</p>
+                    <p>Z danych telemetrycznych wynika, że Subaru radzi sobie znakomicie na nierównych odcinkach, np. w Szkocji czy Argentynie, dzięki większemu skokowi zawieszenia. Społeczność graczy często podkreśla, że Impreza ma najlepszą przyczepność boczną na żwirze, co czyni ją maszyną do zadań specjalnych na odcinkach leśnych. Na szybkich, asfaltowych odcinkach może jednak tracić do bardziej sztywno zawieszonej Lancii lub Forda. W porównaniu do reszty stawki, Subaru wyróżnia się charakterystycznym rozkładem masy i miękkim zawieszeniem, które na nierównych nawierzchniach pozwala utrzymać lepszy kontakt z drogą niż sztywne europejskie konstrukcje, co może być kluczowym atutem w szutrowych rundach PRC.</p>
+                    <p>W zespole Subaru warto również wspomnieć o Subaru Legacy RS – nieco starszej, ale wciąż groźnej konstrukcji dostępnej w ramach dodatku Flat Out Pack. Legacy RS oferuje dłuższy rozstaw osi, co przekłada się na lepszą stabilność na szybkich prostych. Jego silnik o pojemności 2.0L generuje około 280 KM, a masa 1220 kg sprawia, że jest nieco bardziej ospały od Imprezy. Mimo to, Legacy RS bywa wybierane przez kierowców ceniących sobie przewidywalność i mniej agresywną charakterystykę na nawierzchniach szutrowych. Na odcinkach szybkich, takich jak Finlandia, dłuższa baza zapewnia większą stabilność przy wysokich prędkościach.</p>
                 </div>
-                               <div class="driver-img-wrap animate-on-scroll car-gallery-img">
-                    <img src="https://motorsportmagazine.b-cdn.net/wp-content/uploads/2024/03/2-litre-boxer-engine-on-the-1995-New-Zealand-Rally.jpg" alt="Subaru Impreza 555 w poślizgu" class="driver-footer-img" style="max-height: 420px; margin-top: 0;" />
-                </div><br>
-                <div class="subaru-double-card">
+
+                <div class="driver-img-wrap animate-on-scroll">
+                    <img src="https://motorsportmagazine.b-cdn.net/wp-content/uploads/2024/03/2-litre-boxer-engine-on-the-1995-New-Zealand-Rally.jpg" alt="Subaru Impreza 555 w poślizgu" />
+                    <p class="driver-img-caption">© PRC</p>
+                </div>
+
+                <div class="subaru-double-card" style="margin-top: 32px;">
                     <div class="stats-card animate-on-scroll">
                         <div class="stats-card__head--two"><span>Subaru Impreza 1995</span><span>Wartość / Ocena</span></div>
                         <div class="stats-card__row--two"><span>Napęd / Typ</span><span>AWD (4x4)</span></div>
@@ -430,10 +464,13 @@
                         <div class="stats-card__row--two"><span>Stosunek m/masy</span><span>~4.1 kg/KM</span></div>
                         <div class="stats-card__row--two"><span>Moment obrotowy</span><span>~343 Nm</span></div>
                     </div>
-                                                   <div class="driver-img-wrap animate-on-scroll car-gallery-img">
-                    <img src="https://scontent-waw2-1.xx.fbcdn.net/v/t39.30808-6/504386077_24002802969369512_144957184579077738_n.jpg?stp=dst-jpg_tt6&cstp=mx2048x1364&ctp=s2048x1364&_nc_cat=108&ccb=1-7&_nc_sid=aa7b47&_nc_ohc=t6P_G1oia6EQ7kNvwGa-q7-&_nc_oc=AdoDOgE4kzdP6Gl_yNdxvNCFRxfyLwwnV6bcFYWf7RrbL5WkQ_uIkMPY8lf4uqXAVZ8&_nc_zt=23&_nc_ht=scontent-waw2-1.xx&_nc_gid=tDKoHOjaS_Aygu_MOKdYYQ&_nc_ss=7b2a8&oh=00_Af-JlhoPA_SF_MFd-5wu6fMnFM5VxT2dx4TKNkaAKnLwNw&oe=6A332F2A" alt="Subaru Legacy RS" class="driver-footer-img" style="max-height: 420px; margin-top: 0;" />
-                <br></div>
-                    <div class="stats-card animate-on-scroll">
+
+                    <div class="driver-img-wrap animate-on-scroll" style="margin-top: 32px;">
+                        <img src="https://scontent-waw2-1.xx.fbcdn.net/v/t39.30808-6/504386077_24002802969369512_144957184579077738_n.jpg?stp=dst-jpg_tt6&cstp=mx2048x1364&ctp=s2048x1364&_nc_cat=108&ccb=1-7&_nc_sid=aa7b47&_nc_ohc=t6P_G1oia6EQ7kNvwGa-q7-&_nc_oc=AdoDOgE4kzdP6Gl_yNdxvNCFRxfyLwwnV6bcFYWf7RrbL5WkQ_uIkMPY8lf4uqXAVZ8&_nc_zt=23&_nc_ht=scontent-waw2-1.xx&_nc_gid=tDKoHOjaS_Aygu_MOKdYYQ&_nc_ss=7b2a8&oh=00_Af-JlhoPA_SF_MFd-5wu6fMnFM5VxT2dx4TKNkaAKnLwNw&oe=6A332F2A" alt="Subaru Legacy RS" />
+                        <p class="driver-img-caption">© PRC</p>
+                    </div>
+
+                    <div class="stats-card animate-on-scroll" style="margin-top: 32px;">
                         <div class="stats-card__head--two"><span>Subaru Legacy RS</span><span>Wartość / Ocena</span></div>
                         <div class="stats-card__row--two"><span>Napęd / Typ</span><span>AWD (4x4)</span></div>
                         <div class="stats-card__row--two"><span>Moc maks. (KM)</span><span>~280 KM @ 6000 obr.</span></div>
@@ -442,18 +479,20 @@
                         <div class="stats-card__row--two"><span>Moment obrotowy</span><span>~320 Nm</span></div>
                     </div>
                 </div>
- 
 
-                <!-- SEKCJA FORD ESCORT RS COSWORTH -->
+                <!-- SEKCJA FORD -->
                 <div class="driver-section-title animate-on-scroll">Ford Escort RS Cosworth</div>
                 <div class="driver-bio animate-on-scroll">
                     <p>Ford Escort RS Cosworth to pojazd, który został zbudowany w liczbie 2500 egzemplarzy wyłącznie po to, by spełnić wymogi homologacyjne Grupy A. W DiRT Rally 2.0 auto to słynie z niesamowitej przyczepności na szybkich odcinkach oraz charakterystycznego, dużego tylnego skrzydła (tzw. "whale tail"), które zapewnia znaczący docisk przy wysokich prędkościach. W rzeczywistości silnik Cosworth YB w wersji rajdowej generował około 360 KM, co czyniło go jednym z najmocniejszych silników w swojej erze.</p>
-                    <p>W porównaniu do japońskich rywali, Escort RS Cosworth ma bardziej sztywne zawieszenie i szybszą reakcję na gaz, co przekłada się na agresywne wyjścia z zakrętów. To sprawia, że na asfalcie i szybkich odcinkach szutrowych Cosworth potrafi być niezwykle konkurencyjny – jego stabilność przy prędkościach powyżej 180 km/h jest bezkonkurencyjna w stawce. Jego główną bolączką jest większa masa (1250 kg) oraz wyraźna tendencja do podsterowności przy agresywnym wjeździe w ciasne nawroty. Wynika to z konstrukcji przedniego zawieszenia i rozkładu masy – cięższy przód sprawia, że auto "ucieka" na zewnątrz zakrętu, wymagając od kierowcy bardziej zdecydowanego skrętu kierownicy i często użycia hamulca ręcznego, aby skutecznie skręcić. Mimo to, na odcinkach szybkich, takich jak Hiszpania czy Polska, Cosworth potrafi dorównać tempem Lancii Deltcie, a na asfalcie jego prowadzenie jest jednym z najbardziej przewidywalnych wśród aut Grupy A. Analizując pozycję Forda w stawce PRC #4, należy podkreślić, że Escort RS Cosworth oferuje najlepszy potencjał na szybkich, płynnych odcinkach – jego aerodynamika i stabilność przy wysokich prędkościach są niekwestionowanym atutem, choć na technicznych, ciasnych trasach może odstawać od zwrotniejszych japońskich konstrukcji. To wybór dla kierowców, którzy preferują szybkie, płynne trasy i potrafią przewidzieć podsterowność auta.</p>
+                    <p>W porównaniu do japońskich rywali, Escort RS Cosworth ma bardziej sztywne zawieszenie i szybszą reakcję na gaz, co przekłada się na agresywne wyjścia z zakrętów. Na asfalcie i szybkich odcinkach szutrowych Cosworth potrafi być niezwykle konkurencyjny – jego stabilność przy prędkościach powyżej 180 km/h jest bezkonkurencyjna w stawce. Jego główną bolączką jest większa masa (1250 kg) oraz wyraźna tendencja do podsterowności przy agresywnym wjeździe w ciasne nawroty. Analizując pozycję Forda w stawce PRC #4, należy podkreślić, że Escort RS Cosworth oferuje najlepszy potencjał na szybkich, płynnych odcinkach – jego aerodynamika i stabilność przy wysokich prędkościach są niekwestionowanym atutem, choć na technicznych, ciasnych trasach może odstawać od zwrotniejszych japońskich konstrukcji.</p>
                 </div>
-                                <div class="driver-img-wrap animate-on-scroll car-gallery-img">
-                    <img src="https://scontent-waw2-2.xx.fbcdn.net/v/t39.30808-6/641729648_25936440322645094_3133008665159291654_n.jpg?stp=dst-jpg_tt6&cstp=mx1080x810&ctp=s1080x810&_nc_cat=106&ccb=1-7&_nc_sid=aa7b47&_nc_ohc=WitNkr3oFVwQ7kNvwG5_-rs&_nc_oc=AdrWq-T79VzHRiBreXxFCvaRf8a0cgZRMRVrRUJ-n8yBjYB5F97SownBtCbn5QH9kdQ&_nc_zt=23&_nc_ht=scontent-waw2-2.xx&_nc_gid=mttUT2iY-b9ZENPR7L7rRQ&_nc_ss=7b2a8&oh=00_Af8rV1RfOOsSnrBaRnVj28JYeZZHi-RaPqCVmhpjbqWdzg&oe=6A33498C" alt="Ford Escort RS Cosworth w akcji" class="driver-footer-img" style="max-height: 420px; margin-top: 0; object-position: center 20%;" />
-                </div><br>
-                <div class="stats-card animate-on-scroll">
+
+                <div class="driver-img-wrap animate-on-scroll">
+                    <img src="https://scontent-waw2-2.xx.fbcdn.net/v/t39.30808-6/641729648_25936440322645094_3133008665159291654_n.jpg?stp=dst-jpg_tt6&cstp=mx1080x810&ctp=s1080x810&_nc_cat=106&ccb=1-7&_nc_sid=aa7b47&_nc_ohc=WitNkr3oFVwQ7kNvwG5_-rs&_nc_oc=AdrWq-T79VzHRiBreXxFCvaRf8a0cgZRMRVrRUJ-n8yBjYB5F97SownBtCbn5QH9kdQ&_nc_zt=23&_nc_ht=scontent-waw2-2.xx&_nc_gid=mttUT2iY-b9ZENPR7L7rRQ&_nc_ss=7b2a8&oh=00_Af8rV1RfOOsSnrBaRnVj28JYeZZHi-RaPqCVmhpjbqWdzg&oe=6A33498C" alt="Ford Escort RS Cosworth w akcji" style="object-position: center 20%;" />
+                    <p class="driver-img-caption">© WRC</p>
+                </div>
+
+                <div class="stats-card animate-on-scroll" style="margin-top: 32px;">
                     <div class="stats-card__head--two"><span>Ford Escort RS Cosworth</span><span>Wartość / Ocena</span></div>
                     <div class="stats-card__row--two"><span>Napęd / Typ</span><span>AWD (4x4)</span></div>
                     <div class="stats-card__row--two"><span>Moc maks. (KM)</span><span>~310 KM @ 6250 obr.</span></div>
@@ -462,17 +501,19 @@
                     <div class="stats-card__row--two"><span>Moment obrotowy</span><span>~370 Nm</span></div>
                 </div>
 
-
                 <!-- SEKCJA LANCIA -->
                 <div class="driver-section-title animate-on-scroll">Lancia Delta HF Integrale</div>
                 <div class="driver-bio animate-on-scroll">
                     <p>Lancia Delta HF Integrale to absolutna dominatorka historycznej Grupy A. To ona zdobyła 46 zwycięstw w WRC i 6 tytułów konstruktorów z rzędu – rekord, który do dziś budzi podziw i szacunek. W DiRT Rally 2.0 jej agresywna charakterystyka przyspieszenia i sztywna konstrukcja sprawiają, że na asfalcie jest praktycznie bezkonkurencyjna. Doświadczeni symracerzy opisują jazdę Deltą jako niezwykle wymagającą – wszystko musi być zrobione perfekcyjnie przed każdym zakrętem, a technika hamowania silnikiem wymaga pełnego zaangażowania i wyczucia.</p>
-                    <p>Jednak Lancia ma swoją piętę achillesową. Piątą Achillesa jest podatność nadwozia na uszkodzenia – w rzeczywistych rajdach, ze względu na to, że platforma Delty pochodzi z 1979 roku, podwozie nie było przystosowane do ogromnych sił generowanych przez układ napędowy. W DiRT Rally 2.0 przekłada się to na nerwowość auta na nierównych odcinkach, szczególnie przy agresywnym wjeździe w bandaże czy nierówności. Zawieszenie Delty jest sztywne i przy większych nierównościach może prowadzić do utraty przyczepności, co przy ograniczonych możliwościach regulacji (zgodnie z regulaminem PRC) może być wyzwaniem nawet dla doświadczonych kierowców. Dodatkowo, charakterystyka pracy turbosprężarki jest mocno nieliniowa – moc pojawia się nagle i gwałtownie, co wymaga precyzyjnej kontroli pedału gazu. Może to odstraszać mniej doświadczonych kierowców, którzy wolą bardziej liniowe oddawanie mocy. Mimo to, w rękach fachowca, Lancia Delta pozostaje faworytem do wygrania każdego rajdu – jej potencjał na szybkich odcinkach specjalnych jest nie do przelicytowania, a przy odpowiedniej technice jazdy (wczesne hamowanie, precyzyjne wchodzenie w zakręty, płynne dodawanie gazu) pozwala osiągać czasy, o jakich inne auta mogą tylko pomarzyć. To auto dla najbardziej utalentowanych kierowców, którzy potrafią wykorzystać każdy ułamek sekundy i nie boją się jazdy na krawędzi.</p>
+                    <p>Jednak Lancia ma swoją piętę achillesową. Podatność nadwozia na uszkodzenia – w rzeczywistych rajdach platforma Delty pochodzi z 1979 roku, podwozie nie było przystosowane do ogromnych sił generowanych przez układ napędowy. W DiRT Rally 2.0 przekłada się to na nerwowość auta na nierównych odcinkach. Charakterystyka pracy turbosprężarki jest mocno nieliniowa – moc pojawia się nagle i gwałtownie. Mimo to, w rękach fachowca, Lancia Delta pozostaje faworytem do wygrania każdego rajdu – jej potencjał na szybkich odcinkach specjalnych jest nie do przelicytowania, a przy odpowiedniej technice jazdy pozwala osiągać czasy, o jakich inne auta mogą tylko pomarzyć. To auto dla najbardziej utalentowanych kierowców.</p>
                 </div>
-                                <div class="driver-img-wrap animate-on-scroll car-gallery-img">
-                    <img src="https://images.ctfassets.net/lym53uuylvg8/3dhCzQODN7YGIjBwsZwwu8/a1f215b27b9123255a750849acd9ba88/Lancia_Delta_Integrale_Group_A_PREVIEW__3_.jpg?fm=webp&w=1000&q=85" alt="Lancia Delta HF Integrale w rajdzie" class="driver-footer-img" style="max-height: 420px; margin-top: 0;" />
-                </div><br>
-                <div class="stats-card animate-on-scroll">
+
+                <div class="driver-img-wrap animate-on-scroll">
+                    <img src="https://images.ctfassets.net/lym53uuylvg8/3dhCzQODN7YGIjBwsZwwu8/a1f215b27b9123255a750849acd9ba88/Lancia_Delta_Integrale_Group_A_PREVIEW__3_.jpg?fm=webp&w=1000&q=85" alt="Lancia Delta HF Integrale w rajdzie" />
+                    <p class="driver-img-caption">© WRC</p>
+                </div>
+
+                <div class="stats-card animate-on-scroll" style="margin-top: 32px;">
                     <div class="stats-card__head--two"><span>Lancia Delta HF Integrale</span><span>Wartość / Ocena</span></div>
                     <div class="stats-card__row--two"><span>Napęd / Typ</span><span>AWD (4x4)</span></div>
                     <div class="stats-card__row--two"><span>Moc maks. (KM)</span><span>~320 KM @ 5750 obr.</span></div>
@@ -481,34 +522,35 @@
                     <div class="stats-card__row--two"><span>Moment obrotowy</span><span>~365 Nm</span></div>
                 </div>
 
-
-                <!-- Podsumowanie i Verdict -->
+                <!-- Podsumowanie -->
                 <div class="driver-section-title animate-on-scroll">Brutalny werdykt</div>
-                                <div class="driver-bio animate-on-scroll">
+                <div class="driver-bio animate-on-scroll">
                     <p>Analiza osiągów w DiRT Rally 2.0 oraz rzeczywistych danych homologacyjnych wskazuje jednego głównego faworyta, ale nie bez zastrzeżeń. Lancia Delta HF Integrale posiada najlepszy współczynnik mocy do masy oraz legendarną trakcję na zróżnicowanych nawierzchniach. Jej agresywna, wymagająca charakterystyka – szczególnie na nierównych odcinkach, gdzie nadwozie bywa nerwowe, a turbosprężarka wchodzi z opóźnieniem – w rękach czołowych kierowców turnieju zapewni znaczącą przewagę czasową, szczególnie na dłuższych prostych i szybkich łukach. To auto dla śmiałków, którzy potrafią okiełznać jej dziką naturę.</p>
-                    <p>Mitsubishi Evo VI będzie najgroźniejszym konkurentem ze względu na swoją stabilność i wybaczenie błędów – to auto dla kierowców stawiających na regularność i unikanie ryzyka. Subaru Impreza 1995 może zaskoczyć na wymagających trasach leśnych, gdzie jej miękkie zawieszenie i doskonała przyczepność boczna na żwirze dają przewagę, choć na asfalcie traci do sztywniej zawieszonych rywali. Subaru Legacy RS pozostaje ciekawostką dla koneserów – przewidywalne i stabilne na szybkich odcinkach, ale wolniejsze od Imprezy w ciasnych zakrętach ze względu na dłuższy rozstaw osi. Ford Escort RS Cosworth to solidna, acz nieco cięższa konstrukcja, która na szybkich odcinkach potrafi zaskoczyć tempem dzięki doskonałej aerodynamice, ale na technicznych trasach odstaje od zwrotniejszych japońskich aut.</p>
-                    <p>W generalnej klasyfikacji to jednak Lancia ma największy potencjał, by sięgnąć po tytuł. Kluczowe będą jednak umiejętności kierowców – w symulatorze tak wymagającym jak DiRT Rally 2.0, to człowiek, a nie maszyna, często decyduje o końcowym rezultacie. Podsumowując, meta PRC #4 to starcie filozofii jazdy: Lancia dla odważnych łowców sekund, Mitsubishi dla mistrzów regularności, Subaru dla specjalistów od szutru, a Ford dla szybkich odcinków. Ostateczny triumfator wyłoni się na trasie, gdzie teoria spotka się z praktyką.</p>
+                    <p>Mitsubishi Evo VI będzie najgroźniejszym konkurentem ze względu na swoją stabilność i wybaczenie błędów. Subaru Impreza 1995 może zaskoczyć na wymagających trasach leśnych, gdzie jej miękkie zawieszenie i doskonała przyczepność boczna na żwirze dają przewagę. Subaru Legacy RS pozostaje ciekawostką dla koneserów – przewidywalne i stabilne na szybkich odcinkach, ale wolniejsze od Imprezy w ciasnych zakrętach. Ford Escort RS Cosworth to solidna konstrukcja, która na szybkich odcinkach potrafi zaskoczyć tempem dzięki doskonałej aerodynamice, ale na technicznych trasach odstaje od zwrotniejszych japońskich aut.</p>
+                    <p>W generalnej klasyfikacji to jednak Lancia ma największy potencjał, by sięgnąć po tytuł. Kluczowe będą jednak umiejętności kierowców – w symulatorze tak wymagającym jak DiRT Rally 2.0, to człowiek, a nie maszyna, często decyduje o końcowym rezultacie.</p>
                 </div>
                 <div class="driver-bio">
                     <p style="text-align: left; font-size: 14px; margin-left:2px; opacity: 0.7;">Analiza przygotowana na podstawie charakterystyki fabrycznej pojazdów.<br>Źródła danych: DiRT Rally 2.0, dane homologacyjne FIA.</p>
                 </div>
+
             </div>
         </div>
     </main>
 </div>
 
-    <footer class="site-footer">
-      <div class="site-footer__sponsors">
+<div class="footer-spacer"></div>
+
+<footer class="site-footer">
+    <div class="site-footer__sponsors">
         <div class="footer-photo"><img src="https://i.imgur.com/JSWXXPK.png" alt="" /></div>
         <div class="footer-photo"><img src="https://i.imgur.com/3e0jqkQ.png" alt="" /></div>
         <div class="footer-photo"><img src="https://i.imgur.com/BQ7N4GM.png" alt="" /></div>
-      </div>
-      <div class="footer-divider"></div>
-      <p class="footer-copyright">&copy; 2026 PRC. All rights reserved.</p>
-    </footer>
+    </div>
+    <div class="footer-divider"></div>
+    <p class="footer-copyright">&copy; 2026 PRC. All rights reserved.</p>
+</footer>
 
 <script>
-    // PROGRESS BAR - aktualizacja w czasie scrollowania
     window.addEventListener('scroll', function() {
         const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
         const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
@@ -524,11 +566,11 @@
     }, { passive: true });
 
     const observer = new IntersectionObserver((entries) => {
-        entries.forEach((e) => { 
-            if (e.isIntersecting) { 
-                e.target.classList.add("visible"); 
-                observer.unobserve(e.target); 
-            } 
+        entries.forEach((e) => {
+            if (e.isIntersecting) {
+                e.target.classList.add("visible");
+                observer.unobserve(e.target);
+            }
         });
     }, { threshold: 0.1 });
 
