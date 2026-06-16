@@ -4,14 +4,27 @@
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PRC • Afera za kulisami PRC - FIA oddala odwołanie Lancii</title>
+    <title>Afera za kulisami PRC - FIA oddala odwołanie Lancii | DiRT Rally 2.0</title>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css" />
     <link rel="stylesheet" href="css/archiwum.css" />
     <link rel="stylesheet" href="css/style.css" />
-    <link rel="icon" href="https://i.imgur.com/CqBPD1t.png" />
+    <link rel="icon" href="assets/icon.jpg" />
 
-    <style>
+   <style>
+        @font-face {
+    font-family: "SebinoRegular";
+    src: url("assets/fonts/Sebino Regular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+        @font-face {
+    font-family: "WRCCleanRoman";
+    src: url("assets/fonts/WRCCleanRoman.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
         /* ===== PROGRESS BAR ===== */
         .progress-container {
             position: fixed;
@@ -48,7 +61,7 @@
         }
 
         .hero {
-            min-height: 50vh;
+            min-height: 70vh;
         }
 
         .driver-main {
@@ -58,15 +71,44 @@
         body.dark .driver-main { background: #1a1a1a; }
 
         .driver-content {
-            max-width: 1100px;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 1px 44px 80px;
+            padding: 1px 0 80px;
         }
+
+        /* ===== ARTICLE INTRO (jak na zdjęciu) ===== */
+        .article-intro {
+            padding: 0 44px;
+        }
+
+        .article-lead {
+            font-family: "WRCCleanBold", Arial, sans-serif;
+            font-size: 22.5px;
+            line-height: 1.5;
+            color: #1a2635;
+            font-weight: 700;
+            margin: 32px 0 12px;
+        }
+        body.dark .article-lead { color: #e8eef4; }
+
+        .article-meta {
+            font-family: "SebinoRegular", Arial, sans-serif;
+            font-size: 13px;
+            color: #67727f;
+            margin-bottom: 36px;
+            line-height: 1.6;
+        }
+        body.dark .article-meta { color: #888; }
+        .article-meta strong {
+            display: block;
+            color: #26384b;
+        }
+        body.dark .article-meta strong { color: #aaa; }
 
         .driver-section-title {
             font-family: "WRCCleanBold", Arial, sans-serif;
-            font-size: 30px;
-            margin: 44px 0 18px;
+            font-size: 32px;
+            margin: 44px 44px 18px;
             color: #26384b;
             border-left: 4px solid var(--orange);
             padding-left: 15px;
@@ -76,10 +118,10 @@
 
         .stats-card {
             background: #fff;
-            border-radius: 12px;
+            border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 2px 10px rgba(0,0,0,.06);
-            margin-bottom: 32px;
+            margin: 0 44px 32px;
             transition: background .38s, box-shadow .32s;
             box-sizing: border-box;
         }
@@ -91,7 +133,7 @@
         .stats-card__head--two {
             background: #f2f3f3;
             color: #67727f;
-            font-family: "SebinoSoft", Arial, sans-serif;
+            font-family: "SebinoRegular", Arial, sans-serif;
             font-size: 11px;
             letter-spacing: .03em;
             text-transform: uppercase;
@@ -111,7 +153,8 @@
             padding: 0 18px;
             min-height: 48px;
             background: #fff;
-            font-family: "SebinoSoft", Arial, sans-serif;
+            font-family: "SebinoRegular", Arial, sans-serif;
+            
             font-size: 13px;
             color: #26384b;
             border-bottom: 1px solid rgba(225, 231, 238, 0.8);
@@ -145,24 +188,55 @@
             display: block;
         }
 
+        .driver-bio {
+            padding: 0 44px;
+        }
+
         .driver-bio p {
-            font-family: "SebinoMedium", Arial, sans-serif !important;
-            font-size: 16px;
+            font-family: "SebinoRegular", Arial, sans-serif !important;
+            font-size: 18.5px;
             line-height: 1.75;
             color: #26384b;
             margin-bottom: 16px;
         }
         body.dark .driver-bio p { color: #c0c0c0; }
 
-        /* Styl dla strong - zmiana czcionki na Sebino Bold */
-        .driver-bio p strong,
-        .driver-bio strong {
-            font-family: "WRCCleanBold", Arial, sans-serif !important;
+        /* ===== ZDJĘCIA – wyrównane do lewej krawędzi contentu, wychodzą w prawo ===== */
+        .driver-img-wrap {
+            margin: 28px 0 0;
+            padding-left: 44px;
+            overflow: visible;
+        }
+        .driver-img-wrap img {
+            display: block;
+            width: 1098px;
+            max-width: none;
+            height: 731.84px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .driver-img-caption {
+            font-family: "SebinoRegular", Arial, sans-serif;
+            font-size: 12px;
+            color: #67727f;
+            margin-top: 15px;
+            margin-left: 2px;
+        }
+        .driver-img-copyright {
+            display: block;
+            font-size: 11px;
+            color: #aaa;
+            margin-top: 2px;
         }
 
-        .driver-img-wrap { margin: 28px 0 32px; }
-        .driver-img-wrap img { width: 100%; border-radius: 10px; display: block; max-height: 450px; object-fit: cover; }
-        .driver-footer-img { width: 100%; border-radius: 10px; display: block; object-fit: cover; max-height: 500px; margin-top: 52px; }
+        .driver-footer-img {
+            display: block;
+            width: 1098px;
+            max-width: none;
+            height: 731.84px;
+            object-fit: cover;
+            border-radius: 0;
+        }
 
         .animate-on-scroll { opacity: 0; transform: translateY(18px); transition: opacity .5s ease, transform .5s ease; }
         .animate-on-scroll.visible { opacity: 1; transform: none; }
@@ -171,13 +245,32 @@
             .driver-hero-bottom__name { font-size: 40px; }
         }
 
+        .highlight-box {
+            background: rgba(0,0,0,0.03);
+            border-left: 3px solid #ff6b00;
+            padding: 16px 24px;
+            margin: 24px 44px;
+            border-radius: 8px;
+        }
+        body.dark .highlight-box {
+            background: rgba(255,255,255,0.05);
+        }
+        hr {
+            margin: 32px 44px;
+            border: none;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #ccc, transparent);
+        }
+        body.dark hr {
+            background: linear-gradient(to right, transparent, #444, transparent);
+        }
         .article-quote {
-            margin: 10px 0 10px;
+            margin: 10px 44px 10px;
             padding: 18px 22px 14px;
-            background: #f3f4f5;
             border-radius: 20px;
             text-align: center;
         }
+
         body.dark .article-quote {
             background: #222;
         }
@@ -189,7 +282,7 @@
         }
         .article-quote__text {
             font-family: "WRCCleanBold", Arial, sans-serif !important;
-            font-size: 32px !important;
+            font-size: 50px !important;
             line-height: 1.25 !important;
             color: #1a2635 !important;
             margin: 0 0 15px !important;
@@ -200,7 +293,7 @@
         .article-quote__author {
             display: inline-block;
             font-family: "WRCCleanBold", Arial, sans-serif;
-            font-size: 16px;
+            font-size: 20px;
             font-weight: 600;
             color: #26384b;
             text-decoration: none;
@@ -219,32 +312,12 @@
             color: #ff6b00;
             border-color: #ff6b00;
         }
-        
-        .highlight-box {
-            background: rgba(0,0,0,0.03);
-            border-left: 3px solid #ff6b00;
-            padding: 16px 24px;
-            margin: 24px 0;
-            border-radius: 8px;
-        }
-        body.dark .highlight-box {
-            background: rgba(255,255,255,0.05);
-        }
-        hr {
-            margin: 32px 0;
-            border: none;
-            height: 1px;
-            background: linear-gradient(to right, transparent, #ccc, transparent);
-        }
-        body.dark hr {
-            background: linear-gradient(to right, transparent, #444, transparent);
-        }
         .verdict-badge {
             background: #0a2a3b;
             color: white;
             padding: 24px 32px;
             border-radius: 20px;
-            margin: 48px 0 24px;
+            margin: 48px 44px 24px;
         }
         body.dark .verdict-badge {
             background: #0f212e;
@@ -252,6 +325,22 @@
         .verdict-badge h3 {
             margin-top: 0;
             font-size: 28px;
+        }
+        .driver-bio p strong,
+        .driver-bio strong {
+
+        }
+        .hero__title-wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 44px;
+}
+.hero__title {
+    font-size: 57px;
+}
+        .topbar__link {
+            font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+            font-weight: 550 !important;
         }
     </style>
 
@@ -312,90 +401,98 @@
     <main class="driver-main">
         <div class="driver-content">
             <div id="panel-prc1" class="archive-panel active">
-                
-                <!-- Wprowadzenie po decyzji FIA -->
-                <div class="driver-section-title animate-on-scroll">Koniec batalii prawnej – FIA mówi stanowcze „nie”</div>
+
+                <!-- Lead + meta -->
+                <div class="article-intro animate-on-scroll">
+                    <p class="article-lead">FIA oddaliła odwołanie Team Lancia w sprawie zakazu tuningu. Kontrowersyjna decyzja pozostaje w mocy – wszystkie zespoły muszą używać wyłącznie domyślnych ustawień fabrycznych.</p>
+                    <p class="article-meta">
+                        4 min czytania • Opublikowano 16.06.2026 • 09:00 GMT+2
+                    </p>
+                </div>
+
+                <!-- Sekcja 1 -->
+                <div class="driver-section-title animate-on-scroll">Koniec batalii prawnej – FIA mówi stanowcze „nie"</div>
                 <div class="driver-bio animate-on-scroll">
                     <p>Team Lancia wniósł oficjalne odwołanie od decyzji o wprowadzeniu całkowitego zakazu tuningu pojazdów podczas turnieju. Zespół argumentował, że tuning jest integralną częścią rajdowej rywalizacji, zgodną z tradycją i regulaminami FIA. Lancia wskazywała, że zakaz jest nieproporcjonalny, odbiera rywalizacji techniczny charakter i faworyzuje kierowców, którzy nie chcą poświęcać czasu na rozwijanie ustawień. FIA jednak po analizie uznała, że argumenty Lancii nie są wystarczające i podtrzymała całkowity zakaz.</p>
-                    <p>Finał afery, która przez ostatnie dni rozpalała kierowców przed nadchodzącym turniejem, właśnie nadszedł. Fédération Internationale de l’Automobile po dogłębnej analizie odwołania złożonego przez Team Lancia podjęła decyzję o jego <strong>oddaleniu w całości</strong>. Oznacza to, że kontrowersyjny całkowity zakaz tuningu pojazdów pozostaje utrzymany – kierowcy nie mogą liczyć na żadne modyfikacje ustawień samochodów.</p>
+                    <p>Finał afery, która przez ostatnie dni rozpalała kierowców przed nadchodzącym turniejem, właśnie nadszedł. Fédération Internationale de l'Automobile po dogłębnej analizie odwołania złożonego przez Team Lancia podjęła decyzję o jego <strong>oddaleniu w całości</strong>. Oznacza to, że kontrowersyjny całkowity zakaz tuningu pojazdów pozostaje utrzymany – kierowcy nie mogą liczyć na żadne modyfikacje ustawień samochodów.</p>
                     <p>To szczególny cios dla zespołu Lancia, który od początku głosowania walczył o przywrócenie technicznego charakteru rywalizacji. FIA w swoim uzasadnieniu wskazała jednak, że argumenty odwołującego nie zdołały podważyć demokratycznej woli większości oraz nadrzędnego celu, jakim jest zapewnienie równej i dostępnej rywalizacji dla wszystkich uczestników.</p>
                 </div>
 
-                <!-- Grafika 1 -->
+                <!-- Zdjęcie 1 -->
                 <div class="driver-img-wrap animate-on-scroll">
-                    <img src="https://giacomobaj.com/cdn/shop/files/00.jpg?v=1744381385&width=2048" alt="Lancia Delta - smutna twarz po decyzji FIA" class="driver-footer-img" style="object-position: center 62%; max-height: 450px; margin-top: 0;" />
+                    <img src="https://giacomobaj.com/cdn/shop/files/00.jpg?v=1744381385&width=2048" alt="Lancia Delta - smutna twarz po decyzji FIA" style="object-position: center 62%;" />
+                    <p class="driver-img-caption">© FIA / PRC</p>
                 </div>
-                
-                <!-- Wynik głosowania (bez zmian) -->
-                <div class="stats-card animate-on-scroll">
+
+                <!-- Tabela -->
+                <div class="stats-card animate-on-scroll" style="margin-top: 32px;">
                     <div class="stats-card__head--two"><span>Wynik głosowania w sprawie zakazu tuningu</span><span>Liczba głosów</span></div>
                     <div class="stats-card__row--two"><span>Za zakazem tuningu</span><span>60%</span></div>
                     <div class="stats-card__row--two"><span>Przeciw zakazowi (za tuningiem)</span><span>40%</span></div>
                 </div>
 
-                 <!-- Uzasadnienie FIA -->
-                <div class="driver-section-title animate-on-scroll">Oficjalne uzasadnienie - dlaczego FIA oddaliła odwołanie?</div>
+                <!-- Sekcja 2 -->
+                <div class="driver-section-title animate-on-scroll">Oficjalne uzasadnienie – dlaczego FIA oddaliła odwołanie?</div>
                 <div class="driver-bio animate-on-scroll">
                     <p>W oficjalnej korespondencji skierowanej do Team Lancia, FIA przedstawiła kilka kluczowych powodów swojej decyzji. Federacja motoryzacyjna nie pozostawiła złudzeń – demokratyczny mandat oraz dobro całej stawki przeważyły nad postulatami technicznymi apelującego zespołu.</p>
                     <p>Po pierwsze, zakaz tuningu został wprowadzony w wyniku ważnego głosowania uczestników, w którym większość opowiedziała się za jego wprowadzeniem. FIA uznała, że taka procedura gwarantuje legitymację regulacji, nawet jeśli część zawodników jest niezadowolona z wyniku. Po drugie, według danych dostępnych federacji, Team Lancia dysponuje obecnie najmocniejszym samochodem w stawce, a przywrócenie tuningu mogłoby doprowadzić do dalszego zwiększenia różnic osiągów, co negatywnie wpłynęłoby na wyrównaną rywalizację. FIA nie chciała ryzykować powstania dominacji technicznej jednego zespołu.</p>
                     <p>Kolejny argument dotyczy indywidualnego charakteru tuningu – skuteczne przygotowanie ustawień wymaga znacznego nakładu czasu oraz pracy z dużym wyprzedzeniem, co stawiałoby część kierowców w systemowo niekorzystnej sytuacji. Po czwarte, nadrzędnym celem regulacji PRC jest zapewnienie możliwie równej i dostępnej rywalizacji – a całkowity zakaz tuningu pozostaje w pełni zgodny z tym założeniem. Wreszcie, piąty punkt uzasadnienia podkreśla zmniejszenie bariery wejścia dla nowych zawodników: zakaz pozwala świeżym uczestnikom skupić się na rozwijaniu umiejętności jazdy i poznawaniu rajdowej specyfiki, bez konieczności zdobywania zaawansowanej wiedzy technicznej.</p>
                 </div>
 
-                <!-- Wywiad z Damianem Siemaszko po decyzji -->
-                <div class="driver-section-title animate-on-scroll">„Nie składamy broni, ale decyzja FIA boli” – wywiad z Damianem Siemaszko</div>
+                <!-- Sekcja 3 – wywiad -->
+                <div class="driver-section-title animate-on-scroll">„Nie rezygnujemy, ale decyzja boli" – wywiad z Damianem Siemaszko</div>
                 <div class="driver-bio animate-on-scroll">
                     <p><strong>Damian Siemaszko:</strong> Czuję ogromny niedosyt i rozczarowanie. Włożyliśmy mnóstwo pracy w to odwołanie – przygotowaliśmy szczegółowe argumenty, proponowaliśmy kompromisy, odwoływaliśmy się do wielkich tradycji rajdowych. Tymczasem FIA w zasadzie powiela argumenty, które słyszeliśmy już podczas głosowania: demokracja, przewaga Lancii, brak czasu innych zawodników. Z szacunkiem do federacji, ale nie możemy zgodzić się z tezą, że zakaz tuningu służy wyrównaniu szans. Wyrównywanie poprzez ograniczanie tych, którzy chcą się rozwijać, to droga donikąd.</p>
-                    <p><strong>Damian Siemaszko:</strong> Na tę chwilę FIA wypowiedziała się wiążąco. Musimy uszanować tę decyzję, choć w głębi ducha pozostajemy przy swoim zdaniu. Zespół Lancia nie wycofuje się ze swojego stanowiska. Będziemy zabiegać o nowe konsultacje przed kolejnym sezonem. Na razie jednak przyjmujemy werdykt do wiadomości.</p>
                 </div>
-                
+
                 <div class="article-quote animate-on-scroll">
-                    <img src="assets/cudz.png" alt="" class="article-quote__mark" />
+                    <img src="https://i.imgur.com/niCQozh.png" alt="" class="article-quote__mark" />
                     <p class="article-quote__text">Wyrównywanie poprzez ograniczanie tych, którzy chcą się rozwijać, to droga donikąd</p>
                     <a href="d4xan.html" class="article-quote__author">Damian Siemaszko, Team Lancia</a>
                 </div>
 
-
-                <!-- Kwestia organizatora i głosowania -->
-                <div class="driver-section-title animate-on-scroll">„Głosowanie wygrało lenistwo zamiast rywalizacji”</div>
+                <!-- Sekcja 4 -->
+                <div class="driver-section-title animate-on-scroll">„Wygrało lenistwo zamiast rywalizacji"</div>
                 <div class="driver-bio animate-on-scroll">
-                    <p><strong>Damian Siemaszko:</strong> Niestety, to sedno problemu. Niektórzy uczestnicy, w tym osoby funkcyjne, nie chcą inwestować czasu w rozwój ustawień i woleli przegłosować wygodny dla siebie wariant. Mamy demokrację, ale demokracja nie oznacza, że każda decyzja większości jest słuszna merytorycznie. FIA pominęła to w swoim uzasadnieniu, skupiając się na formalnej stronie głosowania. A przecież istotne jest pytanie: czy zakaz jest proporcjonalny? Naszym zdaniem nie. Proponowaliśmy wiele alternatyw – ograniczenia dla wybranych parametrów, homologowane konfiguracje czy dobrowolne dzielenie się ustawieniami. Nikt nie chciał o tym nawet dyskutować.</p>
+                    <p><strong>Damian Siemaszko:</strong> Niektórzy uczestnicy, w tym osoby funkcyjne, nie chcą inwestować czasu w rozwój ustawień i woleli przegłosować wygodny dla siebie wariant. Mamy demokrację, ale demokracja nie oznacza, że każda decyzja większości jest słuszna merytorycznie. FIA pominęła to w swoim uzasadnieniu, skupiając się na formalnej stronie głosowania. A przecież istotne jest pytanie: czy zakaz jest proporcjonalny? Naszym zdaniem nie. Proponowaliśmy wiele alternatyw – ograniczenia dla wybranych parametrów, homologowane konfiguracje czy dobrowolne dzielenie się ustawieniami. Nikt nie chciał o tym nawet dyskutować.</p>
                     <p>W uzasadnieniu FIA zabrakło również odpowiedzi na kluczowy argument Lancii: brak dowodów na to, że tuning tworzył nieuczciwą przewagę lub prowadził do nadużyć. Przed głosowaniem nie odnotowano żadnej formalnej skargi dotyczącej konfiguracji technicznych. Decydenci nie przedstawili analizy, dlaczego mniej restrykcyjne środki (jak limity przedziałów regulacji) byłyby niewystarczające. Zdaniem zespołu Lancia jest to istotne uchybienie, które podważa proporcjonalność całkowitego bana.</p>
                 </div>
 
-                                <!-- Druga grafika -->
+                <!-- Zdjęcie 2 -->
                 <div class="driver-img-wrap animate-on-scroll">
-                    <img src="https://am-s3-bucket-assets.s3.eu-west-2.amazonaws.com/silverstone/prod/lot_images/xlarge/rec03815-1/rec03815-1_1.jpg" alt="Zawodnik PRC w czasie jazdy testowej" class="driver-footer-img" style="object-position: center 56%; max-height: 420px; margin-top: 0;" />
+                    <img src="https://am-s3-bucket-assets.s3.eu-west-2.amazonaws.com/silverstone/prod/lot_images/xlarge/rec03815-1/rec03815-1_1.jpg" alt="Zawodnik PRC w czasie jazdy testowej" style="object-position: center 56%;" />
+                    <p class="driver-img-caption">© PRC</p>
                 </div>
 
-                <!-- Podsumowanie i nowa rzeczywistość -->
+                <!-- Sekcja 5 -->
                 <div class="driver-section-title animate-on-scroll">Nowa rzeczywistość w PRC – co dalej?</div>
                 <div class="driver-bio animate-on-scroll">
                     <p>Z dniem ogłoszenia decyzji FIA wszystkie zespoły startujące w PRC muszą bezwzględnie przestrzegać zakazu tuningu. Oznacza to, że w Dirt Rally 2.0 wolno używać wyłącznie domyślnych ustawień fabrycznych – zarówno w zakresie zawieszenia, geometrii, dyferencjałów, hamulców, jak i przełożeń skrzyni biegów. Jakiekolwiek odstępstwo będzie traktowane jako naruszenie regulaminu i może skutkować karami sportowymi.</p>
-                   
-                   
                     <p>Zespół Lancia nie kryje rozczarowania, ale zapowiada, że nie opuści mistrzostw. W nieoficjalnych rozmowach pojawiają się głosy, że Lancia będzie zabiegać o nowe konsultacje przed kolejnym sezonem. Na ten moment jednak obowiązuje całkowity zakaz modyfikacji.</p>
                 </div>
-                                <div class="article-quote animate-on-scroll">
-                    <img src="assets/cudz.png" alt="" class="article-quote__mark" />
-                    <p class="article-quote__text">Decyzja FIA potwierdza, że PRC podąża właściwą ścieżką – ku rywalizacji przyjaznej i skoncentrowanej na umiejętnościach kierowców</p>
+
+                <div class="article-quote animate-on-scroll">
+                    <img src="https://i.imgur.com/niCQozh.png" alt="" class="article-quote__mark" />
+                    <p class="article-quote__text">Decyzja FIA potwierdza, że PRC podąża właściwą ścieżką – ku rywalizacji skoncentrowanej na umiejętnościach kierowców</p>
                     <a href="white.html" class="article-quote__author">Krzysztof Drozd, Główny Organizator PRC</a>
                 </div>
-
 
             </div>
         </div>
     </main>
 </div>
 
-    <footer class="site-footer">
-      <div class="site-footer__sponsors">
+<div class="footer-spacer"></div>
+
+<footer class="site-footer">
+    <div class="site-footer__sponsors">
         <div class="footer-photo"><img src="https://i.imgur.com/JSWXXPK.png" alt="" /></div>
         <div class="footer-photo"><img src="https://i.imgur.com/3e0jqkQ.png" alt="" /></div>
         <div class="footer-photo"><img src="https://i.imgur.com/BQ7N4GM.png" alt="" /></div>
-      </div>
-      <div class="footer-divider"></div>
-      <p class="footer-copyright">&copy; 2026 PRC. All rights reserved.</p>
-    </footer>
+    </div>
+    <div class="footer-divider"></div>
+    <p class="footer-copyright">&copy; 2026 PRC. All rights reserved.</p>
+</footer>
 
 <script>
     window.addEventListener('scroll', function() {
@@ -413,11 +510,11 @@
     }, { passive: true });
 
     const observer = new IntersectionObserver((entries) => {
-        entries.forEach((e) => { 
-            if (e.isIntersecting) { 
-                e.target.classList.add("visible"); 
-                observer.unobserve(e.target); 
-            } 
+        entries.forEach((e) => {
+            if (e.isIntersecting) {
+                e.target.classList.add("visible");
+                observer.unobserve(e.target);
+            }
         });
     }, { threshold: 0.1 });
 
