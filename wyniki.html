@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PRC • Wyniki</title>
+  <title>Wyniki – PRC</title>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css" />
   <link rel="stylesheet" href="css/style.css" />
-  <link rel="icon" href="https://i.imgur.com/Lg9NZIK.png" />
+  <link rel="icon" href="assets/icon.jpg" />
 
   <style>
     .flag-emoji {
@@ -491,15 +491,12 @@ function getDriverLink(driverName, driverId) {
 
   <div class="footer-spacer"></div>
 
-    <footer class="site-footer">
-      <div class="site-footer__sponsors">
-        <div class="footer-photo"><img src="https://i.imgur.com/JSWXXPK.png" alt="" /></div>
-        <div class="footer-photo"><img src="https://i.imgur.com/3e0jqkQ.png" alt="" /></div>
-        <div class="footer-photo"><img src="https://i.imgur.com/BQ7N4GM.png" alt="" /></div>
-      </div>
-      <div class="footer-divider"></div>
-      <p class="footer-copyright">&copy; 2026 PRC. All rights reserved.</p>
-    </footer>
+  <footer class="site-footer">
+    <div class="site-footer__sponsors"><div class="footer-photo"><img src="https://i.imgur.com/JSWXXPK.png" alt="" /></div><div class="footer-photo"><img src="https://i.imgur.com/3e0jqkQ.png" alt="" /></div><div class="footer-photo"><img src="https://i.imgur.com/BQ7N4GM.png" alt="" /></div></div>
+    <div class="site-footer__sponsors site-footer__sponsors--secondary"><div class="footer-photo footer-photo--sm"><img src="https://i.imgur.com/pAroXd5.png" alt="" /></div><div class="footer-photo footer-photo--sm"><img src="https://i.imgur.com/vUDesth.png" alt="" /></div><div class="footer-photo footer-photo--sm"><img src="https://i.imgur.com/hG0ISSY.png" alt="" /></div></div>
+    <div class="footer-divider"></div>
+    <p class="footer-copyright">&copy; 2026 PRC. All rights reserved.</p>
+  </footer>
 
   <script src="config.js"></script>
   <script src="api.js"></script>
@@ -751,10 +748,33 @@ function getDriverLink(driverName, driverId) {
         <div data-sort="pos" data-type="number" class="sort-asc">POZ.<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>
         <div data-sort="driver" data-type="string">KIEROWCA<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>
         <div>ZESPÓŁ / AUTO</div>`;
-      if (hasPowerStage) headHtml += `<div data-sort="ps" data-type="time" data-stage-name="${powerStage}">PS<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>`;
-      regularStages.forEach((stage, idx) => {
-        headHtml += `<div data-sort="os_${idx}" data-type="time" data-stage-index="${idx}">OS${idx + 1}<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>`;
-      });
+      
+      // Pobieramy oryginalną listę etapów
+      const allStages = rallyData.stages;
+      const powerStageName = rallyData.powerStage;
+      
+      // Tworzymy mapę: nazwa etapu -> czy to PS
+      const isPowerStageMap = {};
+      if (powerStageName) {
+        isPowerStageMap[powerStageName] = true;
+      }
+      
+      // Dla każdego etapu w oryginalnej kolejności - używamy indeksu + 1 jako numeru OS
+      for (let i = 0; i < allStages.length; i++) {
+        const stage = allStages[i];
+        const isPS = isPowerStageMap[stage] || false;
+        
+        let label;
+        if (isPS) {
+          label = 'PS';
+        } else {
+          // Numer OS to indeks + 1, niezależnie od pozycji PS
+          label = `OS${i + 1}`;
+        }
+        
+        headHtml += `<div data-sort="os_${i}" data-type="time" data-stage-index="${i}" data-is-ps="${isPS}">${label}<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>`;
+      }
+      
       headHtml += `
         <div data-sort="total" data-type="time" class="sort-asc">ŁĄCZNY CZAS<span class="sort-icon"><svg class="arr-up" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 0L7 5H0z" fill="currentColor"/></svg><svg class="arr-down" width="5" height="4" viewBox="0 0 7 5"><path d="M3.5 5L0 0H7z" fill="currentColor"/></svg></span></div>
         <div>DIFF.</div>
@@ -786,18 +806,10 @@ function getDriverLink(driverName, driverId) {
               <img class="team-logo-tooltip" data-team-name="${team?.name || '-'}" src="${team?.logo || 'assets/teams/default.png'}" alt="${team?.name || '-'}" onerror="this.src='assets/teams/default.png'" style="width:28px;height:28px;object-fit:contain;" />
               <span class="col-car-model">${result.carModel || team?.carModel || '-'}</span>
             </div>`;
-        if (hasPowerStage) {
-          const psStageTime = result.stageTimes?.find(st => st.stage === powerStage);
-          let timeHtml = '—', timeSecs = Infinity;
-          if (psStageTime?.time) {
-            if (psStageTime.status === 'OK') {
-              timeHtml = psStageTime.time; timeSecs = timeToSeconds(psStageTime.time);
-              if (psStageTime.tireChange) timeHtml = `<span class="time-with-tire">${shortTime(psStageTime.time)}<span class="tire-icon" data-tooltip="Zmiana opony podczas OS"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="11.5"/><circle cx="12" cy="12" r="8.8" fill="var(--color-background-primary,#fff)"/><circle cx="12" cy="12" r="8.1"/><circle cx="12" cy="12" r="7.2" fill="var(--color-background-primary,#fff)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(45 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(90 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(135 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(180 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(225 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(270 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(315 12 12)"/><circle cx="12" cy="12" r="2.4" fill="var(--color-background-primary,#fff)"/><circle cx="12" cy="12" r="1.6"/></svg></span></span>`;
-            } else timeHtml = psStageTime.status;
-          }
-          bodyHtml += `<div data-ps-time="${timeSecs}" data-ps-display="${psStageTime?.time || '—'}">${timeHtml}</div>`;
-        }
-        regularStages.forEach((stage, j) => {
+        
+        // Dla każdego etapu w oryginalnej kolejności
+        for (let i = 0; i < allStages.length; i++) {
+          const stage = allStages[i];
           const stageTime = result.stageTimes?.find(st => st.stage === stage);
           let timeHtml = '—', timeSecs = Infinity;
           if (stageTime?.time) {
@@ -806,8 +818,9 @@ function getDriverLink(driverName, driverId) {
               if (stageTime.tireChange) timeHtml = `<span class="time-with-tire">${shortTime(stageTime.time)}<span class="tire-icon" data-tooltip="Zmiana opony podczas OS"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="11.5"/><circle cx="12" cy="12" r="8.8" fill="var(--color-background-primary,#fff)"/><circle cx="12" cy="12" r="8.1"/><circle cx="12" cy="12" r="7.2" fill="var(--color-background-primary,#fff)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(45 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(90 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(135 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(180 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(225 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(270 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(315 12 12)"/><circle cx="12" cy="12" r="2.4" fill="var(--color-background-primary,#fff)"/><circle cx="12" cy="12" r="1.6"/></svg></span></span>`;
             } else timeHtml = stageTime.status;
           }
-          bodyHtml += `<div data-os-time="${timeSecs}" data-os-display="${stageTime?.time || '—'}" data-stage-index="${j}">${timeHtml}</div>`;
-        });
+          bodyHtml += `<div data-os-time="${timeSecs}" data-os-display="${stageTime?.time || '—'}" data-stage-index="${i}">${timeHtml}</div>`;
+        }
+        
         bodyHtml += `
             <div class="col-total">${result.totalTime}</div>
             <div class="col-diff">${result.diff !== null ? formatDiff(result.diff) : '—'}</div>
@@ -886,14 +899,31 @@ function getDriverLink(driverName, driverId) {
       const tabsContainer = document.getElementById('stageTabs');
       const stages = rallyData.stages, powerStage = rallyData.powerStage;
       if (!stages || stages.length === 0) return;
-      const regularStages = stages.filter(s => s !== powerStage);
-      const hasPowerStage = powerStage && stages.includes(powerStage);
+      
       let html = '<button class="tab active" type="button" data-tab="lacznie">Łącznie</button>';
-      if (hasPowerStage) html += `<button class="tab" type="button" data-tab="powerstage" data-is-ps="true">Power Stage</button>`;
-      regularStages.forEach((stage, index) => {
-        const originalIndex = stages.findIndex(s => s === stage);
-        html += `<button class="tab" type="button" data-tab="stage_${originalIndex}" data-is-ps="false">OS${index + 1}</button>`;
-      });
+      
+      // Tworzymy mapę: nazwa etapu -> czy to PS
+      const isPowerStageMap = {};
+      if (powerStage) {
+        isPowerStageMap[powerStage] = true;
+      }
+      
+      // Dla każdego etapu w oryginalnej kolejności - używamy indeksu + 1 jako numeru OS
+      for (let i = 0; i < stages.length; i++) {
+        const stage = stages[i];
+        const isPS = isPowerStageMap[stage] || false;
+        
+        let label;
+        if (isPS) {
+          label = 'Power Stage';
+        } else {
+          // Numer OS to indeks + 1, niezależnie od pozycji PS
+          label = `OS${i + 1}`;
+        }
+        
+        html += `<button class="tab" type="button" data-tab="stage_${i}" data-is-ps="${isPS}">${label}</button>`;
+      }
+      
       tabsContainer.innerHTML = html;
       document.querySelectorAll('.tab').forEach(tab => {
         tab.addEventListener('click', async () => {
@@ -903,13 +933,9 @@ function getDriverLink(driverName, driverId) {
           tab.classList.add('active');
           if (target === 'lacznie') {
             document.querySelector('.tab-panel[data-panel="lacznie"]').classList.add('active');
-          } else if (target === 'powerstage') {
-            const powerStageIndex = rallyData.stages.findIndex(s => s === rallyData.powerStage);
-            await showStageResults(powerStageIndex, true);
-            document.querySelector(`.tab-panel[data-panel="stage_${powerStageIndex}"]`)?.classList.add('active');
           } else {
             const stageIndex = parseInt(target.split('_')[1]);
-            await showStageResults(stageIndex, false);
+            await showStageResults(stageIndex, isPS);
             document.querySelector(`.tab-panel[data-panel="stage_${stageIndex}"]`)?.classList.add('active');
           }
         });
@@ -933,7 +959,9 @@ function getDriverLink(driverName, driverId) {
       const allPenalties  = results.penalties || {};
       const powerStage    = rallyData.powerStage;
       const regularStages = rallyData.stages.filter(s => s !== powerStage);
-      const regularStageIndex    = isPowerStage ? -1 : regularStages.indexOf(stageName);
+      
+      // Znajdujemy indeks bieżącego etapu wśród regularnych etapów (dla PS będzie -1)
+      const regularStageIndex = isPowerStage ? -1 : regularStages.indexOf(stageName);
       const stagesToSumPenalties = isPowerStage ? [stageName] : regularStages.slice(0, regularStageIndex + 1);
       const allDriverIds = stageResults.map(r => r.driverId);
 
