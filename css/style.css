@@ -3750,3 +3750,11 @@ body.dark .index-section-header__meta {
   vertical-align: middle;
   margin-right: 0px;
 }
+
+* {
+    scroll-behavior: smooth;
+}
+
+.rallytv-btn{
+  font-family: "WRCCleanBold", Arial, sans-serif !important;
+}
