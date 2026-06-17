@@ -7,7 +7,7 @@
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css" />
   <link rel="stylesheet" href="css/style.css" />
-    <link rel="icon" href="https://i.imgur.com/CqBPD1t.png" />
+  <link rel="icon" href="assets/icon.jpg" />
 
   <style>
     .flag-emoji {
@@ -158,29 +158,39 @@
     .standings-table--ss .standings-row > div:nth-child(7) { justify-content: center; text-align: center; }
     .standings-table--ss .standings-row > div:nth-child(8) { justify-content: center; text-align: center; }
 
+    /* ═══════════════════════════════════════════
+       POPRAWIONE STYLE DLA IKONY OPONY
+       ═══════════════════════════════════════════ */
+    .time-with-tire {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      white-space: nowrap;
+      line-height: 1;
+      vertical-align: middle;
+    }
+
     .tire-icon {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      margin-left: 2px;
       line-height: 1;
+      vertical-align: middle;
       position: relative;
-      top: -0.5px;
+      top: 0;
+      margin: 0;
+      padding: 0;
     }
+
     .tire-icon svg {
       width: 10px;
-      height: 11px;
+      height: 10px;
       display: block;
       color: inherit;
       opacity: 0.90;
-    }
-    .time-with-tire {
-      display: inline-flex;
-      align-items: center;
-      gap: 0;
-      white-space: nowrap;
-      line-height: 1;
+      vertical-align: middle;
     }
 
     [data-tooltip] {
@@ -442,13 +452,13 @@ function getDriverLink(driverName, driverId) {
       <div class="hero__content">
         <nav class="topbar">
           <div class="topbar__left"></div>
-            <div class="topbar__center">
-              <a href="index.html" class="topbar__link">Strona główna</a>
-              <a href="kalendarz.html" class="topbar__link">Kalendarz</a>
-              <a href="tab.html" class="topbar__link active">Wyniki i klasyfikacja</a>
-              <a href="teams.html" class="topbar__link">Zespoły i kierowcy</a>
-              <a href="archiwum.html" class="topbar__link">Archiwum</a>
-            </div>
+          <div class="topbar__center">
+            <a href="start.html" class="topbar__link">Start</a>
+            <a href="kalendarz.html" class="topbar__link">Kalendarz</a>
+            <a href="index.html" class="topbar__link active">Wyniki i klasyfikacja</a>
+            <a href="teams.html" class="topbar__link">Zespoły i kierowcy</a>
+            <a href="archiwum.html" class="topbar__link">Archiwum</a>
+          </div>
           <div class="topbar__right">
             <a href="#" class="rallytv-btn">Rally.TV</a>
             <button class="theme-toggle-btn" id="themeToggle" aria-label="Przełącz motyw" type="button">
@@ -766,7 +776,7 @@ function getDriverLink(driverName, driverId) {
         
         let label;
         if (isPS) {
-          label = 'PS';
+          label = `PS (OS${i + 1})`;
         } else {
           // Numer OS to indeks + 1, niezależnie od pozycji PS
           label = `OS${i + 1}`;
