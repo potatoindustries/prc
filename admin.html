@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>RPC • Panel Administratora</title>
+  <title>Panel Administratora - WRC Manager</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="css/style.css">
@@ -961,10 +961,25 @@
 
     function _getLocalData() {
       if (Cache._rawData) return Cache._rawData;
-      return {
+      // Pobieramy dane z API - nie ustawiamy domyślnego hasła w kodzie
+      const defaultData = {
         seasons: { "2025": { calendar: [], drivers: [], teams: [], rallyResults: {}, calendarOrder: {} } },
-        settings: { currentSeason: "2025", adminPassword: "admin123", teamPointsCount: 2, pointsSystem: [25,18,15,12,10,8,6,4,2,1], powerStagePoints: [5,4,3,2,1], driverLaurels: {} }
+        settings: { 
+          currentSeason: "2025", 
+          adminPassword: "", // Puste hasło - wymagane ustawienie przy pierwszym uruchomieniu
+          teamPointsCount: 2, 
+          pointsSystem: [25,18,15,12,10,8,6,4,2,1], 
+          powerStagePoints: [5,4,3,2,1], 
+          driverLaurels: {} 
+        }
       };
+      
+      // Jeśli API ma dane, użyj ich, w przeciwnym razie zwróć puste
+      if (api && api.data) {
+        return api.data;
+      }
+      
+      return defaultData;
     }
 
     function _getLocalSeason() {
