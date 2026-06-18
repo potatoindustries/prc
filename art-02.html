@@ -4,14 +4,48 @@
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PRC • Przygotowania do sezonu</title>
+    <title>Profil Kierowcy - Przygotowania do sezonu DiRT Rally 2.0</title>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css" />
     <link rel="stylesheet" href="css/archiwum.css" />
     <link rel="stylesheet" href="css/style.css" />
-    <link rel="icon" href="https://i.imgur.com/CqBPD1t.png" />
+    <link rel="icon" href="assets/icon.jpg" />
 
     <style>
+        @font-face {
+            font-family: "SebinoRegular";
+            src: url("assets/fonts/Sebino Regular.ttf") format("truetype");
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: "WRCCleanRoman";
+            src: url("assets/fonts/WRCCleanRoman.ttf") format("truetype");
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        /* ===== PROGRESS BAR ===== */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: rgba(0, 0, 0, 0.1);
+            z-index: 10000;
+        }
+        .progress-bar {
+            height: 4px;
+            background: #ff6b00;
+            width: 0%;
+            transition: width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        body.dark .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
         /* ===== HELPERS ===== */
         .no-transition * { transition: none !important; }
         .icon-moon { display: none; }
@@ -28,79 +62,7 @@
         }
 
         .hero {
-            min-height: 50vh;
-        }
-
-        .driver-hero-bottom {
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            padding: 0 44px 36px;
-            display: flex;
-            align-items: center;
-            gap: 24px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .driver-hero-bottom__socials {
-            display: flex;
-            gap: 10px;
-            margin-left: auto;
-            flex-shrink: 0;
-            align-self: flex-end;
-            margin-right: 40px;
-            padding-bottom: 4px;
-        }
-        .driver-social-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(15, 20, 30, 0.55);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255,255,255,0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #e8eaf0;
-            text-decoration: none;
-            transition: background .22s, transform .18s, border-color .22s;
-        }
-        .driver-social-icon:hover {
-            background: rgba(255, 255, 255, 0.18);
-        }
-        .driver-social-icon svg {
-            width: 18px;
-            height: 18px;
-            fill: currentColor;
-            flex-shrink: 0;
-        }
-        .driver-hero-bottom__avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid rgba(255,255,255,.45);
-            flex-shrink: 0;
-            display: block;
-        }
-        .driver-hero-bottom__text {
-            flex: 1;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: baseline;
-            gap: 24px;
-            row-gap: 12px;
-        }
-        .driver-hero-bottom__name {
-            font-family: "WRCCleanBold", Arial, sans-serif;
-            font-size: 48px;
-            line-height: 1.05;
-            color: #fff;
-            text-shadow: 0 2px 14px rgba(0,0,0,.5);
-            margin: 0;
-            display: flex;
-            flex-direction: column;
+            min-height: 70vh;
         }
 
         .driver-main {
@@ -110,15 +72,44 @@
         body.dark .driver-main { background: #1a1a1a; }
 
         .driver-content {
-            max-width: 1100px;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 1px 44px 80px;
+            padding: 1px 0 80px;
         }
+
+        /* ===== ARTICLE INTRO ===== */
+        .article-intro {
+            padding: 0 44px;
+        }
+
+        .article-lead {
+            font-family: "WRCCleanBold", Arial, sans-serif;
+            font-size: 22.5px;
+            line-height: 1.5;
+            color: #1a2635;
+            font-weight: 700;
+            margin: 32px 0 12px;
+        }
+        body.dark .article-lead { color: #e8eef4; }
+
+        .article-meta {
+            font-family: "SebinoRegular", Arial, sans-serif;
+            font-size: 13px;
+            color: #67727f;
+            margin-bottom: 36px;
+            line-height: 1.6;
+        }
+        body.dark .article-meta { color: #888; }
+        .article-meta strong {
+            display: block;
+            color: #26384b;
+        }
+        body.dark .article-meta strong { color: #aaa; }
 
         .driver-section-title {
             font-family: "WRCCleanBold", Arial, sans-serif;
-            font-size: 30px;
-            margin: 44px 0 18px;
+            font-size: 32px;
+            margin: 44px 44px 18px;
             color: #26384b;
             border-left: 4px solid var(--orange);
             padding-left: 15px;
@@ -128,10 +119,10 @@
 
         .stats-card {
             background: #fff;
-            border-radius: 12px;
+            border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 2px 10px rgba(0,0,0,.06);
-            margin-bottom: 32px;
+            margin: 0 44px 32px;
             transition: background .38s, box-shadow .32s;
             box-sizing: border-box;
         }
@@ -143,7 +134,7 @@
         .stats-card__head--two {
             background: #f2f3f3;
             color: #67727f;
-            font-family: "SebinoSoft", Arial, sans-serif;
+            font-family: "SebinoRegular", Arial, sans-serif;
             font-size: 11px;
             letter-spacing: .03em;
             text-transform: uppercase;
@@ -163,7 +154,7 @@
             padding: 0 18px;
             min-height: 48px;
             background: #fff;
-            font-family: "SebinoSoft", Arial, sans-serif;
+            font-family: "SebinoRegular", Arial, sans-serif;
             font-size: 13px;
             color: #26384b;
             border-bottom: 1px solid rgba(225, 231, 238, 0.8);
@@ -197,21 +188,55 @@
             display: block;
         }
 
+        .driver-bio {
+            padding: 0 44px;
+        }
+
         .driver-bio p {
-            font-family: "SebinoMedium", Arial, sans-serif !important;
-            font-size: 16px;
+            font-family: "SebinoRegular", Arial, sans-serif !important;
+            font-size: 18.5px;
             line-height: 1.75;
             color: #26384b;
             margin-bottom: 16px;
         }
         body.dark .driver-bio p { color: #c0c0c0; }
 
-        .driver-img-wrap { margin: 28px 0 32px; }
-        .driver-img-wrap img { width: 100%; border-radius: 10px; display: block; max-height: 450px; object-fit: cover; }
-        .driver-img-caption { font-family: "SebinoSoft", Arial, sans-serif; font-size: 12px; color: #67727f; margin-top: 8px; margin-left: 5px;}
-        .driver-img-copyright { display: block; font-size: 10px; color: #aaa; margin-top: 2px; }
+        /* ===== ZDJĘCIA – wyrównane do lewej krawędzi contentu, wychodzą w prawo ===== */
+        .driver-img-wrap {
+            margin: 28px 0 0;
+            padding-left: 44px;
+            overflow: visible;
+        }
+        .driver-img-wrap img {
+            display: block;
+            width: 1098px;
+            max-width: none;
+            height: 731.84px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .driver-img-caption {
+            font-family: "SebinoRegular", Arial, sans-serif;
+            font-size: 12px;
+            color: #67727f;
+            margin-top: 15px;
+            margin-left: 2px;
+        }
+        .driver-img-copyright {
+            display: block;
+            font-size: 11px;
+            color: #aaa;
+            margin-top: 2px;
+        }
 
-        .driver-footer-img { width: 100%; border-radius: 10px; display: block; object-fit: cover; max-height: 500px; margin-top: 52px; }
+        .driver-footer-img {
+            display: block;
+            width: 1098px;
+            max-width: none;
+            height: 731.84px;
+            object-fit: cover;
+            border-radius: 0;
+        }
 
         .animate-on-scroll { opacity: 0; transform: translateY(18px); transition: opacity .5s ease, transform .5s ease; }
         .animate-on-scroll.visible { opacity: 1; transform: none; }
@@ -224,14 +249,14 @@
             background: rgba(0,0,0,0.03);
             border-left: 3px solid #ff6b00;
             padding: 16px 24px;
-            margin: 24px 0;
+            margin: 24px 44px;
             border-radius: 8px;
         }
         body.dark .highlight-box {
             background: rgba(255,255,255,0.05);
         }
         hr {
-            margin: 32px 0;
+            margin: 32px 44px;
             border: none;
             height: 1px;
             background: linear-gradient(to right, transparent, #ccc, transparent);
@@ -239,80 +264,200 @@
         body.dark hr {
             background: linear-gradient(to right, transparent, #444, transparent);
         }
-        /* ===== PROGRESS BAR ===== */
-.progress-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 5px;
-    background: rgba(0, 0, 0, 0.1);
-    z-index: 10000;
-}
-.progress-bar {
-    height: 4px;
-    background: #ff6b00;
-    width: 0%;
-    transition: width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-body.dark .progress-container {
-    background: rgba(255, 255, 255, 0.1);
-}
-/* ===== CYTAT ===== */
-.article-quote {
-    margin: 10px 0 10px;
-    padding: 18px 22px 14px;
-    background: #f3f4f5;
-    border-radius: 20px;
-    text-align: center;
-}
-body.dark .article-quote {
-    background: #222;
-}
-.article-quote__mark {
-    display: block;
-    width: 48px;
-    height: auto;
-    margin: 0 auto 20px auto;
-}
-.article-quote__text {
-    font-family: "WRCCleanBold", Arial, sans-serif !important;
-    font-size: 32px !important;
-    line-height: 1.25 !important;
-    color: #1a2635 !important;
-    margin: 0 0 15px !important;
-}
-body.dark .article-quote__text {
-    color: #e8eef4 !important;
-}
-.article-quote__author {
-    display: inline-block;
-    font-family: "WRCCleanBold", Arial, sans-serif;
-    font-size: 16px;
-    font-weight: 600;
-    color: #26384b;
-    text-decoration: none;
-    border-bottom: 1px solid rgba(38,56,75,0.3);
-    transition: color 0.2s, border-color 0.2s;
-}
-.article-quote__author:hover {
-    color: #ff6b00;
-    border-color: #ff6b00;
-}
-body.dark .article-quote__author {
-    color: #c0c0c0;
-    border-color: rgba(192,192,192,0.3);
-}
-body.dark .article-quote__author:hover {
-    color: #ff6b00;
-    border-color: #ff6b00;
-}        /* Styl dla strong - zmiana czcionki na Sebino Bold */
-        .driver-bio p strong,
-        .driver-bio strong {
-            font-family: "WRCCleanBold", Arial, sans-serif !important;
+        .article-quote {
+            margin: 10px 44px 10px;
+            padding: 18px 22px 14px;
+            border-radius: 20px;
+            text-align: center;
         }
-    </style>
 
+        body.dark .article-quote {
+            background: #222;
+        }
+        .article-quote__mark {
+            display: block;
+            width: 48px;
+            height: auto;
+            margin: 0 auto 20px auto;
+        }
+        .article-quote__text {
+            font-family: "WRCCleanBold", Arial, sans-serif !important;
+            font-size: 50px !important;
+            line-height: 1.25 !important;
+            color: #1a2635 !important;
+            margin: 0 0 15px !important;
+        }
+        body.dark .article-quote__text {
+            color: #e8eef4 !important;
+        }
+        .article-quote__author {
+            display: inline-block;
+            font-family: "WRCCleanBold", Arial, sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            color: #26384b;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(38,56,75,0.3);
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .article-quote__author:hover {
+            color: #ff6b00;
+            border-color: #ff6b00;
+        }
+        body.dark .article-quote__author {
+            color: #c0c0c0;
+            border-color: rgba(192,192,192,0.3);
+        }
+        body.dark .article-quote__author:hover {
+            color: #ff6b00;
+            border-color: #ff6b00;
+        }
+        .verdict-badge {
+            background: #0a2a3b;
+            color: white;
+            padding: 24px 32px;
+            border-radius: 20px;
+            margin: 48px 44px 24px;
+        }
+        body.dark .verdict-badge {
+            background: #0f212e;
+        }
+        .verdict-badge h3 {
+            margin-top: 0;
+            font-size: 28px;
+        }
+
+        .hero__title-wrap {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 44px;
+        }
+        .hero__title {
+            font-size: 57px;
+        }
+        .topbar__link {
+            font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+            font-weight: 550 !important;
+        }
+        /* ── STYLE NAVBAR ── */
+.topbar {
+  align-items: center !important;
+  grid-template-columns: 180px auto 170px !important;
+  justify-content: space-between !important;
+}
+
+.topbar__center {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: auto !important;
+  flex: 0 0 auto !important;
+  gap: 0 !important;
+  background: rgba(28, 28, 28, 0.58) !important;
+  backdrop-filter: blur(8px) saturate(1.3) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(1.3) !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  padding: 3px 20px !important;
+  transform: translateY(-3px) !important;
+}
+
+.topbar__link {
+  font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+  font-weight: 500 !important;
+  color: rgba(255,255,255,0.88) !important;
+  text-decoration: none !important;
+  font-size: 15px !important;
+  letter-spacing: 0.01em !important;
+  padding: 10px 20px !important;
+  height: auto !important;
+  border-radius: 999px !important;
+  transition: color 0.15s ease !important;
+  white-space: nowrap !important;
+  position: relative !important;
+  line-height: 1 !important;
+}
+
+.topbar__link::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,0.10) !important;
+  opacity: 0 !important;
+  transform: scale(0.82) !important;
+  transition: opacity 0.18s ease, transform 0.18s ease !important;
+  pointer-events: none !important;
+}
+
+.topbar__link:first-child {
+  border-radius: 999px !important;
+  margin-left: -7px !important;
+}
+.topbar__link:first-child::before {
+  left: -10px !important;
+  right: 0 !important;
+  border-radius: 999px !important;
+}
+.topbar__link:last-child {
+  border-radius: 999px !important;
+  margin-right: -7px !important;
+}
+.topbar__link:last-child::before {
+  right: -10px !important;
+  left: 0 !important;
+  border-radius: 999px !important;
+}
+
+.topbar__link:hover::before {
+  opacity: 1 !important;
+  transform: scale(1) !important;
+}
+
+.topbar__link:hover {
+  color: #fff !important;
+}
+
+.topbar__link::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 50% !important;
+  bottom: 1px !important;
+  width: 0 !important;
+  height: 2px !important;
+  border-radius: 1000px !important;
+  background: var(--orange) !important;
+  transform: translateX(-50%) !important;
+  opacity: 0 !important;
+  transition: width 0.24s ease, opacity 0.2s ease !important;
+  display: block !important;
+}
+
+.topbar__link:hover::after {
+  width: 0 !important;
+  opacity: 0 !important;
+}
+
+.topbar__link.active {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+.topbar__link.active::after {
+  width: calc(100% - 40px) !important;
+  opacity: 1 !important;
+}
+
+.tab {
+  font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+  font-weight: 500 !important;
+}
+
+.rallytv-btn {
+  font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+  font-weight: 500 !important;
+}
+    </style>
     <script>
         if (localStorage.getItem("wrc-theme") === "dark")
             document.documentElement.classList.add("wrc-dark");
@@ -320,9 +465,10 @@ body.dark .article-quote__author:hover {
     <script src="theme.js"></script>
 </head>
 <body>
-    <div class="progress-container">
+<div class="progress-container">
     <div class="progress-bar" id="scrollProgressBar"></div>
 </div>
+
 <a href="index.html" class="floating-logo" aria-label="Home">
     <img src="assets/logo.png" alt="Logo" class="floating-logo__img" />
 </a>
@@ -332,88 +478,79 @@ body.dark .article-quote__author:hover {
         <div class="hero__bg"></div>
         <div class="hero__overlay"></div>
         <div class="hero__content">
-            <nav class="topbar">
-                <div class="topbar__left"></div>
-            <div class="topbar__center">
-              <a href="index.html" class="topbar__link">Strona główna</a>
-              <a href="kalendarz.html" class="topbar__link">Kalendarz</a>
-              <a href="tab.html" class="topbar__link">Wyniki i klasyfikacja</a>
-              <a href="teams.html" class="topbar__link">Zespoły i kierowcy</a>
-              <a href="archiwum.html" class="topbar__link">Archiwum</a>
-            </div>
-                <div class="topbar__right">
-                    <a href="#" class="rallytv-btn">PRC</a>
-                    <button class="theme-toggle-btn" id="themeToggle" aria-label="Przełącz motyw" type="button">
-                        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="5" />
-                            <line x1="12" y1="1" x2="12" y2="3" />
-                            <line x1="12" y1="21" x2="12" y2="23" />
-                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                            <line x1="1" y1="12" x2="3" y2="12" />
-                            <line x1="21" y1="12" x2="23" y2="12" />
-                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-                        </svg>
-                        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                        </svg>
-                    </button>
-                </div>
-            </nav>
+<nav class="topbar">
+  <div class="topbar__left"></div>
+  <div class="topbar__center">
+    <a href="index.html" class="topbar__link">Strona główna</a>
+    <a href="kalendarz.html" class="topbar__link">Kalendarz</a>
+    <a href="tab.html" class="topbar__link">Wyniki i klasyfikacja</a>
+    <a href="teams.html" class="topbar__link">Zespoły i kierowcy</a>
+    <a href="archiwum.html" class="topbar__link">Archiwum</a>
+  </div>
+  <div class="topbar__right">
+    <a href="#" class="rallytv-btn">PRC</a>
+    <button class="theme-toggle-btn" id="themeToggle" aria-label="Przełącz motyw" type="button">
+      <svg class="icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg class="icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</nav>
             <div class="hero__title-wrap">
-                <h1 class="hero__title">Za kierownicą Lancii <br> <small>czyli jak Dyxan przygotowuje się do sezonu</small></h1>
+                <h1 class="hero__title">Za kierownicą Lancii<br><small>czyli jak Dyxan przygotowuje się do sezonu</small></h1>
             </div>
         </div>
     </header>
     <main class="driver-main">
         <div class="driver-content">
             <div id="panel-prc1" class="archive-panel active">
-                
-                <!-- Wprowadzenie -->
+
+                <!-- Lead + meta -->
+                <div class="article-intro animate-on-scroll">
+                    <p class="article-lead">Damian Siemaszko bez tuningu, ale z ambicjami. Sprawdzamy, jak Dyxan przygotowuje się do nowego sezonu PRC po kontrowersyjnej decyzji FIA.</p>
+                    <p class="article-meta">
+                        3 min czytania • Opublikowano 16.06.2026 • 09:00 GMT+2
+                    </p>
+                </div>
+
+                <!-- Sekcja 1 -->
                 <div class="driver-section-title animate-on-scroll">Nowy sezon, nowe wyzwania</div>
                 <div class="driver-bio animate-on-scroll">
                     <p>Gdy zapadła decyzja FIA o całkowitym zakazie tuningu, wielu ekspertów zaczęło typować, że sezon może być jednostajny. Ale nie dla Damiana Siemaszko. Jego przygotowania do rozpoczynającej się rywalizacji pokazują, że nawet bez możliwości modyfikacji ustawień można szukać czasu na trasie. Ostatnie dni to dla niego prawdziwy maraton treningowy.</p>
                     <p>Dla Dyxana zakaz tuningu to cios szczególnie bolesny. To właśnie w szczegółowych konfiguracjach pojazdu czuł się najlepiej. Dziś, gdy cała stawka startuje z tymi samymi, domyślnymi ustawieniami, jego rola jako kierowcy nabiera zupełnie nowego znaczenia.</p>
                 </div>
 
-                <!-- Grafika 1 -->
+                <!-- Zdjęcie 1 -->
                 <div class="driver-img-wrap animate-on-scroll">
-                              <img src="https://i.imgur.com/14qK9c6.jpeg" alt="Damian Siemaszko podczas treningu Lancią" class="driver-footer-img animate-on-scroll" style="object-position: center 66%; max-height: 1000px;" />
+                    <img src="https://i.imgur.com/ozqvzfl.png" alt="Damian Siemaszko podczas treningu Lancią" style="object-position: center 66%;" />
+                    <p class="driver-img-caption">© PRC / Damian Siemaszko</p>
                 </div>
 
-                <!-- Sekcja Trening w Monte Carlo -->
+                <!-- Sekcja 2 -->
                 <div class="driver-section-title animate-on-scroll">Monte Carlo – poligon mistrzów</div>
                 <div class="driver-bio animate-on-scroll">
                     <p>Rajd Monte Carlo to nie tylko ikona rajdów, ale także najbardziej zdradliwy sprawdzian dla każdego kierowcy. Lód, śnieg, suchy asfalt – wszystko w ciągu jednego odcinka. Dyxan od dawna przyznawał, że to jego ukochana runda. Tu czuje się jak ryba w wodzie, a jego Lancia Delta HF Integrale, nawet w wersji fabrycznej, wydaje się stworzona do tych wymagających warunków.</p>
                     <p>Przedsezonowe testy na monakijskich odcinkach specjalnych pokazały, że nawet bez możliwości regulacji zawieszenia Lancia zachowuje zaskakująco dużo przyczepności i stabilności. Dyxan notował czasy, które w zestawieniu z poprzednimi latami plasowałyby go w ścisłej czołówce.</p>
                 </div>
-                <!-- Film (grafika) -->
-                <div class="animate-on-scroll">
-                              <img src="https://i.imgur.com/4Bjyv8v.png" alt="Lancia na zakręcie – zbliżenie" class="driver-footer-img animate-on-scroll" style="object-position: center 66%; max-height: 1000px;" />
+
+                <!-- Zdjęcie 2 -->
+                <div class="driver-img-wrap animate-on-scroll">
+                    <img src="https://i.imgur.com/4Bjyv8v.png" alt="Lancia na zakręcie – zbliżenie" style="object-position: center 66%;" />
+                    <p class="driver-img-caption">© PRC</p>
                 </div>
-                <br>
+
                 <!-- Cytat -->
                 <div class="article-quote animate-on-scroll">
                     <img src="https://i.imgur.com/niCQozh.png" alt="" class="article-quote__mark" />
-                    <p class="article-quote__text">Tu cie mam... Tu cie mam...</p>
+                    <p class="article-quote__text">Tu cie mam ... Tu cie mam...</p>
                     <a href="d4xan.html" class="article-quote__author">Damian Siemaszko</a>
                 </div>
 
-                
-                <!-- Plan taktyczny -->
+                <!-- Sekcja 3 -->
                 <div class="driver-section-title animate-on-scroll">Strategia na cały turniej</div>
                 <div class="driver-bio animate-on-scroll">
                     <p>W szczerej rozmowie z redaktorem Dyxan zdradził kulisy swojej tegorocznej taktyki. Ponieważ nie może już polegać na swoich setupach, cały nacisk położył na perfekcyjne opanowanie linii jazdy, precyzyjne hamowanie i wyczucie balansu auta.</p>
-                    <p>Głównym celem pozostaje jak najwyższa lokata w rajdzie Monte Carlo – jego koronnej rundzie – a potem systematyczne skubanie wysokich punktów w całym sezonie. Dyxan nie ukrywa też, że obserwuje rywali: <strong>„Widzę, że niektórzy mają problem z dostosowaniem się do nowych aut To może być nasza szansa”.</strong></p>
+                    <p>Głównym celem pozostaje jak najwyższa lokata w rajdzie Monte Carlo – jego koronnej rundzie – a potem systematyczne wysokie punkty w całym sezonie. Dyxan nie ukrywa też, że obserwuje rywali: <strong>„Widzę, że niektórzy mają problem z dostosowaniem się do nowych przepisów. To może być nasza szansa".</strong></p>
                     <p>Zapowiada się emocjonujący sezon, w którym surowe przepisy mogą paradoksalnie wyłonić najlepszego kierowcę, a nie najlepszego inżyniera.</p>
-                </div>
-
-                <!-- Dodatkowa sekcja - sprzęt i współpraca z zespołem -->
-                <div class="driver-section-title animate-on-scroll">Lancia i zespół – jedność ponad wszystko</div>
-                <div class="driver-bio animate-on-scroll">
-                    <p>Nie można jednak zapominać, że za jednym kierowcą stoi cały sztab. Team Lancia, mimo rozczarowania decyzją FIA, stanął za Dyxanem murem. Inżynierowie przygotowali dla niego szczegółowe raporty z zachowania samochodu na domyślnych ustawieniach, a także zestawienia optymalnych stylów jazdy na każdy odcinek. „Mój inżynier spędził tygodnie nad danymi telemetrycznymi, żeby znaleźć choćby ułamek sekundy” – chwali współpracę.</p>
-                    <p>Co ciekawe, zespół przygotował też specjalny program psychologiczny, by pomóc kierowcy oswoić się z brakiem możliwości wpływania na ustawienia. „To nie jest łatwe, zwłaszcza gdy przez lata tuning był twoją drugą naturą. Ale powoli zaczynam to akceptować”. Wspólna kolacja przed pierwszym rajdem? Ma być symbolicznym początkiem nowego rozdziału – bez śrubokrętów i klawiatur konfiguracji, tylko z kierownicą i pędem do przodu.</p>
                 </div>
 
             </div>
@@ -421,23 +558,26 @@ body.dark .article-quote__author:hover {
     </main>
 </div>
 
-    <footer class="site-footer">
-      <div class="site-footer__sponsors">
+<div class="footer-spacer"></div>
+
+<footer class="site-footer">
+    <div class="site-footer__sponsors">
         <div class="footer-photo"><img src="https://i.imgur.com/JSWXXPK.png" alt="" /></div>
         <div class="footer-photo"><img src="https://i.imgur.com/3e0jqkQ.png" alt="" /></div>
         <div class="footer-photo"><img src="https://i.imgur.com/BQ7N4GM.png" alt="" /></div>
-      </div>
-      <div class="footer-divider"></div>
-      <p class="footer-copyright">&copy; 2026 PRC. All rights reserved.</p>
-    </footer>
+    </div>
+    <div class="footer-divider"></div>
+    <p class="footer-copyright">&copy; 2026 PRC. All rights reserved.</p>
+</footer>
 
 <script>
     window.addEventListener('scroll', function() {
-    const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-    const scrolled = (winScroll / height) * 100;
-    document.getElementById('scrollProgressBar').style.width = scrolled + '%';
-});
+        const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (winScroll / height) * 100;
+        document.getElementById('scrollProgressBar').style.width = scrolled + '%';
+    });
+
     const logo = document.querySelector(".floating-logo");
     const hero = document.querySelector(".hero");
     window.addEventListener("scroll", () => {
@@ -446,11 +586,11 @@ body.dark .article-quote__author:hover {
     }, { passive: true });
 
     const observer = new IntersectionObserver((entries) => {
-        entries.forEach((e) => { 
-            if (e.isIntersecting) { 
-                e.target.classList.add("visible"); 
-                observer.unobserve(e.target); 
-            } 
+        entries.forEach((e) => {
+            if (e.isIntersecting) {
+                e.target.classList.add("visible");
+                observer.unobserve(e.target);
+            }
         });
     }, { threshold: 0.1 });
 
@@ -463,36 +603,6 @@ body.dark .article-quote__author:hover {
     }
 
     observeActivePanelElements();
-
-    function switchArchivePanel(panelId) {
-        document.querySelectorAll('.archive-panel').forEach(panel => {
-            panel.classList.remove('active');
-        });
-        const activePanel = document.getElementById(panelId);
-        if (activePanel) {
-            activePanel.classList.add('active');
-        }
-        setTimeout(() => {
-            observeActivePanelElements();
-        }, 100);
-    }
-
-    document.querySelectorAll('.tab').forEach(tab => {
-        tab.addEventListener('click', function() {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-            const tabId = this.getAttribute('data-tab');
-            let panelId = 'panel-prc1';
-            switch(tabId) {
-                case 'prc1': panelId = 'panel-prc1'; break;
-                case 'prc2': panelId = 'panel-prc2'; break;
-                case 'prxc': panelId = 'panel-prxc'; break;
-                case 'prc3': panelId = 'panel-prc3'; break;
-                default: panelId = 'panel-prc1';
-            }
-            switchArchivePanel(panelId);
-        });
-    });
 
     (function () {
         if (localStorage.getItem("wrc-theme") === "dark") document.body.classList.add("dark");

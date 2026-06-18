@@ -448,6 +448,143 @@
       background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 60%, rgba(0,0,0,0.05) 100%);
       opacity: 0.3;
     }
+
+    /* ── STYLE NAVBAR ── */
+    .topbar {
+      align-items: center !important;
+      grid-template-columns: 180px auto 170px !important;
+      justify-content: space-between !important;
+    }
+
+    .topbar__center {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: auto !important;
+      flex: 0 0 auto !important;
+      gap: 0 !important;
+      background: rgba(28, 28, 28, 0.58) !important;
+      backdrop-filter: blur(8px) saturate(1.3) !important;
+      -webkit-backdrop-filter: blur(8px) saturate(1.3) !important;
+      border-radius: 999px !important;
+      border: 1px solid rgba(255,255,255,0.14) !important;
+      padding: 3px 20px !important;
+      transform: translateY(-3px) !important;
+      background: rgba(28, 28, 28, 0.45) !important;
+    }
+
+    .topbar__link {
+      font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+      font-weight: 500 !important;
+      color: rgba(255,255,255,0.88) !important;
+      text-decoration: none !important;
+      font-size: 15px !important;
+      letter-spacing: 0.01em !important;
+      padding: 10px 20px !important;
+      height: auto !important;
+      border-radius: 999px !important;
+      transition: color 0.15s ease !important;
+      white-space: nowrap !important;
+      position: relative !important;
+      line-height: 1 !important;
+    }
+
+    .topbar__link::before {
+      content: "" !important;
+      position: absolute !important;
+      inset: 0 !important;
+      border-radius: 999px !important;
+      background: rgba(255,255,255,0.10) !important;
+      opacity: 0 !important;
+      transform: scale(0.82) !important;
+      transition: opacity 0.18s ease, transform 0.18s ease !important;
+      pointer-events: none !important;
+    }
+
+    .topbar__link:first-child {
+      border-radius: 999px !important;
+      margin-left: -7px !important;
+    }
+    .topbar__link:first-child::before {
+      left: -10px !important;
+      right: 0 !important;
+      border-radius: 999px !important;
+    }
+    .topbar__link:last-child {
+      border-radius: 999px !important;
+      margin-right: -7px !important;
+    }
+    .topbar__link:last-child::before {
+      right: -10px !important;
+      left: 0 !important;
+      border-radius: 999px !important;
+    }
+
+    .topbar__link:hover::before {
+      opacity: 1 !important;
+      transform: scale(1) !important;
+    }
+
+    .topbar__link:hover {
+      color: #fff !important;
+    }
+
+    .topbar__link::after {
+      content: "" !important;
+      position: absolute !important;
+      left: 50% !important;
+      bottom: 1px !important;
+      width: 0 !important;
+      height: 2px !important;
+      border-radius: 1000px !important;
+      background: var(--orange) !important;
+      transform: translateX(-50%) !important;
+      opacity: 0 !important;
+      transition: width 0.24s ease, opacity 0.2s ease !important;
+      display: block !important;
+    }
+
+    .topbar__link:hover::after {
+      width: 0 !important;
+      opacity: 0 !important;
+    }
+
+    .topbar__link.active {
+      background: transparent !important;
+      color: #fff !important;
+    }
+
+    .topbar__link.active::after {
+      width: calc(100% - 40px) !important;
+      opacity: 1 !important;
+    }
+    
+    .rallytv-btn {
+      font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+      font-weight: 500 !important;
+    }
+    
+    .driver-card__country,
+    .driver-card__role,
+    .driver-card__car,
+    .team-info__category,
+    .team-stat__label {
+      font-family: "SebinoSoft", Arial, sans-serif !important;
+    }
+    
+    .hero__bg {
+      background-image: url("https://www.goodwood.com/globalassets/.road--racing/event-coverage/fos/2023/07-july/-on-event-/friday/rally-stage/rally-stage-festival-of-speed-2023-36.jpg?rxy=0.5,0.5");
+    }
+
+    .team-info__name,
+    .team-stat__value {
+      font-family: "WRCCleanBold", Arial, sans-serif !important;
+    }
+    
+    .driver-card-link {
+      text-decoration: none;
+      color: inherit;
+    }
     
     /* Responsywność */
     @media (max-width: 1100px) {
@@ -478,39 +615,6 @@
       .team-item::after { bottom: -20px; left: 5px; right: 5px; }
       .laurel-img { width: 16px; height: 16px; }
       .driver-card__photo img { border-radius: 0 16px 16px 0; }
-    }
-
-    /* Poprawki czcionek - navbar i zakładki */
-    .topbar__link {
-      font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
-      font-weight: 550 !important;
-    }
-    
-    .rallytv-btn {
-      font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
-      font-weight: 500 !important;
-    }
-    
-    .driver-card__country,
-    .driver-card__role,
-    .driver-card__car,
-    .team-info__category,
-    .team-stat__label {
-      font-family: "SebinoSoft", Arial, sans-serif !important;
-    }
-    
-    .hero__bg {
-      background-image: url("https://www.goodwood.com/globalassets/.road--racing/event-coverage/fos/2023/07-july/-on-event-/friday/rally-stage/rally-stage-festival-of-speed-2023-36.jpg?rxy=0.5,0.5");
-    }
-
-    .team-info__name,
-    .team-stat__value {
-      font-family: "WRCCleanBold", Arial, sans-serif !important;
-    }
-    
-    .driver-card-link {
-      text-decoration: none;
-      color: inherit;
     }
   </style>
   <script>

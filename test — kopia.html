@@ -4,7 +4,7 @@
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PRC • Rajd Monte Carlo – zapowiedź pierwszej rundy PRC</title>
+    <title>PRC • Rajd Szwecji – podsumowanie 2. rundy</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css" />
     <link rel="stylesheet" href="css/archiwum.css" />
     <link rel="stylesheet" href="css/style.css" />
@@ -12,18 +12,17 @@
 
     <style>
         @font-face {
-    font-family: "SebinoRegular";
-    src: url("assets/fonts/Sebino Regular.ttf") format("truetype");
-    font-weight: normal;
-    font-style: normal;
-}
-
+            font-family: "SebinoRegular";
+            src: url("assets/fonts/Sebino Regular.ttf") format("truetype");
+            font-weight: normal;
+            font-style: normal;
+        }
         @font-face {
-    font-family: "WRCCleanRoman";
-    src: url("assets/fonts/WRCCleanRoman.ttf") format("truetype");
-    font-weight: normal;
-    font-style: normal;
-}
+            font-family: "WRCCleanRoman";
+            src: url("assets/fonts/WRCCleanRoman.ttf") format("truetype");
+            font-weight: normal;
+            font-style: normal;
+        }
         /* ===== PROGRESS BAR ===== */
         .progress-container {
             position: fixed;
@@ -44,7 +43,6 @@
             background: rgba(255, 255, 255, 0.1);
         }
 
-        /* ===== HELPERS ===== */
         .no-transition * { transition: none !important; }
         .icon-moon { display: none; }
         body.dark .icon-sun  { display: none; }
@@ -53,16 +51,14 @@
         /* ===== HERO BG ===== */
         .hero__bg {
             position: absolute; inset: 0;
-            background-image: url("https://upload.wikimedia.org/wikipedia/commons/f/f2/1989_Rallye_Monte_Carlo%2C_Lalouvesc_-_Saby_and_Fauchille%27s_Lancia_Delta_HF_Integrale_%281%29.jpg");
+            background-image: url("https://www.motorsport.com/images/amp/Yn1weaY0/s1000/colin-mcrae-subaru-impreza-wrc-1992-2.jpg");
             background-size: cover;
-            background-position: center 30%;
+            background-position: center 40%;
             background-repeat: no-repeat;
         }
-
         .hero {
             min-height: 70vh;
         }
-
         .driver-main {
             background: var(--section-bg);
             transition: background-color .38s ease;
@@ -74,12 +70,9 @@
             margin: 0 auto;
             padding: 1px 0 80px;
         }
-
-        /* ===== ARTICLE INTRO (jak na zdjęciu) ===== */
         .article-intro {
             padding: 0 44px;
         }
-
         .article-lead {
             font-family: "WRCCleanBold", Arial, sans-serif;
             font-size: 22.5px;
@@ -109,7 +102,7 @@
             font-size: 32px;
             margin: 44px 44px 18px;
             color: #26384b;
-            border-left: 4px solid var(--orange);
+            border-left: 4px solid #ff6b00;
             padding-left: 15px;
             transition: color .28s;
         }
@@ -144,7 +137,6 @@
             align-items: center;
             transition: background .38s, color .28s;
         }
-        
         .stats-card__row--two {
             display: grid;
             grid-template-columns: 1fr 200px;
@@ -153,36 +145,30 @@
             min-height: 48px;
             background: #fff;
             font-family: "SebinoRegular", Arial, sans-serif;
-            
             font-size: 13px;
             color: #26384b;
             border-bottom: 1px solid rgba(225, 231, 238, 0.8);
             transition: background .28s, color .28s, border-bottom-color .28s;
             box-sizing: border-box;
         }
-        
         body.dark .stats-card__head--two {
             background: #2e2e2e;
             color: #9a9088;
         }
-        
         body.dark .stats-card__row--two {
             background: #1e1e1e;
             color: #c0c0c0;
             border-bottom-color: rgba(60, 72, 88, 0.4);
         }
-        
         .stats-card__row--two:last-child {
             border-bottom: none;
         }
-        
         .stats-card__row--two:hover { background: #fcfdff; }
         body.dark .stats-card__row--two:hover { background: #252525; }
-        
+
         .archive-panel {
             display: none;
         }
-        
         .archive-panel.active {
             display: block;
         }
@@ -190,7 +176,6 @@
         .driver-bio {
             padding: 0 44px;
         }
-
         .driver-bio p {
             font-family: "SebinoRegular", Arial, sans-serif !important;
             font-size: 18.5px;
@@ -200,7 +185,6 @@
         }
         body.dark .driver-bio p { color: #c0c0c0; }
 
-        /* ===== ZDJĘCIA – wyrównane do lewej krawędzi contentu, wychodzą w prawo ===== */
         .driver-img-wrap {
             margin: 28px 0 0;
             padding-left: 44px;
@@ -228,21 +212,8 @@
             margin-top: 2px;
         }
 
-        .driver-footer-img {
-            display: block;
-            width: 1098px;
-            max-width: none;
-            height: 731.84px;
-            object-fit: cover;
-            border-radius: 0;
-        }
-
         .animate-on-scroll { opacity: 0; transform: translateY(18px); transition: opacity .5s ease, transform .5s ease; }
         .animate-on-scroll.visible { opacity: 1; transform: none; }
-
-        @media (max-width: 860px) {
-            .driver-hero-bottom__name { font-size: 40px; }
-        }
 
         .highlight-box {
             background: rgba(0,0,0,0.03);
@@ -269,7 +240,6 @@
             border-radius: 20px;
             text-align: center;
         }
-
         body.dark .article-quote {
             background: #222;
         }
@@ -325,140 +295,42 @@
             margin-top: 0;
             font-size: 28px;
         }
-        .driver-bio p strong,
-        .driver-bio strong {
-
-        }
         .hero__title-wrap {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 0 44px;
-}
-.hero__title {
-    font-size: 57px;
-}
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 44px;
+        }
+        .hero__title {
+            font-size: 57px;
+        }
         .topbar__link {
             font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
             font-weight: 550 !important;
         }
-        /* ── STYLE NAVBAR ── */
-.topbar {
-  align-items: center !important;
-  grid-template-columns: 180px auto 170px !important;
-  justify-content: space-between !important;
-}
-
-.topbar__center {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: auto !important;
-  flex: 0 0 auto !important;
-  gap: 0 !important;
-  background: rgba(28, 28, 28, 0.58) !important;
-  backdrop-filter: blur(8px) saturate(1.3) !important;
-  -webkit-backdrop-filter: blur(8px) saturate(1.3) !important;
-  border-radius: 999px !important;
-  border: 1px solid rgba(255,255,255,0.14) !important;
-  padding: 3px 20px !important;
-  transform: translateY(-3px) !important;
-}
-
-.topbar__link {
-  font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
-  font-weight: 500 !important;
-  color: rgba(255,255,255,0.88) !important;
-  text-decoration: none !important;
-  font-size: 15px !important;
-  letter-spacing: 0.01em !important;
-  padding: 10px 20px !important;
-  height: auto !important;
-  border-radius: 999px !important;
-  transition: color 0.15s ease !important;
-  white-space: nowrap !important;
-  position: relative !important;
-  line-height: 1 !important;
-}
-
-.topbar__link::before {
-  content: "" !important;
-  position: absolute !important;
-  inset: 0 !important;
-  border-radius: 999px !important;
-  background: rgba(255,255,255,0.10) !important;
-  opacity: 0 !important;
-  transform: scale(0.82) !important;
-  transition: opacity 0.18s ease, transform 0.18s ease !important;
-  pointer-events: none !important;
-}
-
-.topbar__link:first-child {
-  border-radius: 999px !important;
-  margin-left: -7px !important;
-}
-.topbar__link:first-child::before {
-  left: -10px !important;
-  right: 0 !important;
-  border-radius: 999px !important;
-}
-.topbar__link:last-child {
-  border-radius: 999px !important;
-  margin-right: -7px !important;
-}
-.topbar__link:last-child::before {
-  right: -10px !important;
-  left: 0 !important;
-  border-radius: 999px !important;
-}
-
-.topbar__link:hover::before {
-  opacity: 1 !important;
-  transform: scale(1) !important;
-}
-
-.topbar__link:hover {
-  color: #fff !important;
-}
-
-.topbar__link::after {
-  content: "" !important;
-  position: absolute !important;
-  left: 50% !important;
-  bottom: 1px !important;
-  width: 0 !important;
-  height: 2px !important;
-  border-radius: 1000px !important;
-  background: var(--orange) !important;
-  transform: translateX(-50%) !important;
-  opacity: 0 !important;
-  transition: width 0.24s ease, opacity 0.2s ease !important;
-  display: block !important;
-}
-
-.topbar__link:hover::after {
-  width: 0 !important;
-  opacity: 0 !important;
-}
-
-.topbar__link.active {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-.topbar__link.active::after {
-  width: calc(100% - 40px) !important;
-  opacity: 1 !important;
-}
-
-.tab {
-  font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
-  font-weight: 500 !important;
-}
-
-.rallytv-btn {
-  font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
-  font-weight: 500 !important;
-}
+        .standings-list {
+            padding: 0 44px 20px;
+        }
+        .standings-list li {
+            font-family: "SebinoRegular", Arial, sans-serif;
+            font-size: 17px;
+            line-height: 2;
+            color: #26384b;
+            border-bottom: 1px solid #eee;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+        }
+        body.dark .standings-list li {
+            color: #c0c0c0;
+            border-bottom-color: #2a2a2a;
+        }
+        .points-system {
+            font-family: "SebinoRegular", Arial, sans-serif;
+            font-size: 15px;
+            color: #67727f;
+            padding: 0 44px 10px;
+        }
+        body.dark .points-system { color: #999; }
     </style>
 
     <script>
@@ -482,103 +354,141 @@
         <div class="hero__overlay"></div>
         <div class="hero__content">
             <nav class="topbar">
-  <div class="topbar__left"></div>
-  <div class="topbar__center">
-    <a href="index.html" class="topbar__link">Strona główna</a>
-    <a href="kalendarz.html" class="topbar__link">Kalendarz</a>
-    <a href="tab.html" class="topbar__link">Wyniki i klasyfikacja</a>
-    <a href="teams.html" class="topbar__link">Zespoły i kierowcy</a>
-    <a href="archiwum.html" class="topbar__link">Archiwum</a>
-  </div>
-  <div class="topbar__right">
-    <a href="#" class="rallytv-btn">PRC</a>
-    <button class="theme-toggle-btn" id="themeToggle" aria-label="Przełącz motyw" type="button">
-      <svg class="icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-      <svg class="icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-    </button>
-  </div>
-</nav>
+                <div class="topbar__left"></div>
+                <div class="topbar__center">
+                    <a href="start.html" class="topbar__link">Start</a>
+                    <a href="kalendarz.html" class="topbar__link">Kalendarz</a>
+                    <a href="index.html" class="topbar__link">Wyniki i klasyfikacja</a>
+                    <a href="teams.html" class="topbar__link">Zespoły i kierowcy</a>
+                    <a href="archiwum.html" class="topbar__link">Archiwum</a>
+                </div>
+                <div class="topbar__right">
+                    <a href="#" class="rallytv-btn">PRC</a>
+                    <button class="theme-toggle-btn" id="themeToggle" aria-label="Przełącz motyw" type="button">
+                        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5" />
+                            <line x1="12" y1="1" x2="12" y2="3" />
+                            <line x1="12" y1="21" x2="12" y2="23" />
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                            <line x1="1" y1="12" x2="3" y2="12" />
+                            <line x1="21" y1="12" x2="23" y2="12" />
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                        </svg>
+                        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                        </svg>
+                    </button>
+                </div>
+            </nav>
             <div class="hero__title-wrap">
-                <h1 class="hero__title">Zapowiedź Rajdu Monte Carlo<br> <small>pierwszy sprawdzian sezonu</small></h1>
+                <h1 class="hero__title">Szwecja – podsumowanie<br> <small>zimowe szaleństwo, przebicia i nowy lider</small></h1>
             </div>
         </div>
     </header>
     <main class="driver-main">
         <div class="driver-content">
-            <div id="panel-prc1" class="archive-panel active">
+            <div id="panel-prc2" class="archive-panel active">
 
                 <!-- Lead + meta -->
                 <div class="article-intro animate-on-scroll">
-                                        <p class="article-meta">
-                        3 min czytania • Opublikowano 17.06.2026 • 16:00 GMT+2 
+                    <p class="article-meta">
+                        5 min czytania • Opublikowano 17.06.2026 • 20:15 GMT+2 
                     </p>
                 </div>
 
                 <!-- Wprowadzenie -->
-                <div class="driver-section-title animate-on-scroll">Monte Carlo – legenda wraca</div>
+                <div class="driver-section-title animate-on-scroll">Śnieżna rewolucja w Szwecji</div>
                 <div class="driver-bio animate-on-scroll">
-                    <p>Już za kilka dni kierowcy staną na starcie jednego z najtrudniejszych i najbardziej prestiżowych rajdów w kalendarzu – Rajdu Monte Carlo. To właśnie tutaj, najlepsi kierowcy zmierzą się z zmiennymi warunkami, które od dawna stanowią największe wyzwanie. W tym roku stawka jest wyjątkowo zbita – różnice między czołowymi kierowcami są minimalne, a każdy błąd może kosztować utratę kilku pozycji.</p>
-                    <p>Organizatorzy przygotowali wymagające odcinki, które zweryfikują przede wszystkim technikę jazdy i umiejętność dostosowania się do panujących warunków, które potrafią być brutalne.</p>
+                    <p>Rajd Szwecji dostarczył emocji, których brakowało w Monte Carlo. Zmiana nawierzchni z asfaltu na śnieg i lód totalnie odmieniła układ sił w PRC. <strong>White</strong> sięgnął po swoje pierwsze zwycięstwo w sezonie, wykorzystując świetną strategię oponową i problemy rywali. Za nim, ze stratą zaledwie 8,7 sekundy, finiszował <strong>Rendi</strong>, który po świetnym występie w Monte Carlo potwierdził swoją wysoką formę. Podium uzupełnił <strong>Beast</strong>, który w końcu pokazał pełnię możliwości Subaru.</p>
+                    <p>Rajd Szwecji od samego początku był nieprzewidywalny. Zmienne warunki, głęboki śnieg i oblodzone odcinki specjalne sprawiły, że wielu faworytów miało problemy. Dyxan, triumfator z Monte Carlo, już na pierwszym odcinku stracił ponad 20 sekund i przez cały rajd gonił stratę. Ostatecznie zajął czwarte miejsce, tracąc prowadzenie w klasyfikacji generalnej na rzecz White'a.</p>
                 </div>
 
                 <!-- Zdjęcie 1 -->
                 <div class="driver-img-wrap animate-on-scroll">
-                    <img src="https://scontent-waw2-2.xx.fbcdn.net/v/t39.30808-6/557455511_4319099311658491_5433783055807954017_n.jpg?stp=dst-jpg_tt6&cstp=mx1600x1066&ctp=p180x540&_nc_cat=101&ccb=1-7&_nc_sid=aa7b47&_nc_ohc=HupmlI2FktMQ7kNvwH5R7UV&_nc_oc=AdoBgYjIPS0i51-Ge5GIDGxSpv-aPyc9tM5-usFHdZWWrjrRKyAGH7oPZ1Ssd_gv9I4&_nc_zt=23&_nc_ht=scontent-waw2-2.xx&_nc_gid=HdmMST_4GE2bDyGfca4Gog&_nc_ss=7b2a8&oh=00_Af_Nco1ff3mkH2fs-AXKOWVQEVT_RhpuLaitlS8BT0IElA&oe=6A3760EE" alt="Lancia Delta na trasie Rajdu Monte Carlo" style="object-position: center 80%;" />
+                    <img src="https://www.motorsport.com/images/amp/6nEwz1rY/s1000/subaru-impreza-wrc-1998-1.jpg" alt="Subaru Impreza w akcji na śniegu w Szwecji" style="object-position: center 60%;" />
                     <p class="driver-img-caption">© FIA Potato Rally Championship</p>
                 </div>
 
-                <!-- Formuła rajdu -->
-                <div class="driver-section-title animate-on-scroll">Formuła i trasa</div>
+                <!-- Kluczowe momenty -->
+                <div class="driver-section-title animate-on-scroll">Lód, śnieg i łzy</div>
                 <div class="driver-bio animate-on-scroll">
-                    <p>Rajd rozpocznie się od krótkiego odcinka Power Stage, który będzie pierwszym testem dla zawodników. Po nim kierowców czekają trzy odcinki specjalne o zróżnicowanej długości. Łącznie uczestnicy pokonają wiele kilometrów, a każdy z nich będzie wymagał innego podejścia i odmiennej techniki jazdy.</p>
-                    <p>Warunki na trasie pozostają na razie niewiadomą. Monte Carlo słynie z tego, że pogoda potrafi zmienić się w ciągu kilku minut. To właśnie ta nieprzewidywalność sprawia, że rajd ten jest uznawany za jeden z najtrudniejszych w kalendarzu, a kierowcy muszą być gotowi na każdy scenariusz.</p>
+                    <p>Największym bohaterem drugiego dnia został <strong>White</strong>. Kierowca Mitsubishi, który w Monte Carlo zajął czwarte miejsce, w Szwecji odnalazł się jak ryba w wodzie. Już na trzecim OS-ie objął prowadzenie i kontrolował sytuację do mety. Jego jazda w śnieżnych warunkach była mistrzowska – płynna, pewna i niesamowicie szybka.</p>
+                    <p>Pechowcem rajdu został <strong>Rusell</strong>. Lider Lancii na jednym z odcinków specjalnych uderzył w zaspę i stracił blisko półtorej minuty. Mimo dzielnej walki zdołał awansować na piątą lokatę, ale strata do lidera klasyfikacji generalnej znacząco się powiększyła. Z kolei <strong>Dombart</strong> zaprezentował się z dobrej strony, kończąc rajd na szóstej pozycji i zdobywając cenne punkty dla Mitsubishi.</p>
+                    <p>Walka o trzecie miejsce była niesamowicie zacięta. Beast, Rendi i Dyxan wymieniali się pozycjami, a ostatecznie to kierowca Subaru okazał się lepszy o zaledwie 0.9 sekundy. To pokazuje, jak niewielkie różnice dzielą czołówkę PRC w tym sezonie.</p>
                 </div>
 
-                <!-- Tabela z formatem rajdu -->
+                <!-- Tabela wyników czołówki -->
                 <div class="stats-card animate-on-scroll">
-                    <div class="stats-card__head--two"><span>Format rajdu</span><span>Szczegóły</span></div>
-                    <div class="stats-card__row--two"><span>(1) Power Stage</span><span>Krótki odcinek</span></div>
-                    <div class="stats-card__row--two"><span>(2) Odcinek specjalny</span><span>?</span></div>
-                    <div class="stats-card__row--two"><span>(3) Odcinek specjalny</span><span>?</span></div>
-                    <div class="stats-card__row--two"><span>(4) Odcinek specjalny</span><span>?</span></div>
+                    <div class="stats-card__head--two"><span>Miejsce</span><span>Kierowca / Zespół</span></div>
+                    <div class="stats-card__row--two"><span>1. </span><span>White (Mitsubishi Ralliart PRT)</span></div>
+                    <div class="stats-card__row--two"><span>2. </span><span>Rendi (Ford Motor PRT)</span></div>
+                    <div class="stats-card__row--two"><span>3. </span><span>Beast (Subaru)</span></div>
+                    <div class="stats-card__row--two"><span>4.</span><span>Dyxan (Lancia Potato RT)</span></div>
+                    <div class="stats-card__row--two"><span>5.</span><span>Rusell (Lancia Potato RT)</span></div>
                 </div>
 
-                <!-- Faworyci -->
-                <div class="driver-section-title animate-on-scroll">Kto ma największe szanse?</div>
-                <div class="driver-bio animate-on-scroll">
-                    <p>Wśród faworytów do zwycięstwa w Monte Carlo prym wiedzie <strong>Dyxan</strong>, który od lat uznawany jest za specjalistę od Monako. Jego wygrana w pierwszej rundzie poprzedniego turnieju oraz doskonałe wyczucie Lancii sprawiają, że to właśnie on wymieniany jest jako główny pretendent do wygranej. Dyxan nie kryje, że Monte Carlo to jego ulubiony rajd – i jak sam przyznaje, celuje on w jak najlepszy wynik.</p>
-                    <p>Nie można zapominać o <strong>Rusellu</strong>, który również prowadzi Lancię Deltę – maszynę o ogromnym potencjale na tego typu trasach. Jeśli uda mu się uniknąć błędów i wykorzystać atuty swojego auta, może powalczyć o miejsce na podium.</p>
-                    <p>Nieco za nimi plasuje się <strong>Rendi</strong>, który choć dysponuje słabszym samochodem, swoją techniką jazdy i unikalnym stylem potrafi nadrobić wiele czasu nawet w gorszym autcie.</p>
-                    <p>Zespół Mitsubishi i Subaru natomiast może mieć nieco trudniejsze zadanie – ciasne, górskie uliczki Monte Carlo nie są ich najmocniejszą stroną ich pakietu rajdowego, choć ich kierowcy na pewno nie odpuszczą i będą walczyć o cenne punkty.</p>
-                    <p>Stawka jest tak mocno zbita, że o końcowym wyniku mogą zadecydować detale – setne sekundy, wybór opon czy chociażby moment, w którym na trasie pojawi się deszcz. To właśnie ta nieprzewidywalność czyni Rajd Monte Carlo tak wyjątkowym i emocjonującym.</p>
+                <!-- System punktacji -->
+                <div class="points-system animate-on-scroll">
                 </div>
 
-                <!-- Cytat -->
+                <!-- Cytat zwycięzcy -->
                 <div class="article-quote animate-on-scroll">
                     <img src="https://i.imgur.com/niCQozh.png" alt="" class="article-quote__mark" />
-                    <p class="article-quote__text">Będę pierwszy i chuj, nawet nie ma innej możliwości.</p>
-                    <a href="d4xan.html" class="article-quote__author">Damian Siemaszko</a>
+                    <p class="article-quote__text">To był mój rajd. Śnieg i lód to moja specjalność!</p>
+                    <a href="white.html" class="article-quote__author">White</a>
                 </div>
 
-                <!-- Zdjęcie 2 -->
+                <!-- Zdjęcie 2 – podium -->
                 <div class="driver-img-wrap animate-on-scroll" style="margin-top: 32px;">
-                    <img src="https://pbs.twimg.com/media/GOrVhWNWAAAtzUr.jpg" alt="Lancia Delta na trasie Rajdu Monte Carlo" style="object-position: center 80%;" />
+                    <img src="https://www.motorsport.com/images/amp/7LzE2rY0/s1000/colin-mcrae-subaru-impreza-wrc-1995-1.jpg" alt="Podium rajdu Szwecji" style="object-position: center 50%;" />
                     <p class="driver-img-caption">© FIA Potato Rally Championship</p>
                 </div>
+
+                <!-- Klasyfikacja po 2. rundzie -->
+                <div class="driver-section-title animate-on-scroll">Klasyfikacja PRC po Szwecji</div>
+                <div class="driver-bio animate-on-scroll">
+                    <p>Po drugiej rundzie liderem jest <strong>White</strong> z dorobkiem 26 punktów (8 z Monte Carlo + 18 ze Szwecji). Na drugiej pozycji <strong>Dyxan</strong> (18 pkt. z Monte Carlo + 6 pkt. za 4. miejsce = 24 pkt.), a trzecie miejsce zajmuje <strong>Rendi</strong> z 20 punktami (10 + 10). W klasyfikacji konstruktorów Lancia Potato Rally Team utrzymuje prowadzenie (Dyxan 24 pkt. + Rusell 18 pkt. = 42 pkt.), ale Mitsubishi Ralliart PRT zbliża się z 35 punktami, a Ford Motor PRT ma 33 punkty.</p>
+                </div>
+
+                <!-- Klasyfikacja punktowa z uwzględnieniem Power Stage -->
+                <div class="standings-list animate-on-scroll">
+                    <ul style="padding-left: 0;">
+                        <li><span>1. White (Mitsubishi)</span> <span>26 pkt.</span></li>
+                        <li><span>2. Dyxan (Lancia)</span> <span>24 pkt.</span></li>
+                        <li><span>3. Rendi (Ford)</span> <span>20 pkt.</span></li>
+                        <li><span>4. Rusell (Lancia)</span> <span>18 pkt.</span></li>
+                        <li><span>5. Beast (Subaru)</span> <span>12 pkt.</span></li>
+                        <li><span>6. Dombart (Mitsubishi)</span> <span>7 pkt.</span></li>
+                        <li><span>7. Barto (Subaru)</span> <span>5 pkt.</span></li>
+                        <li><span>8. Rambo (Subaru)</span> <span>3 pkt.</span></li>
+                        <li><span>9. Pixelek (Ford)</span> <span>1 pkt.</span></li>
+                        <li><span>10. Szpaku (Ford)</span> <span>0 pkt.</span></li>
+                    </ul>
+                </div>
+
+                <!-- Podsumowanie i zapowiedź -->
+                <div class="driver-section-title animate-on-scroll">Co dalej?</div>
+                <div class="driver-bio animate-on-scroll">
+                    <p>Rajd Szwecji całkowicie odmienił układ sił w PRC. White udowodnił, że potrafi wygrywać na śniegu, a Dyxan stracił prowadzenie w klasyfikacji generalnej. Kolejna runda – Rajd Portugalii – ponownie zweryfikuje formę kierowców. Szutrowe odcinki w południowej Europie to kolejne wyzwanie, które może przynieść następne niespodzianki.</p>
+                    <p>Rywalizacja w PRC nabiera tempa. Zapraszamy do śledzenia naszych relacji i zapoznania się z poprzednim artykułem: <a href="monte-carlo-podsumowanie.html" style="text-decoration: underline; font-weight: bold;">Monte Carlo – podsumowanie 1. rundy</a>.</p>
+                    <p>Do zobaczenia na odcinkach!</p>
+                </div>
+                <hr />
 
             </div>
         </div>
     </main>
 </div>
 
-  <div class="footer-spacer"></div>
+<div class="footer-spacer"></div>
 
-  <footer class="site-footer">
+<footer class="site-footer">
     <div class="site-footer__sponsors"><div class="footer-photo"><img src="https://i.imgur.com/JSWXXPK.png" alt="" /></div><div class="footer-photo"><img src="https://i.imgur.com/3e0jqkQ.png" alt="" /></div><div class="footer-photo"><img src="https://i.imgur.com/BQ7N4GM.png" alt="" /></div></div>
     <div class="footer-divider"></div>
     <p class="footer-copyright">&copy; 2026 PRC. All rights reserved.</p>
-  </footer>
-
+</footer>
 
 <script>
     window.addEventListener('scroll', function() {
@@ -611,7 +521,6 @@
             elements.forEach((el) => observer.observe(el));
         }
     }
-
     observeActivePanelElements();
 
     (function () {

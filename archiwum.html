@@ -52,8 +52,8 @@
             height: 40px;
             border-radius: 50%;
             background: rgba(15, 20, 30, 0.55);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             border: 1px solid rgba(255,255,255,0.15);
             display: flex;
             align-items: center;
@@ -329,12 +329,146 @@
         @media (max-width: 860px) {
             .driver-hero-bottom__name { font-size: 40px; }
         }
-        .rallytv-btn{
-  font-family: "WRCCleanBold", Arial, sans-serif !important;
-}
-    </style>
 
-    <style>
+        /* ── STYLE NAVBAR ── */
+        .topbar {
+            align-items: center !important;
+            grid-template-columns: 180px auto 170px !important;
+            justify-content: space-between !important;
+        }
+
+        .topbar__center {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: auto !important;
+            flex: 0 0 auto !important;
+            gap: 0 !important;
+            background: rgba(28, 28, 28, 0.58) !important;
+            backdrop-filter: blur(8px) saturate(1.3) !important;
+            -webkit-backdrop-filter: blur(8px) saturate(1.3) !important;
+            border-radius: 999px !important;
+            border: 1px solid rgba(255,255,255,0.14) !important;
+            padding: 3px 20px !important;
+            transform: translateY(-3px) !important;
+        }
+
+        .topbar__link {
+            font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+            font-weight: 500 !important;
+            color: rgba(255,255,255,0.88) !important;
+            text-decoration: none !important;
+            font-size: 15px !important;
+            letter-spacing: 0.01em !important;
+            padding: 10px 20px !important;
+            height: auto !important;
+            border-radius: 999px !important;
+            transition: color 0.15s ease !important;
+            white-space: nowrap !important;
+            position: relative !important;
+            line-height: 1 !important;
+        }
+
+        .topbar__link::before {
+            content: "" !important;
+            position: absolute !important;
+            inset: 0 !important;
+            border-radius: 999px !important;
+            background: rgba(255,255,255,0.10) !important;
+            opacity: 0 !important;
+            transform: scale(0.82) !important;
+            transition: opacity 0.18s ease, transform 0.18s ease !important;
+            pointer-events: none !important;
+        }
+
+        .topbar__link:first-child {
+            border-radius: 999px !important;
+            margin-left: -7px !important;
+        }
+        .topbar__link:first-child::before {
+            left: -10px !important;
+            right: 0 !important;
+            border-radius: 999px !important;
+        }
+        .topbar__link:last-child {
+            border-radius: 999px !important;
+            margin-right: -7px !important;
+        }
+        .topbar__link:last-child::before {
+            right: -10px !important;
+            left: 0 !important;
+            border-radius: 999px !important;
+        }
+
+        .topbar__link:hover::before {
+            opacity: 1 !important;
+            transform: scale(1) !important;
+        }
+
+        .topbar__link:hover {
+            color: #fff !important;
+        }
+
+        .topbar__link::after {
+            content: "" !important;
+            position: absolute !important;
+            left: 50% !important;
+            bottom: 1px !important;
+            width: 0 !important;
+            height: 2px !important;
+            border-radius: 1000px !important;
+            background: var(--orange) !important;
+            transform: translateX(-50%) !important;
+            opacity: 0 !important;
+            transition: width 0.24s ease, opacity 0.2s ease !important;
+            display: block !important;
+        }
+
+        .topbar__link:hover::after {
+            width: 0 !important;
+            opacity: 0 !important;
+        }
+
+        .topbar__link.active {
+            background: transparent !important;
+            color: #fff !important;
+        }
+
+        .topbar__link.active::after {
+            width: calc(100% - 40px) !important;
+            opacity: 1 !important;
+        }
+
+        .tab {
+            transition: color 0.22s ease;
+            font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+            font-weight: 500 !important;
+        }
+        body.dark .tab { color: rgba(255, 255, 255, 0.82); }
+
+        .tabs {
+            transition: background-color 0.38s ease;
+        }
+        body.dark .tabs { background: #2a2a2a; }
+
+        .rallytv-btn {
+            font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+            font-weight: 500 !important;
+        }
+
+        p { font-family: "SebinoMedium", Arial, sans-serif !important; }
+
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            will-change: opacity, transform;
+        }
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         /* Poprawki dla archiwum */
         .archive-main { background: var(--section-bg); padding-top: 0; }
         body.dark .archive-main { background: #1a1a1a; }
@@ -358,41 +492,6 @@
             max-width: 1100px;
             padding: 0 22px;
         }
-
-        .tab {
-            transition: color 0.22s ease;
-            font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
-            font-weight: 500 !important;
-        }
-        body.dark .tab { color: rgba(255, 255, 255, 0.82); }
-
-        .tabs {
-            transition: background-color 0.38s ease;
-        }
-        body.dark .tabs { background: #2a2a2a; }
-
-        .topbar__link {
-            font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
-            font-weight: 550 !important;
-        }
-
-        .rallytv-btn {
-            font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
-            font-weight: 500 !important;
-        }
-
-        p { font-family: "SebinoMedium", Arial, sans-serif !important; }
-
-        .animate-on-scroll {
-            opacity: 0;
-            transform: translateY(24px);
-            transition: opacity 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-            will-change: opacity, transform;
-        }
-        .animate-on-scroll.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
     </style>
 
     <script>
@@ -413,13 +512,13 @@
         <div class="hero__content">
             <nav class="topbar">
                 <div class="topbar__left"></div>
-            <div class="topbar__center">
-              <a href="index.html" class="topbar__link">Strona główna</a>
-              <a href="kalendarz.html" class="topbar__link">Kalendarz</a>
-              <a href="tab.html" class="topbar__link">Wyniki i klasyfikacja</a>
-              <a href="teams.html" class="topbar__link">Zespoły i kierowcy</a>
-              <a href="archiwum.html" class="topbar__link active">Archiwum</a>
-            </div>
+                <div class="topbar__center">
+                    <a href="index.html" class="topbar__link">Strona główna</a>
+                    <a href="kalendarz.html" class="topbar__link">Kalendarz</a>
+                    <a href="tab.html" class="topbar__link">Wyniki i klasyfikacja</a>
+                    <a href="teams.html" class="topbar__link">Zespoły i kierowcy</a>
+                    <a href="archiwum.html" class="topbar__link active">Archiwum</a>
+                </div>
                 <div class="topbar__right">
                     <a href="#" class="rallytv-btn">PRC</a>
                     <button class="theme-toggle-btn" id="themeToggle" aria-label="Przełącz motyw" type="button">
@@ -536,11 +635,9 @@
                         <div>Rendi</div>
                     </div>
                 </div>
-
-                <!-- Zdjęcie na dole dla PRC #1 -->
             </div>
 
-            <!-- PANEL PRC #2 (pusty do uzupełnienia) -->
+            <!-- PANEL PRC #2 -->
             <div id="panel-prc2" class="archive-panel">
                 <img src="https://www.gasolinasuper.es/wp-content/uploads/2015/03/imprezawrc2008_subaru_002.jpg" alt="Rally action" class="driver-footer-img animate-on-scroll" style="object-position: center 80%;"/>
                 <div class="driver-img-caption animate-on-scroll">
@@ -571,8 +668,7 @@
                     </div>
                 </div>
 
-                                <img src="https://live.staticflickr.com/7422/13250763723_710b9c1207_b.jpg" alt="Rally action" class="driver-footer-img animate-on-scroll" style="object-position: center 40%;" />
-
+                <img src="https://live.staticflickr.com/7422/13250763723_710b9c1207_b.jpg" alt="Rally action" class="driver-footer-img animate-on-scroll" style="object-position: center 40%;" />
 
                 <div class="driver-section-title animate-on-scroll">Kalendarz</div>
 
@@ -641,12 +737,9 @@
                         <div>Rendi</div>
                     </div>
                 </div>
-
-                <!-- Zdjęcie na dole dla PRC #2 -->
-
             </div>
 
-            <!-- PANEL PRXC #1 (pusty do uzupełnienia) -->
+            <!-- PANEL PRXC #1 -->
             <div id="panel-prxc" class="archive-panel">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/World_RX_-_2018_-_RD6_Sweden_%2829262747938%29.jpg/1280px-World_RX_-_2018_-_RD6_Sweden_%2829262747938%29.jpg" alt="Rally action" class="driver-footer-img animate-on-scroll" style="object-position: center 20%;" />
                 <div class="driver-img-caption animate-on-scroll">
@@ -678,7 +771,6 @@
 
                 <img src="https://media.evo.co.uk/image/private/s--X-WVjvBW--/f_auto,t_content-image-full-desktop@1/v1556222040/evo/2018/12/p-20170514-01523_hires-jpeg-24bit-rgb.jpg" alt="Rally action" class="driver-footer-img animate-on-scroll" style="object-position: center 90%;"/>
 
-
                 <div class="driver-section-title animate-on-scroll">Kalendarz</div>
 
                 <div class="stats-card stats-card--calendar animate-on-scroll">
@@ -693,7 +785,6 @@
                         <div>Łotwa</div>
                         <div>PRX Łotwy</div>
                         <div>30 Listopada 2025</div>
-
                     </div>
                     <div class="stats-card__row--calendar">
                         <div>2</div>
@@ -714,11 +805,9 @@
                         <div>30 Listopada 2025</div>
                     </div>
                 </div>
-
-                <!-- Zdjęcie na dole dla PRXC #1 -->
             </div>
 
-            <!-- PANEL PRC #3 (pusty do uzupełnienia) -->
+            <!-- PANEL PRC #3 -->
             <div id="panel-prc3" class="archive-panel">
                 <img src="https://skoda-motorsport.s3.amazonaws.com/com/2020/01/Fabia-Turkey.jpg" alt="Rally action" class="driver-footer-img animate-on-scroll" style="object-position: center 77%;" />
                 <div class="driver-img-caption animate-on-scroll">
@@ -732,7 +821,6 @@
                     <p>Po eksperymentalnej edycji PRXC nadszedł czas na wielki powrót do korzeni. Trzecia edycja PRC była rewolucyjna – Nowa formuła mistrzostw konstruktorów oraz lekkie zmiany w zasadach turnieju</p>
                     <p>Przez długie miesiące wydawało się, że Rendi może stracić koronę. Dombart, który w PRC #2 musiał uznać wyższość rywala, wrócił z zimną krwią i brakiem głosu. Zwycięstwa niemiego jeźdzca w Szkocji i Nowej Zelandii postawiły go na tymczasowej pozycji lidera. Lecz Rendi po raz kolejny udowodnił, że sportowa historia lubi niespodzianki.</p>
                     <p>Cztery zwycięstwa w drugiej części sezonu – w Argentynie, Walii i Polsce – oraz triumf w finałowym Power Stage w USA odwróciły losy rywalizacji. Rendi sięgnął po trzeci tytuł z rzędu, zdobywając 129 punktów. Podium uzupełnili: Dombart (115 punkty) oraz D4xan (93 punkty). W klasyfikacji konstruktorów bezkonkurencyjne okazało się Mitsubishi (198 punktów), które zdominowało całą stawkę.</p>
-                    
                 </div>
 
                 <div class="stats-card animate-on-scroll">
@@ -754,8 +842,7 @@
                     </div>
                 </div>
 
-                                <img src="https://www.ginomotorsport.com/wp-content/uploads/AMG-05-1659-90002.jpg" alt="Rally action" class="driver-footer-img animate-on-scroll" style="object-position: center 87%;"/>
-
+                <img src="https://www.ginomotorsport.com/wp-content/uploads/AMG-05-1659-90002.jpg" alt="Rally action" class="driver-footer-img animate-on-scroll" style="object-position: center 87%;"/>
 
                 <div class="driver-section-title animate-on-scroll">Kalendarz</div>
 
@@ -824,19 +911,17 @@
                         <div>Rendi</div>
                     </div>
                 </div>
-
-                <!-- Zdjęcie na dole dla PRC #3 -->
             </div>
-
         </div>
     </main>
 </div>
-  <footer class="site-footer">
+
+<footer class="site-footer">
     <div class="site-footer__sponsors"><div class="footer-photo"><img src="https://i.imgur.com/JSWXXPK.png" alt="" /></div><div class="footer-photo"><img src="https://i.imgur.com/3e0jqkQ.png" alt="" /></div><div class="footer-photo"><img src="https://i.imgur.com/BQ7N4GM.png" alt="" /></div></div>
     <div class="site-footer__sponsors site-footer__sponsors--secondary"><div class="footer-photo footer-photo--sm"><img src="https://i.imgur.com/pAroXd5.png" alt="" /></div><div class="footer-photo footer-photo--sm"><img src="https://i.imgur.com/vUDesth.png" alt="" /></div><div class="footer-photo footer-photo--sm"><img src="https://i.imgur.com/hG0ISSY.png" alt="" /></div></div>
     <div class="footer-divider"></div>
     <p class="footer-copyright">&copy; 2026 PRC. All rights reserved.</p>
-  </footer>
+</footer>
 
 <script>
     const logo = document.querySelector(".floating-logo");

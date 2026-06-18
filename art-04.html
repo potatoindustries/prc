@@ -342,6 +342,124 @@
             font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
             font-weight: 550 !important;
         }
+        /* ── STYLE NAVBAR ── */
+.topbar {
+  align-items: center !important;
+  grid-template-columns: 180px auto 170px !important;
+  justify-content: space-between !important;
+}
+
+.topbar__center {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: auto !important;
+  flex: 0 0 auto !important;
+  gap: 0 !important;
+  background: rgba(28, 28, 28, 0.58) !important;
+  backdrop-filter: blur(8px) saturate(1.3) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(1.3) !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  padding: 3px 20px !important;
+  transform: translateY(-3px) !important;
+}
+
+.topbar__link {
+  font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+  font-weight: 500 !important;
+  color: rgba(255,255,255,0.88) !important;
+  text-decoration: none !important;
+  font-size: 15px !important;
+  letter-spacing: 0.01em !important;
+  padding: 10px 20px !important;
+  height: auto !important;
+  border-radius: 999px !important;
+  transition: color 0.15s ease !important;
+  white-space: nowrap !important;
+  position: relative !important;
+  line-height: 1 !important;
+}
+
+.topbar__link::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,0.10) !important;
+  opacity: 0 !important;
+  transform: scale(0.82) !important;
+  transition: opacity 0.18s ease, transform 0.18s ease !important;
+  pointer-events: none !important;
+}
+
+.topbar__link:first-child {
+  border-radius: 999px !important;
+  margin-left: -7px !important;
+}
+.topbar__link:first-child::before {
+  left: -10px !important;
+  right: 0 !important;
+  border-radius: 999px !important;
+}
+.topbar__link:last-child {
+  border-radius: 999px !important;
+  margin-right: -7px !important;
+}
+.topbar__link:last-child::before {
+  right: -10px !important;
+  left: 0 !important;
+  border-radius: 999px !important;
+}
+
+.topbar__link:hover::before {
+  opacity: 1 !important;
+  transform: scale(1) !important;
+}
+
+.topbar__link:hover {
+  color: #fff !important;
+}
+
+.topbar__link::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 50% !important;
+  bottom: 1px !important;
+  width: 0 !important;
+  height: 2px !important;
+  border-radius: 1000px !important;
+  background: var(--orange) !important;
+  transform: translateX(-50%) !important;
+  opacity: 0 !important;
+  transition: width 0.24s ease, opacity 0.2s ease !important;
+  display: block !important;
+}
+
+.topbar__link:hover::after {
+  width: 0 !important;
+  opacity: 0 !important;
+}
+
+.topbar__link.active {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+.topbar__link.active::after {
+  width: calc(100% - 40px) !important;
+  opacity: 1 !important;
+}
+
+.tab {
+  font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+  font-weight: 500 !important;
+}
+
+.rallytv-btn {
+  font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+  font-weight: 500 !important;
+}
     </style>
 
     <script>
@@ -364,35 +482,23 @@
         <div class="hero__bg"></div>
         <div class="hero__overlay"></div>
         <div class="hero__content">
-            <nav class="topbar">
-                <div class="topbar__left"></div>
-            <div class="topbar__center">
-              <a href="index.html" class="topbar__link">Strona główna</a>
-              <a href="kalendarz.html" class="topbar__link">Kalendarz</a>
-              <a href="tab.html" class="topbar__link">Wyniki i klasyfikacja</a>
-              <a href="teams.html" class="topbar__link">Zespoły i kierowcy</a>
-              <a href="archiwum.html" class="topbar__link">Archiwum</a>
-            </div>
-                <div class="topbar__right">
-                    <a href="#" class="rallytv-btn">PRC</a>
-                    <button class="theme-toggle-btn" id="themeToggle" aria-label="Przełącz motyw" type="button">
-                        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="5" />
-                            <line x1="12" y1="1" x2="12" y2="3" />
-                            <line x1="12" y1="21" x2="12" y2="23" />
-                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                            <line x1="1" y1="12" x2="3" y2="12" />
-                            <line x1="21" y1="12" x2="23" y2="12" />
-                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-                        </svg>
-                        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                        </svg>
-                    </button>
-                </div>
-            </nav>
+<nav class="topbar">
+  <div class="topbar__left"></div>
+  <div class="topbar__center">
+    <a href="index.html" class="topbar__link">Strona główna</a>
+    <a href="kalendarz.html" class="topbar__link">Kalendarz</a>
+    <a href="tab.html" class="topbar__link">Wyniki i klasyfikacja</a>
+    <a href="teams.html" class="topbar__link">Zespoły i kierowcy</a>
+    <a href="archiwum.html" class="topbar__link">Archiwum</a>
+  </div>
+  <div class="topbar__right">
+    <a href="#" class="rallytv-btn">PRC</a>
+    <button class="theme-toggle-btn" id="themeToggle" aria-label="Przełącz motyw" type="button">
+      <svg class="icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg class="icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</nav>
             <div class="hero__title-wrap">
                 <h1 class="hero__title">Ostateczna decyzja FIA<br><small>Koniec kontrowersyjnej batalii o tuningi</small></h1>
             </div>
@@ -404,7 +510,6 @@
 
                 <!-- Lead + meta -->
                 <div class="article-intro animate-on-scroll">
-                    <p class="article-lead">FIA oddaliła odwołanie Team Lancia w sprawie zakazu tuningu. Kontrowersyjna decyzja pozostaje w mocy – wszystkie zespoły muszą używać wyłącznie domyślnych ustawień fabrycznych.</p>
                     <p class="article-meta">
                         4 min czytania • Opublikowano 16.06.2026 • 09:00 GMT+2
                     </p>
@@ -447,12 +552,11 @@
 
                 <div class="article-quote animate-on-scroll">
                     <img src="https://i.imgur.com/niCQozh.png" alt="" class="article-quote__mark" />
-                    <p class="article-quote__text">Wyrównywanie poprzez ograniczanie tych, którzy chcą się rozwijać, to droga donikąd</p>
+                    <p class="article-quote__text">Wygrało lenistwo zamiast rywalizacji</p>
                     <a href="d4xan.html" class="article-quote__author">Damian Siemaszko, Team Lancia</a>
                 </div>
 
                 <!-- Sekcja 4 -->
-                <div class="driver-section-title animate-on-scroll">„Wygrało lenistwo zamiast rywalizacji"</div>
                 <div class="driver-bio animate-on-scroll">
                     <p><strong>Damian Siemaszko:</strong> Niektórzy uczestnicy, w tym osoby funkcyjne, nie chcą inwestować czasu w rozwój ustawień i woleli przegłosować wygodny dla siebie wariant. Mamy demokrację, ale demokracja nie oznacza, że każda decyzja większości jest słuszna merytorycznie. FIA pominęła to w swoim uzasadnieniu, skupiając się na formalnej stronie głosowania. A przecież istotne jest pytanie: czy zakaz jest proporcjonalny? Naszym zdaniem nie. Proponowaliśmy wiele alternatyw – ograniczenia dla wybranych parametrów, homologowane konfiguracje czy dobrowolne dzielenie się ustawieniami. Nikt nie chciał o tym nawet dyskutować.</p>
                     <p>W uzasadnieniu FIA zabrakło również odpowiedzi na kluczowy argument Lancii: brak dowodów na to, że tuning tworzył nieuczciwą przewagę lub prowadził do nadużyć. Przed głosowaniem nie odnotowano żadnej formalnej skargi dotyczącej konfiguracji technicznych. Decydenci nie przedstawili analizy, dlaczego mniej restrykcyjne środki (jak limity przedziałów regulacji) byłyby niewystarczające. Zdaniem zespołu Lancia jest to istotne uchybienie, które podważa proporcjonalność całkowitego bana.</p>
@@ -473,7 +577,7 @@
 
                 <div class="article-quote animate-on-scroll">
                     <img src="https://i.imgur.com/niCQozh.png" alt="" class="article-quote__mark" />
-                    <p class="article-quote__text">Decyzja FIA potwierdza, że PRC podąża właściwą ścieżką – ku rywalizacji skoncentrowanej na umiejętnościach kierowców</p>
+                    <p class="article-quote__text">Decyzja ta potwierdza, że PRC podąża właściwą ścieżką – ku rywalizacji skoncentrowanej na umiejętnościach kierowców</p>
                     <a href="white.html" class="article-quote__author">Krzysztof Drozd, Główny Organizator PRC</a>
                 </div>
 
