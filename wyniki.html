@@ -692,22 +692,28 @@ function getDriverLink(driverName, driverId) {
       return `${sign}${seconds}s`;
     }
 
+    // ============================================================
+    // POPRAWIONA FUNKCJA SORTOWANIA – TYLKO DSQ NA KOŃCU
+    // DNF, RET, DNS mają czas (z karą) i są sortowane normalnie
+    // ============================================================
     function getSortPriority(status) {
-      if (status === 'OK') return 0;
-      if (status === 'DNF') return 1;
-      if (status === 'RET') return 2;
-      if (status === 'DNS') return 3;
-      if (status === 'DSQ') return 4;
+      // Tylko DSQ traktujemy jako wyjątek – zawsze na końcu
+      if (status === 'DSQ') return 1;
+      // DNF, RET, DNS mają czas (z karą) – sortujemy normalnie
       return 0;
     }
 
     function sortResultsWithPriority(results) {
       return [...results].sort((a, b) => {
-        const priorityA = getSortPriority(a.status);
-        const priorityB = getSortPriority(b.status);
-        if (priorityA !== priorityB) return priorityA - priorityB;
-        const timeA = a.totalTimeSeconds !== undefined && a.totalTimeSeconds !== Infinity ? a.totalTimeSeconds : Infinity;
-        const timeB = b.totalTimeSeconds !== undefined && b.totalTimeSeconds !== Infinity ? b.totalTimeSeconds : Infinity;
+        // DSQ zawsze na końcu
+        if (a.status === 'DSQ' && b.status !== 'DSQ') return 1;
+        if (b.status === 'DSQ' && a.status !== 'DSQ') return -1;
+        
+        // Reszta według czasu (DNF, RET, DNS mają czas z karą)
+        const timeA = a.totalTimeSeconds !== undefined && a.totalTimeSeconds !== null && a.totalTimeSeconds !== Infinity 
+            ? a.totalTimeSeconds : Infinity;
+        const timeB = b.totalTimeSeconds !== undefined && b.totalTimeSeconds !== null && b.totalTimeSeconds !== Infinity 
+            ? b.totalTimeSeconds : Infinity;
         return timeA - timeB;
       });
     }
@@ -839,23 +845,55 @@ function getDriverLink(driverName, driverId) {
       const head = document.getElementById('overallHead');
       const body = document.getElementById('overallBody');
       if (!results || results.length === 0) { body.innerHTML = '<div class="loading-spinner"></div>'; return; }
+      
+      // Użyj poprawionej funkcji sortowania
       const sortedResults = sortResultsWithPriority(results);
+      
       const resultsWithTotalPoints = sortedResults.map(result => {
         const psResult    = (powerStageResults || []).find(ps => ps.driverId === result.driverId);
         const psPoints    = psResult ? (psResult.points || 0) : 0;
         const totalPoints = (result.points || 0) + (result.totalBonus || 0) + psPoints + (result.extraPoints || 0);
         return { ...result, totalPoints, psPoints };
       });
+      
       let leaderTime = null, currentPos = 1, prevTime = null;
       for (let i = 0; i < resultsWithTotalPoints.length; i++) {
         const result = resultsWithTotalPoints[i];
-        if (leaderTime === null && result.status === 'OK' && result.totalTimeSeconds !== null && result.totalTimeSeconds !== Infinity) leaderTime = result.totalTimeSeconds;
-        if (i > 0 && result.status === 'OK' && prevTime !== null && Math.abs(result.totalTimeSeconds - prevTime) < 0.001) result.position = currentPos;
-        else if (result.status === 'OK') { currentPos = i + 1; result.position = currentPos; }
-        else result.position = null;
-        result.diff = (leaderTime !== null && result.totalTimeSeconds !== null && result.totalTimeSeconds !== Infinity) ? result.totalTimeSeconds - leaderTime : null;
-        prevTime = result.totalTimeSeconds;
+        // DSQ pomijamy przy ustalaniu lidera i pozycji
+        if (result.status === 'DSQ' || result.status === '—' || result.status === 'CANCELLED') {
+          result.position = null;
+          result.diff = '—';
+          continue;
+        }
+        
+        if (leaderTime === null && result.status !== 'DSQ' && result.totalTimeSeconds !== null && result.totalTimeSeconds !== Infinity) {
+          leaderTime = result.totalTimeSeconds;
+        }
+        
+        const time = result.totalTimeSeconds;
+        if (time === null || time === Infinity) {
+          result.position = null;
+          result.diff = '—';
+          continue;
+        }
+        
+        if (leaderTime === null) {
+          leaderTime = time;
+          currentPos = 1;
+          result.position = 1;
+          result.diff = '—';
+        } else {
+          if (i > 0 && prevTime !== null && Math.abs(time - prevTime) < 0.001) {
+            result.position = currentPos;
+          } else {
+            currentPos = i + 1;
+            result.position = currentPos;
+          }
+          result.diff = time - leaderTime;
+        }
+        prevTime = time;
       }
+      
       const powerStage    = rallyData.powerStage;
       const regularStages = stages.filter(s => s !== powerStage);
       const hasPowerStage = powerStage && stages.includes(powerStage);
@@ -904,13 +942,22 @@ function getDriverLink(driverName, driverId) {
         if (result.psPoints    > 0) _parts.push(result.psPoints);
         if (result.extraPoints > 0) _parts.push(result.extraPoints);
         const pointsHtml = _parts.length > 0 ? _parts.join(' + ') : '0';
+        
+        // Dla DSQ pokazujemy "DSQ" zamiast czasu
+        let totalTimeDisplay = result.totalTime;
+        let totalTimeSecondsVal = result.totalTimeSeconds;
+        if (result.status === 'DSQ') {
+          totalTimeDisplay = 'DSQ';
+          totalTimeSecondsVal = Infinity;
+        }
+        
         bodyHtml += `
           <div class="standings-row"
             data-pos="${result.position !== null ? result.position : 999}"
-            data-total-seconds="${result.totalTimeSeconds !== null ? result.totalTimeSeconds : Infinity}"
+            data-total-seconds="${totalTimeSecondsVal !== null ? totalTimeSecondsVal : Infinity}"
             data-driver-name="${result.driverName}"
             data-total-points="${result.totalPoints}"
-            data-diff="${result.diff !== null ? result.diff : Infinity}"
+            data-diff="${result.diff !== null && result.diff !== Infinity ? result.diff : Infinity}"
             data-status="${result.status}">
             <div class="col-pos">${result.position !== null ? result.position : '—'}</div>
             <div class="col-driver">
@@ -936,9 +983,16 @@ function getDriverLink(driverName, driverId) {
           bodyHtml += `<div data-os-time="${timeSecs}" data-os-display="${stageTime?.time || '—'}" data-stage-index="${i}">${timeHtml}</div>`;
         }
         
+        // Dla DSQ pokazujemy "DSQ" zamiast czasu
+        let diffDisplay = result.diff !== null && result.diff !== Infinity ? formatDiff(result.diff) : '—';
+        if (result.status === 'DSQ') {
+          totalTimeDisplay = 'DSQ';
+          diffDisplay = '—';
+        }
+        
         bodyHtml += `
-            <div class="col-total">${result.totalTime}</div>
-            <div class="col-diff">${result.diff !== null ? formatDiff(result.diff) : '—'}</div>
+            <div class="col-total">${totalTimeDisplay}</div>
+            <div class="col-diff">${diffDisplay}</div>
             <div class="col-pts">${pointsHtml}</div>
           </div>`;
       }
@@ -956,15 +1010,27 @@ function getDriverLink(driverName, driverId) {
       let currentSort = { column: 'total', direction: 'asc', stageIndex: null, stageName: null };
       const totalTimeColumn = head.querySelector('[data-sort="total"]');
       if (totalTimeColumn) totalTimeColumn.classList.add('sort-asc');
+      
       function getSortValue(row, columnKey, stageIndex = null) {
-        const status = row.dataset.status, priority = getSortPriority(status);
+        const status = row.dataset.status;
+        // DSQ zawsze na końcu
+        const isDSQ = status === 'DSQ';
+        const basePriority = isDSQ ? 1e12 : 0;
+        
         if (columnKey === 'pos')    return parseFloat(row.dataset.pos) || 999;
-        if (columnKey === 'total')  return priority * 1e9 + (parseFloat(row.dataset.totalSeconds) || Infinity);
+        if (columnKey === 'total')  return basePriority + (parseFloat(row.dataset.totalSeconds) || Infinity);
         if (columnKey === 'points') return parseFloat(row.dataset.totalPoints) || 0;
-        if (columnKey === 'ps')     { const c = row.querySelector('[data-ps-time]'); return priority * 1e9 + (c ? parseFloat(c.getAttribute('data-ps-time')) || Infinity : Infinity); }
-        if (columnKey.startsWith('os_')) { const c = row.querySelector(`[data-stage-index="${stageIndex}"]`); return priority * 1e9 + (c ? parseFloat(c.getAttribute('data-os-time')) || Infinity : Infinity); }
+        if (columnKey === 'ps')     { 
+          const c = row.querySelector('[data-ps-time]'); 
+          return basePriority + (c ? parseFloat(c.getAttribute('data-ps-time')) || Infinity : Infinity); 
+        }
+        if (columnKey.startsWith('os_')) { 
+          const c = row.querySelector(`[data-stage-index="${stageIndex}"]`); 
+          return basePriority + (c ? parseFloat(c.getAttribute('data-os-time')) || Infinity : Infinity); 
+        }
         return 0;
       }
+      
       function sortTable(columnKey, sortType, direction, stageIndex = null, stageName = null) {
         const rows = Array.from(body.querySelectorAll('.standings-row'));
         rows.sort((a, b) => {
@@ -975,25 +1041,57 @@ function getDriverLink(driverName, driverId) {
         const updatedRows = Array.from(body.querySelectorAll('.standings-row'));
         let curPos = 1, prevT = null, leaderT = null;
         updatedRows.forEach((row, i) => {
-          const status = row.dataset.status, priority = getSortPriority(status);
+          const status = row.dataset.status;
+          const isDSQ = status === 'DSQ';
+          
           let timeValue;
           if (columnKey === 'total' || columnKey === 'pos') timeValue = parseFloat(row.dataset.totalSeconds) || Infinity;
           else if (columnKey === 'ps') { const c = row.querySelector('[data-ps-time]'); timeValue = c ? parseFloat(c.getAttribute('data-ps-time')) || Infinity : Infinity; }
           else if (columnKey.startsWith('os_')) { const c = row.querySelector(`[data-stage-index="${stageIndex}"]`); timeValue = c ? parseFloat(c.getAttribute('data-os-time')) || Infinity : Infinity; }
           else timeValue = parseFloat(row.dataset.totalSeconds) || Infinity;
+          
           const posCell = row.querySelector('.col-pos'), diffCell = row.querySelector('.col-diff');
-          if (priority === 0 && timeValue !== Infinity) {
-            if (i === 0) leaderT = timeValue;
-            if (i > 0 && Math.abs(timeValue - prevT) < 0.001) { posCell.textContent = curPos; row.dataset.pos = curPos; }
-            else { curPos = i + 1; posCell.textContent = curPos; row.dataset.pos = curPos; }
-            if (diffCell && (columnKey === 'total' || columnKey === 'pos' || columnKey === 'ps' || columnKey === ('os_' + stageIndex))) { const diff = timeValue - leaderT; diffCell.textContent = diff === 0 ? '—' : formatDiff(diff); row.dataset.diff = diff; }
-          } else if (priority === 1 && timeValue !== Infinity && leaderT !== null) {
-            posCell.textContent = '—'; row.dataset.pos = 999;
-            if (diffCell) diffCell.textContent = formatDiff(timeValue - leaderT);
-          } else { posCell.textContent = '—'; row.dataset.pos = 999; if (diffCell) diffCell.textContent = '—'; }
+          
+          // DSQ – brak pozycji
+          if (isDSQ || status === '—' || status === 'CANCELLED') {
+            posCell.textContent = '—';
+            row.dataset.pos = 999;
+            if (diffCell) diffCell.textContent = '—';
+            return;
+          }
+          
+          // DNF, RET, DNS – mają czas z karą, sortujemy normalnie
+          if (timeValue !== Infinity && !isDSQ) {
+            if (i === 0 || leaderT === null) {
+              leaderT = timeValue;
+              curPos = 1;
+              posCell.textContent = curPos;
+              row.dataset.pos = curPos;
+              if (diffCell) diffCell.textContent = '—';
+            } else {
+              if (Math.abs(timeValue - prevT) < 0.001) {
+                posCell.textContent = curPos;
+                row.dataset.pos = curPos;
+              } else {
+                curPos = i + 1;
+                posCell.textContent = curPos;
+                row.dataset.pos = curPos;
+              }
+              if (diffCell) {
+                const diff = timeValue - leaderT;
+                diffCell.textContent = diff === 0 ? '—' : formatDiff(diff);
+                row.dataset.diff = diff;
+              }
+            }
+          } else {
+            posCell.textContent = '—';
+            row.dataset.pos = 999;
+            if (diffCell) diffCell.textContent = '—';
+          }
           prevT = timeValue;
         });
       }
+      
       sortableColumns.forEach(col => {
         col.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -1087,43 +1185,118 @@ function getDriverLink(driverName, driverId) {
         else prevPosMap = computePositionsAfterStages(results, regularStages, regularStageIndex - 1, allDriverIds);
       }
 
-      // Łączne czasy bez kar
+      // ============================================================
+      // OBLICZANIE ŁĄCZNYCH CZASÓW Z KARAMI DLA DNF, RET, DNS
+      // ============================================================
       let cumulativeMap = {};
       if (!isPowerStage && regularStageIndex >= 0) {
+        // Najpierw znajdź najgorszy czas na każdym OS (tylko OK)
+        const worstPerStage = {};
+        for (let si = 0; si <= regularStageIndex; si++) {
+          const sName = regularStages[si];
+          const sData = results.stages[sName] || [];
+          const okTimes = sData
+            .filter(e => e.status === 'OK')
+            .map(e => timeToSeconds(e.time))
+            .filter(t => t !== Infinity && !isNaN(t));
+          worstPerStage[sName] = okTimes.length > 0 ? Math.max(...okTimes) : 9999;
+        }
+
+        // Dla każdego kierowcy oblicz łączny czas z karami
         for (const driverId of allDriverIds) {
-          let total = 0, valid = true;
+          let total = 0;
+          let valid = true;
+          
           for (let si = 0; si <= regularStageIndex; si++) {
-            const sName = regularStages[si], sData = results.stages[sName] || [];
+            const sName = regularStages[si];
+            const sData = results.stages[sName] || [];
             const dEntry = sData.find(e => e.driverId === driverId);
-            if (!dEntry || dEntry.status !== 'OK') { valid = false; break; }
-            const t = timeToSeconds(dEntry.time);
-            if (t === Infinity) { valid = false; break; }
-            total += t;
+            const worst = worstPerStage[sName] || 9999;
+            
+            if (!dEntry) {
+              // DNS: najgorszy + 45s
+              total += worst + 45;
+              continue;
+            }
+            
+            const status = dEntry.status || 'OK';
+            
+            if (status === 'DSQ') {
+              valid = false;
+              break;
+            } else if (status === 'RET' || status === 'DNS') {
+              total += worst + 45;
+            } else if (status === 'DNF') {
+              total += worst + 30;
+            } else if (status === 'OK') {
+              const t = timeToSeconds(dEntry.time);
+              if (t === Infinity || isNaN(t)) {
+                valid = false;
+                break;
+              }
+              total += t;
+            } else {
+              // nieznany status - traktuj jak DNF
+              total += worst + 30;
+            }
           }
+          
           cumulativeMap[driverId] = valid ? total : Infinity;
         }
       }
 
+      // ============================================================
+      // SORTOWANIE: DSQ na końcu, reszta według czasu (z karami)
+      // ============================================================
       const sortedResults = [...stageResults].sort((a, b) => {
-        const pA = getSortPriority(a.status), pB = getSortPriority(b.status);
-        if (pA !== pB) return pA - pB;
-        if (!isPowerStage) return (cumulativeMap[a.driverId] ?? Infinity) - (cumulativeMap[b.driverId] ?? Infinity);
+        // DSQ zawsze na końcu
+        if (a.status === 'DSQ' && b.status !== 'DSQ') return 1;
+        if (b.status === 'DSQ' && a.status !== 'DSQ') return -1;
+        
+        // Reszta według czasu (DNF, RET, DNS mają czas z karą)
+        if (!isPowerStage) {
+          const aTime = cumulativeMap[a.driverId] ?? Infinity;
+          const bTime = cumulativeMap[b.driverId] ?? Infinity;
+          return aTime - bTime;
+        }
         return timeToSeconds(a.time) - timeToSeconds(b.time);
       });
 
       let leaderTime = null, currentPos = 1, prevCumTime = null;
       for (let i = 0; i < sortedResults.length; i++) {
-        const result  = sortedResults[i];
-        const useTime = isPowerStage ? timeToSeconds(result.time) : (cumulativeMap[result.driverId] ?? Infinity);
-        if (result.status === 'OK' && useTime !== Infinity) {
+        const result = sortedResults[i];
+        
+        // Użyj czasu z karami dla DNF/RET/DNS
+        let useTime;
+        if (isPowerStage) {
+          useTime = timeToSeconds(result.time);
+        } else {
+          useTime = cumulativeMap[result.driverId] ?? Infinity;
+        }
+        
+        if (result.status === 'DSQ' || result.status === '—' || result.status === 'CANCELLED') {
+          result.position = null;
+          result.diff = Infinity;
+          result.diffPrev = null;
+          result.cumulativeSeconds = Infinity;
+          continue;
+        }
+        
+        if (useTime !== Infinity) {
           if (leaderTime === null) leaderTime = useTime;
-          if (i > 0 && prevCumTime !== null && Math.abs(useTime - prevCumTime) < 0.001) result.position = currentPos;
-          else { currentPos = i + 1; result.position = currentPos; }
-          result.diff     = useTime - leaderTime;
-          result.diffPrev = i > 0 && prevCumTime !== null && sortedResults[i-1].status === 'OK' ? useTime - prevCumTime : null;
+          if (i > 0 && prevCumTime !== null && Math.abs(useTime - prevCumTime) < 0.001) {
+            result.position = currentPos;
+          } else {
+            currentPos = i + 1;
+            result.position = currentPos;
+          }
+          result.diff = useTime - leaderTime;
+          result.diffPrev = i > 0 && prevCumTime !== null && sortedResults[i-1].status !== 'DSQ' 
+            ? useTime - prevCumTime 
+            : null;
         } else {
           result.position = null;
-          result.diff     = (leaderTime !== null && useTime !== Infinity) ? useTime - leaderTime : Infinity;
+          result.diff = (leaderTime !== null && useTime !== Infinity) ? useTime - leaderTime : Infinity;
           result.diffPrev = null;
         }
         result.cumulativeSeconds = useTime;
@@ -1152,20 +1325,30 @@ function getDriverLink(driverName, driverId) {
             <div class="standings-table__body">`;
 
       for (let i = 0; i < sortedResults.length; i++) {
-        const result  = sortedResults[i];
-        const driver  = drivers.find(d => d.id === result.driverId);
-        const team    = teams.find(t => t.id === driver?.teamId);
+        const result = sortedResults[i];
+        const driver = drivers.find(d => d.id === result.driverId);
+        const team = teams.find(t => t.id === driver?.teamId);
         const cumulativePenalty = getCumulativePenalty(allPenalties, stagesToSumPenalties, result.driverId);
-        const penaltyDisplay    = cumulativePenalty !== 0 ? (cumulativePenalty > 0 ? `+${cumulativePenalty}s` : `${cumulativePenalty}s`) : '—';
+        const penaltyDisplay = cumulativePenalty !== 0 ? (cumulativePenalty > 0 ? `+${cumulativePenalty}s` : `${cumulativePenalty}s`) : '—';
         const cumSecs = result.cumulativeSeconds;
         let timeDisplay;
-        if (isPowerStage) {
+        
+        if (result.status === 'DSQ') {
+          timeDisplay = 'DSQ';
+        } else if (isPowerStage) {
           if (result.status === 'OK') {
             timeDisplay = result.time;
             if (result.tireChange) timeDisplay = `<span class="time-with-tire">${shortTime(result.time)}<span class="tire-icon" data-tooltip="Zmiana opony podczas OS"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="11.5"/><circle cx="12" cy="12" r="8.8" fill="var(--color-background-primary,#fff)"/><circle cx="12" cy="12" r="8.1"/><circle cx="12" cy="12" r="7.2" fill="var(--color-background-primary,#fff)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(45 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(90 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(135 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(180 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(225 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(270 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(315 12 12)"/><circle cx="12" cy="12" r="2.4" fill="var(--color-background-primary,#fff)"/><circle cx="12" cy="12" r="1.6"/></svg></span></span>`;
           } else timeDisplay = result.status;
         } else {
-          timeDisplay = (cumSecs !== Infinity && cumSecs !== undefined) ? secondsToTime(cumSecs) : (result.status !== 'OK' ? result.status : '—');
+          if (result.status === 'DSQ') {
+            timeDisplay = 'DSQ';
+          } else {
+            // Dla DNF/RET/DNS pokazujemy czas z karą
+            timeDisplay = (cumSecs !== Infinity && cumSecs !== undefined && !isNaN(cumSecs)) 
+              ? secondsToTime(cumSecs) 
+              : (result.status !== 'OK' ? result.status : '—');
+          }
         }
 
         let bonusOrPointsDisplay = '—';
@@ -1182,11 +1365,23 @@ function getDriverLink(driverName, driverId) {
           bonusOrPointsDisplay = cumulativeBonus > 0 ? `+${cumulativeBonus}` : '—';
         }
 
-        const diffDisplay     = formatDiff(result.diff === Infinity ? null : result.diff);
-        const diffPrevDisplay = result.diffPrev !== null && result.diffPrev !== undefined ? formatDiff(result.diffPrev) : '—';
-        const dataTimeSecs    = cumSecs !== undefined ? cumSecs : Infinity;
-        const prevPos         = isPowerStage ? null : (prevPosMap[result.driverId] ?? null);
-        const posCellHtml     = isPowerStage ? (result.position !== null ? result.position : '—') : buildPosCellHtml(result.position, prevPos);
+        let diffDisplay = '—';
+        if (result.status === 'DSQ') {
+          diffDisplay = '—';
+        } else if (result.diff !== undefined && result.diff !== null && result.diff !== Infinity) {
+          diffDisplay = formatDiff(result.diff);
+        }
+        
+        let diffPrevDisplay = '—';
+        if (result.status !== 'DSQ' && result.diffPrev !== null && result.diffPrev !== undefined && result.diffPrev !== Infinity) {
+          diffPrevDisplay = formatDiff(result.diffPrev);
+        }
+        
+        const dataTimeSecs = (result.status === 'DSQ') ? Infinity : (cumSecs !== undefined && !isNaN(cumSecs) ? cumSecs : Infinity);
+        const prevPos = isPowerStage ? null : (prevPosMap[result.driverId] ?? null);
+        const posCellHtml = isPowerStage 
+          ? (result.position !== null ? result.position : '—') 
+          : buildPosCellHtml(result.position, prevPos);
 
         html += `
           <div class="standings-row"
@@ -1194,8 +1389,8 @@ function getDriverLink(driverName, driverId) {
             data-driver-name="${driver?.name || result.driverId}"
             data-time-seconds="${dataTimeSecs}"
             data-penalty-value="${cumulativePenalty}"
-            data-diff="${result.diff === Infinity ? 999 : (result.diff ?? 999)}"
-            data-diff-prev="${result.diffPrev !== null && result.diffPrev !== undefined ? result.diffPrev : 999}"
+            data-diff="${result.diff === Infinity || result.diff === null ? 999 : result.diff}"
+            data-diff-prev="${result.diffPrev !== null && result.diffPrev !== undefined && result.diffPrev !== Infinity ? result.diffPrev : 999}"
             data-ps-points="${isPowerStage ? (powerStagePointsMap[result.driverId] || 0) : 0}"
             data-status="${result.status}">
             <div class="col-pos">${posCellHtml}</div>
@@ -1237,15 +1432,24 @@ function getDriverLink(driverName, driverId) {
       let currentSort = { column: 'time', direction: 'asc' };
       const timeColumn = head.querySelector('[data-sort="time"]');
       if (timeColumn) timeColumn.classList.add('sort-asc');
+      
       function getStageSortValue(row, columnKey) {
-        const priority = getSortPriority(row.dataset.status);
+        const status = row.dataset.status;
+        // DSQ zawsze na końcu
+        const isDSQ = status === 'DSQ';
+        const basePriority = isDSQ ? 1e12 : 0;
+        
         if (columnKey === 'pos')      return parseFloat(row.dataset.pos) || 999;
-        if (columnKey === 'time')     return priority * 1e9 + (parseFloat(row.dataset.timeSeconds) || Infinity);
+        if (columnKey === 'time')     return basePriority + (parseFloat(row.dataset.timeSeconds) || Infinity);
         if (columnKey === 'penalty')  return parseFloat(row.dataset.penaltyValue) || 0;
         if (columnKey === 'pspoints') return parseFloat(row.dataset.psPoints) || 0;
-        if (columnKey === 'diffprev') { const v = parseFloat(row.dataset.diffPrev); return isNaN(v) || v === 999 ? Infinity : v; }
+        if (columnKey === 'diffprev') { 
+          const v = parseFloat(row.dataset.diffPrev); 
+          return isNaN(v) || v === 999 ? Infinity : v; 
+        }
         return 0;
       }
+      
       function sortStageTable(columnKey, sortType, direction) {
         const rows = Array.from(body.querySelectorAll('.standings-row'));
         rows.sort((a, b) => {
@@ -1257,44 +1461,73 @@ function getDriverLink(driverName, driverId) {
         const updatedRows = Array.from(body.querySelectorAll('.standings-row'));
         let curPos = 1, prevT = null, leaderT = null;
         updatedRows.forEach((row, i) => {
-          const priority  = getSortPriority(row.dataset.status);
+          const status = row.dataset.status;
+          const isDSQ = status === 'DSQ';
           const timeValue = parseFloat(row.dataset.timeSeconds) || Infinity;
-          const posCell   = row.querySelector('.col-pos');
-          const diffCell  = row.querySelector('.col-diff');
+          const posCell = row.querySelector('.col-pos');
+          const diffCell = row.querySelector('.col-diff');
           const diffPrevCell = row.querySelector('.col-diff-prev');
-          if (priority === 0 && timeValue !== Infinity) {
-            if (i === 0) leaderT = timeValue;
-            if (i > 0 && prevT !== null && Math.abs(timeValue - prevT) < 0.001) {
+          
+          if (isDSQ || status === '—' || status === 'CANCELLED') {
+            posCell.textContent = '—';
+            row.dataset.pos = 999;
+            if (diffCell) diffCell.textContent = '—';
+            if (diffPrevCell) { diffPrevCell.textContent = '—'; row.dataset.diffPrev = 999; }
+            return;
+          }
+          
+          if (timeValue !== Infinity) {
+            if (i === 0 || leaderT === null) {
+              leaderT = timeValue;
+              curPos = 1;
               const numSpan = posCell.querySelector('.pos-number');
               if (numSpan) numSpan.textContent = curPos; else posCell.textContent = curPos;
               row.dataset.pos = curPos;
+              if (diffCell) diffCell.textContent = '—';
             } else {
-              curPos = i + 1;
-              const numSpan = posCell.querySelector('.pos-number');
-              if (numSpan) numSpan.textContent = curPos; else posCell.textContent = curPos;
-              row.dataset.pos = curPos;
-            }
-            if (diffCell) { const diff = timeValue - leaderT; diffCell.textContent = diff === 0 ? '—' : formatDiff(diff); }
-            if (diffPrevCell) {
-              if (i === 0) { diffPrevCell.textContent = '—'; row.dataset.diffPrev = 999; }
-              else {
-                const prevRow = updatedRows[i - 1], prevTime = parseFloat(prevRow.dataset.timeSeconds) || Infinity;
-                if (prevRow.dataset.status === 'OK' && prevTime !== Infinity) { const dp = timeValue - prevTime; diffPrevCell.textContent = formatDiff(dp); row.dataset.diffPrev = dp; }
-                else { diffPrevCell.textContent = '—'; row.dataset.diffPrev = 999; }
+              if (prevT !== null && Math.abs(timeValue - prevT) < 0.001) {
+                const numSpan = posCell.querySelector('.pos-number');
+                if (numSpan) numSpan.textContent = curPos; else posCell.textContent = curPos;
+                row.dataset.pos = curPos;
+              } else {
+                curPos = i + 1;
+                const numSpan = posCell.querySelector('.pos-number');
+                if (numSpan) numSpan.textContent = curPos; else posCell.textContent = curPos;
+                row.dataset.pos = curPos;
+              }
+              if (diffCell) { 
+                const diff = timeValue - leaderT; 
+                diffCell.textContent = diff === 0 ? '—' : formatDiff(diff); 
               }
             }
-          } else if (priority > 0 && timeValue !== Infinity && leaderT !== null) {
-            posCell.textContent = '—'; row.dataset.pos = 999;
-            if (diffCell) diffCell.textContent = formatDiff(timeValue - leaderT);
-            if (diffPrevCell) { diffPrevCell.textContent = '—'; row.dataset.diffPrev = 999; }
+            if (diffPrevCell) {
+              if (i === 0 || leaderT === timeValue) {
+                diffPrevCell.textContent = '—';
+                row.dataset.diffPrev = 999;
+              } else {
+                const prevRow = updatedRows[i - 1];
+                const prevTime = parseFloat(prevRow.dataset.timeSeconds) || Infinity;
+                const prevStatus = prevRow.dataset.status;
+                if (prevStatus !== 'DSQ' && prevTime !== Infinity) {
+                  const dp = timeValue - prevTime;
+                  diffPrevCell.textContent = formatDiff(dp);
+                  row.dataset.diffPrev = dp;
+                } else {
+                  diffPrevCell.textContent = '—';
+                  row.dataset.diffPrev = 999;
+                }
+              }
+            }
           } else {
-            posCell.textContent = '—'; row.dataset.pos = 999;
+            posCell.textContent = '—';
+            row.dataset.pos = 999;
             if (diffCell) diffCell.textContent = '—';
             if (diffPrevCell) { diffPrevCell.textContent = '—'; row.dataset.diffPrev = 999; }
           }
           prevT = timeValue;
         });
       }
+      
       sortableColumns.forEach(col => {
         col.addEventListener('click', (e) => {
           e.stopPropagation();
