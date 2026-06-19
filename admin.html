@@ -670,6 +670,16 @@
       margin-bottom: 20px;
     }
     
+    /* Styl dla anulowanego statusu w adminie */
+    .status-badge-cancelled {
+      background: #dc2626;
+      color: white;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    
     @media (max-width: 900px) {
       .admin-layout { 
         flex-direction: column; 
@@ -961,12 +971,11 @@
 
     function _getLocalData() {
       if (Cache._rawData) return Cache._rawData;
-      // Pobieramy dane z API - nie ustawiamy domyślnego hasła w kodzie
       const defaultData = {
         seasons: { "2025": { calendar: [], drivers: [], teams: [], rallyResults: {}, calendarOrder: {} } },
         settings: { 
           currentSeason: "2025", 
-          adminPassword: "", // Puste hasło - wymagane ustawienie przy pierwszym uruchomieniu
+          adminPassword: "",
           teamPointsCount: 2, 
           pointsSystem: [25,18,15,12,10,8,6,4,2,1], 
           powerStagePoints: [5,4,3,2,1], 
@@ -974,7 +983,6 @@
         }
       };
       
-      // Jeśli API ma dane, użyj ich, w przeciwnym razie zwróć puste
       if (api && api.data) {
         return api.data;
       }
@@ -987,7 +995,7 @@
       return data?.seasons?.[data?.settings?.currentSeason];
     }
     
-    // ==================== SORTOWANIE RAJDÓW (tylko w obrębie tej samej daty) ====================
+    // ==================== SORTOWANIE RAJDÓW ====================
     function getCalendarGroupedByDate() {
       const groups = {};
       Cache.calendar.forEach(rally => {
@@ -995,7 +1003,6 @@
         if (!groups[dateKey]) groups[dateKey] = [];
         groups[dateKey].push(rally);
       });
-      // Sortuj daty rosnąco
       const sortedDates = Object.keys(groups).sort();
       return { groups, sortedDates };
     }
@@ -1025,19 +1032,16 @@
         const storedOrder = getStoredOrderForDate(date);
         
         if (storedOrder.length === rallies.length && storedOrder.every(id => rallies.some(r => r.id === id))) {
-          // Użyj zapisanej kolejności
           const ordered = [];
           for (const id of storedOrder) {
             const rally = rallies.find(r => r.id === id);
             if (rally) ordered.push(rally);
           }
-          // Dodaj brakujące (jeśli jakieś zostały pominięte)
           for (const rally of rallies) {
             if (!ordered.includes(rally)) ordered.push(rally);
           }
           result.push(...ordered);
         } else {
-          // Domyślna kolejność (alfabetyczna)
           result.push(...rallies.sort((a, b) => a.name.localeCompare(b.name)));
         }
       }
@@ -1057,7 +1061,6 @@
     function finishRallySorting() {
       Cache.sortMode = false;
       
-      // Zbierz kolejność dla każdej daty
       const groups = {};
       const containers = document.querySelectorAll('.rally-sort-group');
       
@@ -1221,12 +1224,15 @@
       
       let html = '<table class="admin-table"><thead><tr><th>ID</th><th>Nazwa</th><th>Kraj</th><th>Data</th><th>Status</th><th>OS</th><th>Akcje</th></tr></thead><tbody>';
       sortedCalendar.forEach(rally => {
+        const statusDisplay = rally.status === 'cancelled' 
+          ? `<span class="status-badge-cancelled"><i class="fas fa-times-circle"></i> ANULOWANY</span>`
+          : rally.status;
         html += `<tr>
           <td>${escapeHtml(rally.id)}</td>
           <td>${escapeHtml(rally.name)}</td>
           <td><span class="fi fi-${rally.country}"></span> ${escapeHtml(rally.countryName)}</td>
           <td>${rally.startDate} - ${rally.endDate}</td>
-          <td>${rally.status}</td>
+          <td>${statusDisplay}</td>
           <td>${rally.stages.length}</td>
           <td class="admin-actions">
             <button class="admin-btn admin-btn-edit" onclick="editRally('${rally.id}')"><i class="fas fa-edit"></i> Edytuj</button>
@@ -1312,7 +1318,12 @@
           <div class="admin-form-group"><label>Data rozpoczęcia:</label><input type="date" id="rallyStartDate"></div>
           <div class="admin-form-group"><label>Data zakończenia:</label><input type="date" id="rallyEndDate"></div>
           <div class="admin-form-group"><label>Status:</label>
-            <select id="rallyStatus"><option value="upcoming">Nadchodzący</option><option value="ongoing">Trwa</option><option value="completed">Zakończony</option></select>
+            <select id="rallyStatus">
+              <option value="upcoming">Nadchodzący</option>
+              <option value="ongoing">Trwa</option>
+              <option value="completed">Zakończony</option>
+              <option value="cancelled" style="color:#dc2626;">❌ Anulowany</option>
+            </select>
           </div>
           <div class="admin-form-group"><label>Logo (URL):</label><input type="text" id="rallyLogo" placeholder="assets/rallies/logos/logo.png"></div>
           <div class="admin-form-group"><label>Zdjęcie hero (URL):</label><input type="text" id="rallyHeroImage" placeholder="assets/rallies/photo.jpg"></div>
@@ -1328,6 +1339,14 @@
       currentEditingId = id;
       const rally = Cache.calendar.find(r => r.id === id);
       if (!rally) return;
+      
+      const statusOptions = `
+        <option value="upcoming" ${rally.status === 'upcoming' ? 'selected' : ''}>Nadchodzący</option>
+        <option value="ongoing" ${rally.status === 'ongoing' ? 'selected' : ''}>Trwa</option>
+        <option value="completed" ${rally.status === 'completed' ? 'selected' : ''}>Zakończony</option>
+        <option value="cancelled" ${rally.status === 'cancelled' ? 'selected' : ''} style="color:#dc2626;">❌ Anulowany</option>
+      `;
+      
       showModal(`
         <button class="close-modal-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
         <h3 style="margin-bottom:20px;"><i class="fas fa-edit"></i> Edytuj rajd</h3>
@@ -1339,7 +1358,7 @@
           <div class="admin-form-group"><label>Data rozpoczęcia:</label><input type="date" id="rallyStartDate" value="${rally.startDate}"></div>
           <div class="admin-form-group"><label>Data zakończenia:</label><input type="date" id="rallyEndDate" value="${rally.endDate}"></div>
           <div class="admin-form-group"><label>Status:</label>
-            <select id="rallyStatus"><option value="upcoming" ${rally.status === 'upcoming' ? 'selected' : ''}>Nadchodzący</option><option value="ongoing" ${rally.status === 'ongoing' ? 'selected' : ''}>Trwa</option><option value="completed" ${rally.status === 'completed' ? 'selected' : ''}>Zakończony</option></select>
+            <select id="rallyStatus">${statusOptions}</select>
           </div>
           <div class="admin-form-group"><label>Logo (URL):</label><input type="text" id="rallyLogo" value="${rally.logo || ''}"></div>
           <div class="admin-form-group"><label>Zdjęcie hero (URL):</label><input type="text" id="rallyHeroImage" value="${rally.heroImage || ''}"></div>
@@ -1381,6 +1400,13 @@
       if (currentEditingId) {
         const index = season.calendar.findIndex(r => r.id === currentEditingId);
         if (index !== -1) {
+          // Jeśli status zmienia się na anulowany, usuń wyniki
+          const oldRally = season.calendar[index];
+          if (oldRally.status !== 'cancelled' && rally.status === 'cancelled') {
+            delete season.rallyResults[currentEditingId];
+            season.rallyResults[currentEditingId] = { stages: {}, extraPoints: {}, penalties: {} };
+          }
+          
           const oldResults = season.rallyResults[currentEditingId];
           season.calendar[index] = rally;
           if (currentEditingId !== id && oldResults) {
@@ -1746,8 +1772,21 @@
         return; 
       }
       
-      Cache.currentRallyId = rallyId;
+      // Sprawdź czy rajd jest anulowany
       const rally = Cache.calendar.find(r => r.id === rallyId);
+      if (rally && rally.status === 'cancelled') {
+        document.getElementById('resultsEditor').innerHTML = `
+          <div class="admin-form" style="text-align:center; padding:40px;">
+            <i class="fas fa-ban" style="font-size:48px; color:#dc2626; display:block; margin-bottom:16px;"></i>
+            <h3 style="color:#dc2626;">Ten rajd został anulowany</h3>
+            <p style="color:var(--text-muted); margin-top:8px;">Nie można edytować wyników dla anulowanego rajdu.</p>
+            <p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Aby edytować wyniki, zmień status rajdu na inny.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      Cache.currentRallyId = rallyId;
       let results = Cache.rallyResults.get(rallyId);
       
       if (!results) {
@@ -1809,7 +1848,7 @@
                 <svg class="tire-ok" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6" fill="white"/></svg>
                 <svg class="tire-swap" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15 7H9L12 2zM12 22L9 17H15L12 22zM5 12L10 9V15L5 12zM19 12L14 15V9L19 12z"/></svg>
               </button>
-            </div>
+            </td>
             <td><div class="status-buttons" data-driver="${driver.id}" data-stage="${stage}">
               <button class="status-btn ${sr.status === 'OK' ? 'active' : ''}" data-status="OK">OK</button>
               <button class="status-btn ${sr.status === 'DNF' ? 'active' : ''}" data-status="DNF">DNF</button>
@@ -1925,6 +1964,14 @@
         showToast('Wybierz rajd', 'error');
         return;
       }
+      
+      // Sprawdź czy rajd jest anulowany
+      const rally = Cache.calendar.find(r => r.id === Cache.currentRallyId);
+      if (rally && rally.status === 'cancelled') {
+        showToast('Nie można czyścić wyników anulowanego rajdu', 'error');
+        return;
+      }
+      
       if (!confirm('Czy na pewno wyczyścić wszystkie wyniki dla tego rajdu? Tej operacji nie można cofnąć.')) return;
       
       const data = _getLocalData();
@@ -1944,8 +1991,15 @@
         return;
       }
       
-      const { results, drivers, rally } = Cache.resultsData;
-      _collectCurrentStageFromDOM(results, drivers, rally);
+      // Sprawdź czy rajd jest anulowany
+      const rally = Cache.calendar.find(r => r.id === Cache.currentRallyId);
+      if (rally && rally.status === 'cancelled') {
+        showToast('Nie można zapisywać wyników anulowanego rajdu', 'error');
+        return;
+      }
+      
+      const { results, drivers, rally: rallyData } = Cache.resultsData;
+      _collectCurrentStageFromDOM(results, drivers, rallyData);
       
       Cache.rallyResults.set(Cache.currentRallyId, results);
       

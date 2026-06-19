@@ -29,6 +29,7 @@ const CONFIG = {
     RALLY_STATUS: {
         UPCOMING: 'upcoming',
         ONGOING: 'ongoing',
-        COMPLETED: 'completed'
+        COMPLETED: 'completed',
+        CANCELLED: 'cancelled'  // <-- NOWY STATUS
     }
 };

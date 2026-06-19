@@ -4,11 +4,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PRC • Wyniki i Klasyfikacja</title>
+  <title>Wyniki i Klasyfikacja</title>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css" />
   <link rel="stylesheet" href="css/style.css" />
-  <link rel="icon" href="https://i.imgur.com/CqBPD1t.png">
+  <link rel="icon" href="assets/icon.jpg">
 
   <style>
     /* Poprawki dla flag */
@@ -418,6 +418,7 @@
     .col-winner .driver-link:hover { text-decoration: underline !important; opacity: 0.7; }
     .results-table .col-status { position: relative; left: -10px; }
     .results-table__head div:nth-child(4) { position: relative; left: -10px; }
+
   </style>
   
   <script>
@@ -715,7 +716,7 @@
           <div class="col-date">${formatDateRange(rally.startDate, rally.endDate)}</div>
           <div class="col-status">${statusText}</div>
           <div class="col-winner">${winnerDisplay}</div>
-          <div class="col-results">${(rally.status === 'completed' || rally.status === 'ongoing') ? `<a href="wyniki.html?rally=${rally.id}" class="results-link">Pełne wyniki</a>` : ''}</div>
+          <div class="col-results">${(rally.status === 'completed' || rally.status === 'ongoing') && rally.status !== 'cancelled' ? `<a href="wyniki.html?rally=${rally.id}" class="results-link">Pełne wyniki</a>` : rally.status === 'cancelled' ? '' : ''}</div>
         </div>`;
       }
       tbody.innerHTML = html;
@@ -909,11 +910,12 @@
     }
 
     function getStatusText(status) {
-      switch(status) {
-        case 'completed': return 'ZAKOŃCZONY';
-        case 'ongoing': return 'TRWA';
-        default: return '';
-      }
+        switch(status) {
+            case 'completed': return 'ZAKOŃCZONY';
+            case 'ongoing': return 'TRWA';
+            case 'cancelled': return 'ANULOWANY';  // <-- NOWY
+            default: return '';
+        }
     }
     
     function initSorting(table) {
