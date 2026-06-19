@@ -274,6 +274,11 @@ class WRCAPI {
         return await this.saveData(data);
     }
 
+    // ── Sprawdzanie czy rajd jest anulowany ──────────────────────────────────
+    _isRallyCancelled(rally) {
+        return rally && rally.status === 'cancelled';
+    }
+
     // ── Obliczenia wyników rajdu ──────────────────────────────────────────────
 
     async calculateRallyResults(rallyId) {
@@ -284,33 +289,71 @@ class WRCAPI {
         const rally   = season.calendar.find(r => r.id === rallyId);
         const results = await this.getRallyResults(rallyId);
         const drivers = await this.getDrivers();
+        
+        // Jeśli rajd jest anulowany – zwróć puste wyniki
+        if (this._isRallyCancelled(rally)) {
+            const emptyResults = {
+                overall: drivers.map(d => ({
+                    driverId: d.id,
+                    driverName: d.name,
+                    driverCountry: d.country,
+                    teamId: d.teamId,
+                    carModel: d.carModel || '',
+                    totalTime: '—',
+                    totalTimeSeconds: null,
+                    totalBonus: 0,
+                    stageTimes: [],
+                    status: 'CANCELLED',
+                    extraPoints: 0,
+                    points: 0,
+                    position: 0,
+                    diff: '—'
+                })),
+                powerStage: [],
+                cancelled: true
+            };
+            this._l1[key] = emptyResults;
+            return emptyResults;
+        }
+
         if (!rally || !results) return null;
 
+        // Oblicz najgorszy czas na każdym OS (tylko dla statusu OK)
         const worstTimePerStage = {};
         for (const stage of rally.stages) {
             if (stage === rally.powerStage) continue;
             const stageData = results.stages[stage];
-            if (!stageData || stageData.length === 0) { worstTimePerStage[stage] = 9999; continue; }
-            const times = stageData.filter(r => r.status === 'OK')
-                .map(r => this.timeToSeconds(r.time)).filter(t => t !== Infinity && !isNaN(t));
+            if (!stageData || stageData.length === 0) { 
+                worstTimePerStage[stage] = 9999; 
+                continue; 
+            }
+            const times = stageData
+                .filter(r => r.status === 'OK')
+                .map(r => this.timeToSeconds(r.time))
+                .filter(t => t !== Infinity && !isNaN(t));
             worstTimePerStage[stage] = times.length > 0 ? Math.max(...times) : 9999;
         }
         const hasAnyData = results.stages && Object.keys(results.stages).length > 0;
 
         const overallResults = [];
         for (const driver of drivers) {
-            let totalTimeSeconds = 0, finalStatus = 'OK';
-            let hasDNF = false, hasRET = false, hasDNS = false, hasDSQ = false, hasAnyStageData = false;
+            let totalTimeSeconds = 0;
+            let finalStatus = 'OK';
+            let hasDSQ = false;
+            let hasAnyStageData = false;
             const stageTimes = [];
 
+            // Dla każdego OS (poza Power Stage)
             for (const stage of rally.stages) {
                 const isPowerStage = (stage === rally.powerStage);
-                const stageResult  = results.stages[stage]?.find(r => r.driverId === driver.id);
-                const tc           = stageResult?.tireChange === true;
+                const stageResult = results.stages[stage]?.find(r => r.driverId === driver.id);
+                const tc = stageResult?.tireChange === true;
+                const worst = worstTimePerStage[stage] ?? 9999;
 
                 if (!hasAnyData) {
                     stageTimes.push({ stage, time: '—', secs: Infinity, status: '—', isPowerStage, tireChange: false });
-                    finalStatus = '—'; continue;
+                    finalStatus = '—';
+                    continue;
                 }
 
                 if (isPowerStage) {
@@ -318,18 +361,30 @@ class WRCAPI {
                         stageTimes.push({ stage, time: '—', secs: Infinity, status: '—', isPowerStage, tireChange: false });
                     } else {
                         const psStatus = stageResult.status || 'OK';
-                        const psSecs   = psStatus === 'OK' ? this.timeToSeconds(stageResult.time) : Infinity;
-                        stageTimes.push({ stage, time: psStatus === 'OK' ? stageResult.time : psStatus, secs: psSecs, status: psStatus, isPowerStage, tireChange: tc });
+                        const psSecs = psStatus === 'OK' ? this.timeToSeconds(stageResult.time) : Infinity;
+                        stageTimes.push({ 
+                            stage, 
+                            time: psStatus === 'OK' ? stageResult.time : psStatus, 
+                            secs: psSecs, 
+                            status: psStatus, 
+                            isPowerStage, 
+                            tireChange: tc 
+                        });
                     }
-                    hasAnyStageData = true; continue;
+                    hasAnyStageData = true;
+                    continue;
                 }
 
+                // OS (nie Power Stage)
                 if (!stageResult) {
-                    hasDNS = true; finalStatus = 'DNS';
-                    // DNS: najgorszy czas + 45 sekund
-                    const p = (worstTimePerStage[stage] ?? 9999) + 45;
-                    totalTimeSeconds += p;
-                    stageTimes.push({ stage, time: 'DNS', secs: p, status: 'DNS', penaltyTime: p, isPowerStage, tireChange: false });
+                    // DNS -> najgorszy + 45s
+                    const penaltyTime = worst + 45;
+                    totalTimeSeconds += penaltyTime;
+                    finalStatus = 'DNS';
+                    stageTimes.push({ 
+                        stage, time: 'DNS', secs: penaltyTime, status: 'DNS', 
+                        penaltyTime, isPowerStage, tireChange: false 
+                    });
                     continue;
                 }
 
@@ -337,50 +392,63 @@ class WRCAPI {
                 const status = stageResult.status || 'OK';
 
                 if (status === 'DSQ') {
-                    hasDSQ = true; finalStatus = 'DSQ';
+                    hasDSQ = true;
+                    finalStatus = 'DSQ';
                     stageTimes.push({ stage, time: 'DSQ', secs: Infinity, status: 'DSQ', isPowerStage, tireChange: false });
+                    // Przerywamy – DSQ usuwa z klasyfikacji
+                    totalTimeSeconds = Infinity;
                     break;
-                } else if (status === 'RET') {
-                    hasRET = true; finalStatus = 'RET';
-                    // RET: najgorszy czas + 45 sekund
-                    const p = (worstTimePerStage[stage] ?? 9999) + 45;
-                    totalTimeSeconds += p;
-                    stageTimes.push({ stage, time: 'RET', secs: p, status: 'RET', penaltyTime: p, isPowerStage, tireChange: false });
-                } else if (status === 'DNS') {
-                    hasDNS = true; finalStatus = 'DNS';
-                    // DNS: najgorszy czas + 45 sekund
-                    const p = (worstTimePerStage[stage] ?? 9999) + 45;
-                    totalTimeSeconds += p;
-                    stageTimes.push({ stage, time: 'DNS', secs: p, status: 'DNS', penaltyTime: p, isPowerStage, tireChange: false });
-                    continue;
+                } else if (status === 'RET' || status === 'DNS') {
+                    // RET / DNS -> najgorszy + 45s
+                    const penaltyTime = worst + 45;
+                    totalTimeSeconds += penaltyTime;
+                    if (status === 'RET') finalStatus = 'RET';
+                    else finalStatus = 'DNS';
+                    stageTimes.push({ 
+                        stage, time: status, secs: penaltyTime, status: status, 
+                        penaltyTime, isPowerStage, tireChange: false 
+                    });
                 } else if (status === 'DNF') {
-                    hasDNF = true; finalStatus = 'DNF';
-                    // DNF: najgorszy czas + 30 sekund
-                    const p = (worstTimePerStage[stage] ?? 9999) + 30;
-                    totalTimeSeconds += p;
-                    stageTimes.push({ stage, time: 'DNF', secs: p, status: 'DNF', penaltyTime: p, isPowerStage, tireChange: false });
+                    // DNF -> najgorszy + 30s
+                    const penaltyTime = worst + 30;
+                    totalTimeSeconds += penaltyTime;
+                    finalStatus = 'DNF';
+                    stageTimes.push({ 
+                        stage, time: 'DNF', secs: penaltyTime, status: 'DNF', 
+                        penaltyTime, isPowerStage, tireChange: false 
+                    });
                 } else if (status === 'OK') {
                     const secs = this.timeToSeconds(stageResult.time);
                     if (secs === Infinity || isNaN(secs)) {
-                        stageTimes.push({ stage, time: stageResult.time, secs: Infinity, status: 'INVALID', isPowerStage, tireChange: tc });
+                        stageTimes.push({ 
+                            stage, time: stageResult.time, secs: Infinity, 
+                            status: 'INVALID', isPowerStage, tireChange: tc 
+                        });
                     } else {
                         totalTimeSeconds += secs;
-                        stageTimes.push({ stage, time: stageResult.time, secs, status: 'OK', isPowerStage, tireChange: tc });
+                        stageTimes.push({ 
+                            stage, time: stageResult.time, secs, status: 'OK', 
+                            isPowerStage, tireChange: tc 
+                        });
                     }
                 } else {
-                    hasDNF = true; finalStatus = 'DNF';
-                    // DNF: najgorszy czas + 30 sekund
-                    const p = (worstTimePerStage[stage] ?? 9999) + 30;
-                    totalTimeSeconds += p;
-                    stageTimes.push({ stage, time: status, secs: p, status: 'DNF', penaltyTime: p, isPowerStage, tireChange: false });
+                    // Fallback – nieznany status traktuj jako DNF
+                    const penaltyTime = worst + 30;
+                    totalTimeSeconds += penaltyTime;
+                    finalStatus = 'DNF';
+                    stageTimes.push({ 
+                        stage, time: status, secs: penaltyTime, status: 'DNF', 
+                        penaltyTime, isPowerStage, tireChange: false 
+                    });
                 }
             }
 
             if (!hasAnyStageData && !hasAnyData) finalStatus = '—';
             if (hasDSQ) totalTimeSeconds = Infinity;
 
+            // Bonusy (tylko jeśli nie DSQ)
             let totalBonus = 0;
-            if (finalStatus !== '—' && finalStatus !== 'DSQ') {
+            if (!hasDSQ && finalStatus !== '—') {
                 totalBonus = rally.stages.reduce((sum, stage) => {
                     const sr = results.stages[stage]?.find(r => r.driverId === driver.id);
                     return sum + (sr?.bonus || 0);
@@ -389,57 +457,112 @@ class WRCAPI {
 
             let displayStatus = finalStatus;
             if (hasDSQ) displayStatus = 'DSQ';
-            else if (hasDNS) displayStatus = 'DNS';
-            else if (hasRET) displayStatus = 'RET';
-            else if (hasDNF) displayStatus = 'DNF';
             if (!hasAnyData) displayStatus = '—';
 
-            const hasValidTime = displayStatus !== 'DSQ' && totalTimeSeconds !== Infinity && !isNaN(totalTimeSeconds);
+            const hasValidTime = !hasDSQ && totalTimeSeconds !== Infinity && !isNaN(totalTimeSeconds);
+
             overallResults.push({
-                driverId: driver.id, driverName: driver.name, driverCountry: driver.country,
-                teamId: driver.teamId, carModel: driver.carModel || '',
+                driverId: driver.id,
+                driverName: driver.name,
+                driverCountry: driver.country,
+                teamId: driver.teamId,
+                carModel: driver.carModel || '',
                 totalTime: hasValidTime ? this.secondsToTime(totalTimeSeconds) : '—',
-                totalTimeSeconds: hasValidTime ? totalTimeSeconds : (displayStatus === 'DSQ' ? Infinity : null),
-                totalBonus, stageTimes, status: displayStatus,
+                totalTimeSeconds: hasValidTime ? totalTimeSeconds : (hasDSQ ? Infinity : null),
+                totalBonus,
+                stageTimes,
+                status: displayStatus,
                 extraPoints: results.extraPoints?.[driver.id] || 0,
                 points: 0
             });
         }
 
+        // ===== SORTOWANIE =====
+        // DSQ na końcu, reszta sortowana według czasu (z karami)
         overallResults.sort((a, b) => {
-            const at = a.totalTimeSeconds !== null ? a.totalTimeSeconds : Infinity;
-            const bt = b.totalTimeSeconds !== null ? b.totalTimeSeconds : Infinity;
-            return at - bt;
+            // DSQ zawsze na końcu
+            if (a.status === 'DSQ' && b.status !== 'DSQ') return 1;
+            if (b.status === 'DSQ' && a.status !== 'DSQ') return -1;
+            if (a.status === 'DSQ' && b.status === 'DSQ') return 0;
+
+            // Jeśli brak danych – na koniec
+            const aTime = a.totalTimeSeconds !== null ? a.totalTimeSeconds : Infinity;
+            const bTime = b.totalTimeSeconds !== null ? b.totalTimeSeconds : Infinity;
+            return aTime - bTime;
         });
 
+        // Przypisz pozycje
         const pointsSystem = this.data?.settings?.pointsSystem || CONFIG.DEFAULTS.POINTS_SYSTEM;
-        overallResults.forEach((result, index) => {
-            result.position = index + 1;
-            result.points   = (result.status !== 'DSQ' && result.status !== '—') ? (pointsSystem[index] || 0) : 0;
-            const leader    = overallResults.find(r => r.status !== 'DSQ' && r.status !== '—');
-            if (leader && leader.driverId !== result.driverId && result.status !== 'DSQ' && result.status !== '—'
-                && result.totalTimeSeconds !== null && leader.totalTimeSeconds !== null)
-                result.diff = this.secondsToDiff(result.totalTimeSeconds - leader.totalTimeSeconds);
-            else result.diff = '—';
-        });
+        let currentPos = 1;
+        let leaderTime = null;
+        let prevTime = null;
 
+        for (let i = 0; i < overallResults.length; i++) {
+            const result = overallResults[i];
+
+            // DSQ – brak pozycji, brak punktów
+            if (result.status === 'DSQ' || result.status === '—' || result.status === 'CANCELLED') {
+                result.position = null;
+                result.points = 0;
+                result.diff = '—';
+                continue;
+            }
+
+            const time = result.totalTimeSeconds;
+            if (time === null || time === Infinity) {
+                result.position = null;
+                result.points = 0;
+                result.diff = '—';
+                continue;
+            }
+
+            // Pierwszy poprawny czas = lider
+            if (leaderTime === null) {
+                leaderTime = time;
+                currentPos = 1;
+                result.position = 1;
+                result.diff = '—';
+            } else {
+                // Jeśli czas taki sam jak poprzedni -> ex aequo
+                if (Math.abs(time - prevTime) < 0.001) {
+                    result.position = currentPos;
+                } else {
+                    currentPos = i + 1;
+                    result.position = currentPos;
+                }
+                result.diff = this.secondsToDiff(time - leaderTime);
+            }
+
+            result.points = (pointsSystem[result.position - 1] || 0);
+            if (result.position === null) result.points = 0;
+            prevTime = time;
+        }
+
+        // Power Stage – osobno
         const powerStageResults = [];
-        const powerStage        = results.stages[rally.powerStage];
-        const psPoints          = this.data?.settings?.powerStagePoints || CONFIG.DEFAULTS.POWER_STAGE_POINTS;
+        const powerStage = results.stages[rally.powerStage];
+        const psPoints = this.data?.settings?.powerStagePoints || CONFIG.DEFAULTS.POWER_STAGE_POINTS;
+
         if (powerStage && hasAnyData) {
             const valid = powerStage.filter(r => r.status === 'OK');
             valid.sort((a, b) => this.timeToSeconds(a.time) - this.timeToSeconds(b.time));
+
             valid.forEach((result, index) => {
                 if (index < psPoints.length) {
                     const driver = drivers.find(d => d.id === result.driverId);
                     powerStageResults.push({
-                        driverId: result.driverId, driverName: driver?.name, driverCountry: driver?.country,
-                        time: result.time, position: index + 1, points: psPoints[index]
+                        driverId: result.driverId,
+                        driverName: driver?.name,
+                        driverCountry: driver?.country,
+                        time: result.time,
+                        position: index + 1,
+                        points: psPoints[index]
                     });
                 }
             });
         }
 
+        // Zapisz w cache
         results.calculated = { overall: overallResults, powerStage: powerStageResults };
         this._l1[key] = results.calculated;
         return results.calculated;
@@ -469,10 +592,13 @@ class WRCAPI {
             this.getCalendar()
         ]);
 
-        // Przelicz wyniki wszystkich ukończonych rajdów równolegle
-        await Promise.all(
-            calendar.filter(r => r.status === 'completed').map(r => this.calculateRallyResults(r.id))
-        );
+        // Przelicz wyniki wszystkich NIEANULOWANYCH ukończonych rajdów równolegle
+        const completedRallies = calendar.filter(r => r.status === 'completed');
+        await Promise.all(completedRallies.map(r => this.calculateRallyResults(r.id)));
+
+        // Anulowane rajdy też mają puste wyniki (dla spójności)
+        const cancelledRallies = calendar.filter(r => r.status === 'cancelled');
+        await Promise.all(cancelledRallies.map(r => this.calculateRallyResults(r.id)));
 
         // Teraz wszystkie calc_* są w L1 – obliczenia zbiorcze nie robią fetch
         const [championship, constructors, powerStage] = await Promise.all([
@@ -492,7 +618,8 @@ class WRCAPI {
     async calculateChampionship() {
         if (this._l1.championship) return this._l1.championship;
         const [drivers, calendar] = await Promise.all([this.getDrivers(), this.getCalendar()]);
-        await Promise.all(calendar.filter(r => r.status === 'completed').map(r => this.calculateRallyResults(r.id)));
+        const completedRallies = calendar.filter(r => r.status === 'completed');
+        await Promise.all(completedRallies.map(r => this.calculateRallyResults(r.id)));
         this._l1.championship = await this._computeChampionship(drivers, calendar);
         this._persistCalcToStorage();
         return this._l1.championship;
@@ -501,7 +628,8 @@ class WRCAPI {
     async calculateConstructors() {
         if (this._l1.constructors) return this._l1.constructors;
         const [teams, drivers, calendar] = await Promise.all([this.getTeams(), this.getDrivers(), this.getCalendar()]);
-        await Promise.all(calendar.filter(r => r.status === 'completed').map(r => this.calculateRallyResults(r.id)));
+        const completedRallies = calendar.filter(r => r.status === 'completed');
+        await Promise.all(completedRallies.map(r => this.calculateRallyResults(r.id)));
         this._l1.constructors = await this._computeConstructors(teams, drivers, calendar);
         this._persistCalcToStorage();
         return this._l1.constructors;
@@ -510,7 +638,8 @@ class WRCAPI {
     async calculatePowerStageChampionship() {
         if (this._l1.powerStage) return this._l1.powerStage;
         const [drivers, calendar] = await Promise.all([this.getDrivers(), this.getCalendar()]);
-        await Promise.all(calendar.filter(r => r.status === 'completed').map(r => this.calculateRallyResults(r.id)));
+        const completedRallies = calendar.filter(r => r.status === 'completed');
+        await Promise.all(completedRallies.map(r => this.calculateRallyResults(r.id)));
         this._l1.powerStage = await this._computePowerStage(drivers, calendar);
         this._persistCalcToStorage();
         return this._l1.powerStage;
@@ -526,12 +655,22 @@ class WRCAPI {
             for (const rally of calendar) {
                 let rPts = 0;
                 const rb = { rallyId: rally.id, rallyName: rally.name, points: 0, details: [] };
+                
+                // POMIŃ ANULOWANE RAJDY - nie przyznawaj punktów
+                if (rally.status === 'cancelled') {
+                    rallyDetails.push(rb);
+                    continue;
+                }
+                
                 if (rally.status === 'completed') {
                     const calc = this._l1[`calc_${rally.id}`];
                     if (calc?.overall) {
                         const dr = calc.overall.find(r => r.driverId === driver.id);
-                        if (dr && dr.status !== '—') {
-                            if (dr.status !== 'DSQ') { rPts += dr.points || 0; rb.details.push({ type: 'Position', points: dr.points }); }
+                        if (dr && dr.status !== '—' && dr.status !== 'CANCELLED' && dr.status !== 'DSQ') {
+                            if (dr.points > 0) { 
+                                rPts += dr.points; 
+                                rb.details.push({ type: 'Position', points: dr.points }); 
+                            }
                             const ps = calc.powerStage?.find(r => r.driverId === driver.id);
                             if (ps) { rPts += ps.points; rb.details.push({ type: 'Power Stage', points: ps.points }); }
                             if (dr.totalBonus > 0)  { rPts += dr.totalBonus;  rb.details.push({ type: 'Bonus', points: dr.totalBonus }); }
@@ -559,13 +698,20 @@ class WRCAPI {
             for (const rally of calendar) {
                 let rPts = 0;
                 const driverPoints = [];
+                
+                // POMIŃ ANULOWANE RAJDY
+                if (rally.status === 'cancelled') {
+                    rallyDetails.push({ rallyId: rally.id, rallyName: rally.name, points: 0, driverPoints: [] });
+                    continue;
+                }
+                
                 if (rally.status === 'completed') {
                     const calc = this._l1[`calc_${rally.id}`];
                     if (calc?.overall) {
                         for (const driver of teamDrivers) {
                             const dr = calc.overall.find(r => r.driverId === driver.id);
-                            if (dr && dr.status !== '—') {
-                                let pts = dr.status !== 'DSQ' ? (dr.points || 0) : 0;
+                            if (dr && dr.status !== '—' && dr.status !== 'CANCELLED' && dr.status !== 'DSQ') {
+                                let pts = dr.points || 0;
                                 const ps = calc.powerStage?.find(r => r.driverId === driver.id);
                                 if (ps) pts += ps.points;
                                 pts += (dr.totalBonus || 0) + (dr.extraPoints || 0);
@@ -593,8 +739,15 @@ class WRCAPI {
             let totalPoints = 0;
             const rallyPoints = {};
             for (const rally of calendar) {
+                // POMIŃ ANULOWANE RAJDY
+                if (rally.status === 'cancelled') {
+                    rallyPoints[rally.id] = 0;
+                    continue;
+                }
+                
                 if (rally.status === 'completed') {
-                    const ps = this._l1[`calc_${rally.id}`]?.powerStage?.find(r => r.driverId === driver.id);
+                    const calc = this._l1[`calc_${rally.id}`];
+                    const ps = calc?.powerStage?.find(r => r.driverId === driver.id);
                     if (ps) { totalPoints += ps.points; rallyPoints[rally.id] = ps.points; }
                 }
                 if (!rallyPoints[rally.id]) rallyPoints[rally.id] = 0;
