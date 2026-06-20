@@ -30,6 +30,13 @@ const CONFIG = {
         UPCOMING: 'upcoming',
         ONGOING: 'ongoing',
         COMPLETED: 'completed',
-        CANCELLED: 'cancelled'  // <-- NOWY STATUS
+        CANCELLED: 'cancelled'  
+    }, 
+    
+    SAVE_QUEUE: {
+        DEBOUNCE_DELAY: 1500,      // Czas oczekiwania na kolejne zmiany (ms)
+        MIN_SAVE_INTERVAL: 500,     // Minimalny odstęp między zapisami (ms)
+        AUTO_SAVE_INTERVAL: 30000,  // Automatyczny zapis co 30s
+        MAX_RETRIES: 3              // Maksymalna liczba prób przy błędzie
     }
 };
