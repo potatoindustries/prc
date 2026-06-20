@@ -22,7 +22,7 @@ class WRCAPI {
         // L1 – in-memory cache surowych danych + obliczeń
         this._l1          = {};
         this._l1Time      = 0;
-        this._L1_TTL      = 300000; // 5 min
+        this._L1_TTL      = 300000000; // 5 min
 
         // L2 – localStorage (klucze)
         this._LS_DATA     = 'wrc_data_v2';
@@ -112,13 +112,8 @@ class WRCAPI {
         if (this.data) this._setStatus('online');
 
         // Odpytuj co 5 minut (odpyta JSONBin tylko gdy L1/L2 wygaśnie)
-        this._pollingTimer = setInterval(() => this.loadData(), interval);
 
         // Odśwież gdy zakładka staje się znów aktywna – bez zbędnych requestów
-        this._visibilityHandler = () => {
-            if (document.visibilityState === 'visible') this.loadData();
-        };
-        document.addEventListener('visibilitychange', this._visibilityHandler);
     }
 
     stopStatusPolling() {
