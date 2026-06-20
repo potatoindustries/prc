@@ -1,16 +1,6 @@
 // ============================================================
 // WRCAPI – v2 – zoptymalizowany cache wielopoziomowy
 // ============================================================
-// Poziomy cache (od najszybszego):
-//   L1 – in-memory (ta sama zakładka, ta sama sesja)
-//   L2 – localStorage (między zakładkami, między stronami)
-//   L3 – JSONBin (tylko gdy L2 wygasł lub force=true)
-//
-// Obliczenia (championship, constructors, power stage) są
-// cache'owane osobno i unieważniane TYLKO gdy dane się zmieniły.
-// Status połączenia pochodzi z odpowiedzi loadData()
-// – żadnych osobnych zapytań HEAD.
-// ============================================================
 
 class WRCAPI {
     constructor() {
@@ -51,7 +41,6 @@ class WRCAPI {
             this._l1Time  = meta.ts;
             this._etag    = meta.etag || null;
 
-            // Wczytaj obliczenia jeśli pochodzą z tej samej wersji danych
             const calcRaw = localStorage.getItem(this._LS_CALC);
             if (calcRaw) {
                 const calc = JSON.parse(calcRaw);
@@ -69,7 +58,7 @@ class WRCAPI {
         try {
             localStorage.setItem(this._LS_DATA, JSON.stringify(this.data));
             localStorage.setItem(this._LS_META, JSON.stringify({ ts: this._l1Time, etag: this._etag }));
-            localStorage.removeItem(this._LS_CALC); // dane zmienione – obliczenia nieaktualne
+            localStorage.removeItem(this._LS_CALC);
         } catch (_) {}
     }
 
@@ -106,14 +95,13 @@ class WRCAPI {
         document.querySelectorAll('.rallytv-btn').forEach(b => b.setAttribute('data-status', s));
     }
 
-    // Polling: odpytuje JSONBin tylko gdy TTL wygaśnie.
-    // visibilitychange zapewnia odświeżenie po powrocie do zakładki.
     startStatusPolling(interval = 300000) {
         if (this.data) this._setStatus('online');
-
-        // Odpytuj co 5 minut (odpyta JSONBin tylko gdy L1/L2 wygaśnie)
-
-        // Odśwież gdy zakładka staje się znów aktywna – bez zbędnych requestów
+        // Odpytuj co 5 minut
+        // this._pollingTimer = setInterval(() => this.loadData(), interval);
+        // Obsługa visibilitychange
+        // this._visibilityHandler = () => { if (!document.hidden) this.loadData(); };
+        // document.addEventListener('visibilitychange', this._visibilityHandler);
     }
 
     stopStatusPolling() {
@@ -158,7 +146,6 @@ class WRCAPI {
             const result  = await response.json();
             const newData = result.record;
 
-            // Wykryj czy dane naprawdę się zmieniły – jeśli nie, zachowaj cache obliczeń
             const dataChanged = JSON.stringify(newData) !== JSON.stringify(this.data);
             this.data    = newData;
             this._l1Time = Date.now();
@@ -215,6 +202,51 @@ class WRCAPI {
             this._setStatus('offline');
             return false;
         } finally { this.isLoading = false; }
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
+    // NOWA METODA - DODANA POPRAWNIE JAKO METODA KLASY
+    // ════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Zapisuje dane przy użyciu PATCH (częściowa aktualizacja)
+     * @param {Object} data - Dane do zapisania
+     * @param {Object} changes - Tylko zmienione fragmenty
+     */
+    async saveDataPartial(data, changes) {
+        this.isLoading = true;
+        try {
+            const payload = {
+                ...data,
+                ...changes
+            };
+            
+            const response = await fetch(`${this.config.JSONBIN.URL}/${this.config.JSONBIN.BIN_ID}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': this.config.JSONBIN.API_KEY
+                },
+                body: JSON.stringify(payload)
+            });
+            
+            if (!response.ok) throw new Error('Błąd zapisywania danych');
+            
+            this.data = payload;
+            this._l1 = { data: payload };
+            this._l1Time = Date.now();
+            this._etag = null;
+            this._invalidateStorage();
+            this._persistToStorage();
+            this._setStatus('online');
+            return true;
+        } catch (error) {
+            console.error('Błąd zapisu danych:', error);
+            this._setStatus('offline');
+            return false;
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     // ── Pomocnicze gettery (L1) ───────────────────────────────────────────────
@@ -285,7 +317,6 @@ class WRCAPI {
         const results = await this.getRallyResults(rallyId);
         const drivers = await this.getDrivers();
         
-        // Jeśli rajd jest anulowany – zwróć puste wyniki
         if (this._isRallyCancelled(rally)) {
             const emptyResults = {
                 overall: drivers.map(d => ({
@@ -313,7 +344,6 @@ class WRCAPI {
 
         if (!rally || !results) return null;
 
-        // Oblicz najgorszy czas na każdym OS (tylko dla statusu OK)
         const worstTimePerStage = {};
         for (const stage of rally.stages) {
             if (stage === rally.powerStage) continue;
@@ -338,7 +368,6 @@ class WRCAPI {
             let hasAnyStageData = false;
             const stageTimes = [];
 
-            // Dla każdego OS (poza Power Stage)
             for (const stage of rally.stages) {
                 const isPowerStage = (stage === rally.powerStage);
                 const stageResult = results.stages[stage]?.find(r => r.driverId === driver.id);
@@ -370,9 +399,7 @@ class WRCAPI {
                     continue;
                 }
 
-                // OS (nie Power Stage)
                 if (!stageResult) {
-                    // DNS -> najgorszy + 45s
                     const penaltyTime = worst + 45;
                     totalTimeSeconds += penaltyTime;
                     finalStatus = 'DNS';
@@ -390,11 +417,9 @@ class WRCAPI {
                     hasDSQ = true;
                     finalStatus = 'DSQ';
                     stageTimes.push({ stage, time: 'DSQ', secs: Infinity, status: 'DSQ', isPowerStage, tireChange: false });
-                    // Przerywamy – DSQ usuwa z klasyfikacji
                     totalTimeSeconds = Infinity;
                     break;
                 } else if (status === 'RET' || status === 'DNS') {
-                    // RET / DNS -> najgorszy + 45s
                     const penaltyTime = worst + 45;
                     totalTimeSeconds += penaltyTime;
                     if (status === 'RET') finalStatus = 'RET';
@@ -404,7 +429,6 @@ class WRCAPI {
                         penaltyTime, isPowerStage, tireChange: false 
                     });
                 } else if (status === 'DNF') {
-                    // DNF -> najgorszy + 30s
                     const penaltyTime = worst + 30;
                     totalTimeSeconds += penaltyTime;
                     finalStatus = 'DNF';
@@ -427,7 +451,6 @@ class WRCAPI {
                         });
                     }
                 } else {
-                    // Fallback – nieznany status traktuj jako DNF
                     const penaltyTime = worst + 30;
                     totalTimeSeconds += penaltyTime;
                     finalStatus = 'DNF';
@@ -441,7 +464,6 @@ class WRCAPI {
             if (!hasAnyStageData && !hasAnyData) finalStatus = '—';
             if (hasDSQ) totalTimeSeconds = Infinity;
 
-            // Bonusy (tylko jeśli nie DSQ)
             let totalBonus = 0;
             if (!hasDSQ && finalStatus !== '—') {
                 totalBonus = rally.stages.reduce((sum, stage) => {
@@ -472,21 +494,15 @@ class WRCAPI {
             });
         }
 
-        // ===== SORTOWANIE =====
-        // DSQ na końcu, reszta sortowana według czasu (z karami)
         overallResults.sort((a, b) => {
-            // DSQ zawsze na końcu
             if (a.status === 'DSQ' && b.status !== 'DSQ') return 1;
             if (b.status === 'DSQ' && a.status !== 'DSQ') return -1;
             if (a.status === 'DSQ' && b.status === 'DSQ') return 0;
-
-            // Jeśli brak danych – na koniec
             const aTime = a.totalTimeSeconds !== null ? a.totalTimeSeconds : Infinity;
             const bTime = b.totalTimeSeconds !== null ? b.totalTimeSeconds : Infinity;
             return aTime - bTime;
         });
 
-        // Przypisz pozycje
         const pointsSystem = this.data?.settings?.pointsSystem || CONFIG.DEFAULTS.POINTS_SYSTEM;
         let currentPos = 1;
         let leaderTime = null;
@@ -495,7 +511,6 @@ class WRCAPI {
         for (let i = 0; i < overallResults.length; i++) {
             const result = overallResults[i];
 
-            // DSQ – brak pozycji, brak punktów
             if (result.status === 'DSQ' || result.status === '—' || result.status === 'CANCELLED') {
                 result.position = null;
                 result.points = 0;
@@ -511,14 +526,12 @@ class WRCAPI {
                 continue;
             }
 
-            // Pierwszy poprawny czas = lider
             if (leaderTime === null) {
                 leaderTime = time;
                 currentPos = 1;
                 result.position = 1;
                 result.diff = '—';
             } else {
-                // Jeśli czas taki sam jak poprzedni -> ex aequo
                 if (Math.abs(time - prevTime) < 0.001) {
                     result.position = currentPos;
                 } else {
@@ -533,7 +546,6 @@ class WRCAPI {
             prevTime = time;
         }
 
-        // Power Stage – osobno
         const powerStageResults = [];
         const powerStage = results.stages[rally.powerStage];
         const psPoints = this.data?.settings?.powerStagePoints || CONFIG.DEFAULTS.POWER_STAGE_POINTS;
@@ -557,19 +569,12 @@ class WRCAPI {
             });
         }
 
-        // Zapisz w cache
         results.calculated = { overall: overallResults, powerStage: powerStageResults };
         this._l1[key] = results.calculated;
         return results.calculated;
     }
 
-    // ── Obliczenia zbiorcze: jedno wywołanie zamiast trzech osobnych ──────────
-    //
-    // Użycie na index.html:
-    //   const { championship, constructors, powerStage } = await api.calculateAllStandings();
-    //
-    // Korzyść: wyniki wszystkich rajdów liczone JEDEN RAZ i współdzielone
-    // między championship / constructors / powerStage.
+    // ── Obliczenia zbiorcze ────────────────────────────────────────────────────
 
     async calculateAllStandings() {
         if (this._l1.championship && this._l1.constructors && this._l1.powerStage) {
@@ -580,22 +585,18 @@ class WRCAPI {
             };
         }
 
-        // Pobierz dane równolegle
         const [drivers, teams, calendar] = await Promise.all([
             this.getDrivers(),
             this.getTeams(),
             this.getCalendar()
         ]);
 
-        // Przelicz wyniki wszystkich NIEANULOWANYCH ukończonych rajdów równolegle
         const completedRallies = calendar.filter(r => r.status === 'completed');
         await Promise.all(completedRallies.map(r => this.calculateRallyResults(r.id)));
 
-        // Anulowane rajdy też mają puste wyniki (dla spójności)
         const cancelledRallies = calendar.filter(r => r.status === 'cancelled');
         await Promise.all(cancelledRallies.map(r => this.calculateRallyResults(r.id)));
 
-        // Teraz wszystkie calc_* są w L1 – obliczenia zbiorcze nie robią fetch
         const [championship, constructors, powerStage] = await Promise.all([
             this._computeChampionship(drivers, calendar),
             this._computeConstructors(teams, drivers, calendar),
@@ -640,7 +641,7 @@ class WRCAPI {
         return this._l1.powerStage;
     }
 
-    // ── Wewnętrzne implementacje (synchroniczne po przeliczeniu rajdów) ───────
+    // ── Wewnętrzne implementacje ──────────────────────────────────────────────
 
     async _computeChampionship(drivers, calendar) {
         const standings = [];
@@ -651,7 +652,6 @@ class WRCAPI {
                 let rPts = 0;
                 const rb = { rallyId: rally.id, rallyName: rally.name, points: 0, details: [] };
                 
-                // POMIŃ ANULOWANE RAJDY - nie przyznawaj punktów
                 if (rally.status === 'cancelled') {
                     rallyDetails.push(rb);
                     continue;
@@ -694,7 +694,6 @@ class WRCAPI {
                 let rPts = 0;
                 const driverPoints = [];
                 
-                // POMIŃ ANULOWANE RAJDY
                 if (rally.status === 'cancelled') {
                     rallyDetails.push({ rallyId: rally.id, rallyName: rally.name, points: 0, driverPoints: [] });
                     continue;
@@ -734,7 +733,6 @@ class WRCAPI {
             let totalPoints = 0;
             const rallyPoints = {};
             for (const rally of calendar) {
-                // POMIŃ ANULOWANE RAJDY
                 if (rally.status === 'cancelled') {
                     rallyPoints[rally.id] = 0;
                     continue;
@@ -820,7 +818,7 @@ class WRCAPI {
 // ── Singleton ─────────────────────────────────────────────────────────────────
 const api = new WRCAPI();
 
-// ── Unieważnienie cache z innych zakładek (po zapisie admin) ─────────────────
+// ── Unieważnienie cache z innych zakładek ─────────────────────────────────
 try {
     const _ch = new BroadcastChannel('wrc-data-invalidate');
     _ch.onmessage = (e) => {
