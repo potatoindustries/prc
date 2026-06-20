@@ -839,16 +839,6 @@
       color: #3a4a5a !important;
       font-weight: 520 !important;
     }
-    body.dark .rally-card__name {
-      color: #f0f4f8 !important;
-    }
-    body.dark .rally-card__date,
-    body.dark .rally-card__status {
-      color: #c8d8e8 !important;
-    }
-    body.dark .rally-card__country {
-      color: #9aacbe !important;
-    }
     
     .placeholder-cal {
       text-align: center;
@@ -873,7 +863,7 @@
     }
     * {
     scroll-behavior: smooth;
-}
+    }
 
     /* ===== NAWIGACJA – IDENTYCZNY STYL JAK W index.html (tab.html) ===== */
     .topbar {
@@ -1187,7 +1177,355 @@
 .col-total{
   font-size: 13.5px;
 }
+/* ============================================================
+   POPRAWKI TRYBU CIEMNEGO – ZGODNIE Z tab.html
+   ============================================================ */
 
+/* Tryb ciemny dla całej strony */
+html.wrc-dark,
+html.wrc-dark body,
+html.wrc-dark .page {
+  background: #1a1a1a !important;
+}
+
+body.dark .main--start {
+  background: #121212 !important;
+}
+
+body.dark .start-section--upcoming,
+body.dark .start-section--standings,
+body.dark .start-section--constructors,
+body.dark .start-section--banner,
+body.dark .start-section--articles {
+  background: #121212 !important;
+}
+
+/* Headery sekcji – ciemny tryb */
+body.dark .start-section-heading h2 {
+  color: #e0e8f0 !important;
+}
+
+/* Karty rajdów – ciemny tryb - NEUTRALNE SZAROŚCI ZAMIAST NIEBIESKIEGO */
+body.dark .rally-card {
+  background: #1e1e1e !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28) !important;
+}
+
+body.dark .rally-card__photo {
+  background: #1a1a1a !important;
+}
+
+body.dark .rally-card__name {
+  color: #e8e8e8 !important;
+}
+
+body.dark .rally-card__date,
+body.dark .rally-card__status {
+  color: #b0b0b0 !important;
+}
+
+body.dark .rally-card__country {
+  color: #888888 !important;
+}
+
+body.dark .rally-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28), 0 1px 3px rgba(0, 0, 0, 0.18) !important;
+}
+
+/* Karta wyników – ciemny tryb */
+body.dark .results-card--start {
+  background: #1e1e1e !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28) !important;
+}
+
+/* Nagłówek tabeli klasyfikacji – ciemny tryb */
+body.dark .standings-table--start-top5 .standings-table__head {
+  background: #2a2a2a !important;
+  color: #a0a0a0 !important;
+  border-color: rgba(60, 72, 88, 0.5) !important;
+}
+
+/* Wiersze tabeli klasyfikacji – ciemny tryb */
+body.dark .standings-table--start-top5 .standings-row {
+  background: #1e1e1e !important;
+  color: #c8c8c8 !important;
+}
+
+body.dark .standings-table--start-top5 .standings-row:hover {
+  background: #252525 !important;
+}
+
+body.dark .standings-table--start-top5 .standings-row::after {
+  background: rgba(60, 72, 88, 0.5) !important;
+}
+
+/* Nazwy zespołów w tabeli – ciemny tryb */
+body.dark .col-team-logo .team-name-text {
+  color: #c0c0c0 !important;
+}
+
+/* Nakładka na hero - czarna zamiast niebieskiej TYLKO W TRYBIE CIEMNYM */
+body.dark .hero-overlay--start {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.30) 0%,
+    rgba(0, 0, 0, 0.35) 15%,
+    rgba(0, 0, 0, 0.50) 42%,
+    rgba(0, 0, 0, 0.75) 72%,
+    rgba(0, 0, 0, 0.92) 100%
+  ) !important;
+}
+
+/* Nakładka na banner - czarna zamiast niebieskiej TYLKO W TRYBIE CIEMNYM */
+body.dark .banner-overlay {
+  background: linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.05) 100%) !important;
+}
+
+/* Nazwy konstruktorów – ciemny tryb */
+body.dark .constructor-card__name {
+  color: #e0e8f0 !important;
+}
+
+body.dark .constructor-card__drivers {
+  color: #8a9baa !important;
+}
+
+body.dark .constructor-card__photo {
+  background: #1a1a1a !important;
+}
+
+body.dark .constructor-card__photo img {
+  background: #1a1a1a !important;
+}
+
+/* Artykuły – ciemny tryb */
+body.dark .article-item__title {
+  color: #eef2f8 !important;
+}
+
+body.dark .article-right-card {
+  background: #1e1e1e !important;
+}
+
+body.dark .article-item__img {
+  background: #2a2a2a !important;
+}
+
+/* Tooltipy – ciemny tryb */
+body.dark .team-logo-tooltip:hover::after {
+  background-color: #2a2a2a !important;
+  color: #f0f0f0 !important;
+  border: 1px solid #444 !important;
+}
+
+/* Poprawka dla koloru czcionki w nagłówkach sekcji */
+body.dark .start-section-heading h2 {
+  color: #e0e0e0 !important;
+}
+
+/* Animacja przejścia – ciemny tryb */
+body.theme-animating .page,
+body.theme-animating .main--start,
+body.theme-animating .start-section--upcoming,
+body.theme-animating .start-section--standings,
+body.theme-animating .start-section--constructors,
+body.theme-animating .start-section--banner,
+body.theme-animating .start-section--articles,
+body.theme-animating .results-card--start,
+body.theme-animating .standings-table--start-top5 .standings-table__head,
+body.theme-animating .standings-table--start-top5 .standings-row,
+body.theme-animating .constructor-card,
+body.theme-animating .constructor-card__body,
+body.theme-animating .start-section-heading h2,
+body.theme-animating .rally-card,
+body.theme-animating .rally-card__info,
+body.theme-animating .rally-card__name,
+body.theme-animating .articles-list,
+body.theme-animating .featured-article,
+body.theme-animating .article-item {
+  transition:
+    background-color 0.38s ease,
+    color 0.28s ease,
+    border-color 0.28s ease,
+    box-shadow 0.32s ease !important;
+}
+/* ============================================================
+   POPRAWKI TRYBU CIEMNEGO – ZGODNIE Z tab.html
+   ============================================================ */
+
+/* Tryb ciemny dla całej strony */
+html.wrc-dark,
+html.wrc-dark body,
+html.wrc-dark .page {
+  background: #1a1a1a !important;
+}
+
+body.dark .main--start {
+  background: #121212 !important;
+}
+
+body.dark .start-section--upcoming,
+body.dark .start-section--standings,
+body.dark .start-section--constructors,
+body.dark .start-section--banner,
+body.dark .start-section--articles {
+  background: #121212 !important;
+}
+
+/* Headery sekcji – ciemny tryb */
+body.dark .start-section-heading h2 {
+  color: #e0e8f0 !important;
+}
+
+/* Karty rajdów – ciemny tryb - NEUTRALNE SZAROŚCI ZAMIAST NIEBIESKIEGO */
+body.dark .rally-card {
+  background: #1e1e1e !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28) !important;
+}
+
+body.dark .rally-card__photo {
+  background: #1a1a1a !important;
+}
+
+body.dark .rally-card__name {
+  color: #e8e8e8 !important;
+}
+
+body.dark .rally-card__date,
+body.dark .rally-card__status {
+  color: #b0b0b0 !important;
+}
+
+body.dark .rally-card__country {
+  color: #888888 !important;
+}
+
+body.dark .rally-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28), 0 1px 3px rgba(0, 0, 0, 0.18) !important;
+}
+
+/* Karta wyników – ciemny tryb */
+body.dark .results-card--start {
+  background: #1e1e1e !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28) !important;
+}
+
+/* Nagłówek tabeli klasyfikacji – ciemny tryb */
+body.dark .standings-table--start-top5 .standings-table__head {
+  background: #2a2a2a !important;
+  color: #a0a0a0 !important;
+  border-color: rgba(60, 72, 88, 0.5) !important;
+}
+
+/* Wiersze tabeli klasyfikacji – ciemny tryb */
+body.dark .standings-table--start-top5 .standings-row {
+  background: #1e1e1e !important;
+  color: #c8c8c8 !important;
+}
+
+body.dark .standings-table--start-top5 .standings-row:hover {
+  background: #252525 !important;
+}
+
+body.dark .standings-table--start-top5 .standings-row::after {
+  background: rgba(60, 72, 88, 0.5) !important;
+}
+
+/* Nazwy zespołów w tabeli – ciemny tryb */
+body.dark .col-team-logo .team-name-text {
+  color: #c0c0c0 !important;
+}
+
+/* Nakładka na hero - delikatniejsza, złagodzona winieta TYLKO W TRYBIE CIEMNYM */
+body.dark .hero-overlay--start {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.15) 0%,
+    rgba(0, 0, 0, 0.20) 15%,
+    rgba(0, 0, 0, 0.35) 42%,
+    rgba(0, 0, 0, 0.55) 72%,
+    rgba(0, 0, 0, 0.75) 100%
+  ) !important;
+}
+
+/* Nakładka na banner - delikatniejsza, złagodzona winieta TYLKO W TRYBIE CIEMNYM */
+body.dark .banner-overlay {
+  background: linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.20) 50%, rgba(0,0,0,0.02) 100%) !important;
+}
+
+/* Nakładka na artykuł prawy - delikatniejsza */
+body.dark .article-right-card__overlay {
+  background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.40) 50%, transparent 100%) !important;
+}
+
+/* Nazwy konstruktorów – ciemny tryb */
+body.dark .constructor-card__name {
+  color: #e0e8f0 !important;
+}
+
+body.dark .constructor-card__drivers {
+  color: #8a9baa !important;
+}
+
+body.dark .constructor-card__photo {
+  background: #1a1a1a !important;
+}
+
+body.dark .constructor-card__photo img {
+  background: #1a1a1a !important;
+}
+
+/* Artykuły – ciemny tryb */
+body.dark .article-item__title {
+  color: #eef2f8 !important;
+}
+
+body.dark .article-right-card {
+  background: #1e1e1e !important;
+}
+
+body.dark .article-item__img {
+  background: #2a2a2a !important;
+}
+
+/* Tooltipy – ciemny tryb */
+body.dark .team-logo-tooltip:hover::after {
+  background-color: #2a2a2a !important;
+  color: #f0f0f0 !important;
+  border: 1px solid #444 !important;
+}
+
+/* Poprawka dla koloru czcionki w nagłówkach sekcji */
+body.dark .start-section-heading h2 {
+  color: #e0e0e0 !important;
+}
+
+/* Animacja przejścia – ciemny tryb */
+body.theme-animating .page,
+body.theme-animating .main--start,
+body.theme-animating .start-section--upcoming,
+body.theme-animating .start-section--standings,
+body.theme-animating .start-section--constructors,
+body.theme-animating .start-section--banner,
+body.theme-animating .start-section--articles,
+body.theme-animating .results-card--start,
+body.theme-animating .standings-table--start-top5 .standings-table__head,
+body.theme-animating .standings-table--start-top5 .standings-row,
+body.theme-animating .constructor-card,
+body.theme-animating .constructor-card__body,
+body.theme-animating .start-section-heading h2,
+body.theme-animating .rally-card,
+body.theme-animating .rally-card__info,
+body.theme-animating .rally-card__name,
+body.theme-animating .articles-list,
+body.theme-animating .featured-article,
+body.theme-animating .article-item {
+  transition:
+    background-color 0.38s ease,
+    color 0.28s ease,
+    border-color 0.28s ease,
+    box-shadow 0.32s ease !important;
+}
   </style>
 
   <script>
