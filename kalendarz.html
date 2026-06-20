@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PRC • Kalendarz</title>
+  <title>Kalendarz – PRC 2026</title>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css" />
   <link rel="stylesheet" href="css/style.css" />
-    <link rel="icon" href="https://i.imgur.com/CqBPD1t.png" />
+  <link rel="icon" href="assets/icon.jpg">
 
   <style>
     @font-face {
@@ -559,47 +559,20 @@
     }
     
     // ============================================================
-    // AUTO-ODŚWIEŻANIE - TYLKO PRZY RĘCZNYCH ZMIANACH LUB DŁUGIEJ NIEAKTYWNOŚCI
+    // AUTO-ODŚWIEŻANIE - TYLKO PRZY RĘCZNYCH ZMIANACH Z ADMINA
     // ============================================================
 
-    let lastFullRefresh = Date.now();
-    const MIN_REFRESH_INTERVAL = 300000; // 5 minut
-
     function setupAutoRefresh() {
-      // 1. NASŁUCHIWANIE NA ZMIANY Z ADMINA
+      // TYLKO nasłuchiwanie na zmiany z admina
       try {
         const channel = new BroadcastChannel('wrc-data-invalidate');
         channel.onmessage = async (e) => {
           if (e.data?.action === 'invalidate') {
-            console.log('[Calendar] Wykryto zmianę w adminie - natychmiastowe odświeżenie');
+            console.log('[Calendar] Wykryto zmianę w adminie - odświeżenie');
             await refreshActiveView();
           }
         };
       } catch(e) { console.warn('BroadcastChannel not supported', e); }
-      
-      // 2. OŚWIEŻANIE PO POWROCIE DO ZAKŁADKI
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible' && currentPanel === 'wrc2026') {
-          const now = Date.now();
-          if (now - lastFullRefresh > MIN_REFRESH_INTERVAL) {
-            console.log('[Calendar] Powrót do zakładki po dłuższej nieobecności - odświeżenie');
-            lastFullRefresh = now;
-            refreshActiveView();
-          }
-        }
-      });
-      
-      // 3. Okresowe odświeżanie w tle
-      setInterval(() => {
-        if (document.visibilityState === 'visible' && currentPanel === 'wrc2026') {
-          const now = Date.now();
-          if (now - lastFullRefresh > 900000) { // 15 minut
-            console.log('[Calendar] Okresowe odświeżenie tła');
-            lastFullRefresh = now;
-            refreshActiveView();
-          }
-        }
-      }, 600000);
     }
 
     // Funkcje sortowania
