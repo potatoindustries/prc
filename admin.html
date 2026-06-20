@@ -197,8 +197,27 @@
     .admin-btn-cancel { background: #6b7280; color: white; padding: 10px 24px; }
     .admin-btn-sort { background: #8b5cf6; color: white; }
     .admin-btn-clear { background: #dc2626; color: white; }
+    .admin-btn-flush { 
+      background: #10b981; 
+      color: white; 
+      padding: 10px 20px;
+      border: none;
+      border-radius: 40px;
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: opacity 0.2s;
+    }
+    .admin-btn-flush:hover { opacity: 0.9; }
+    .admin-btn-flush .badge {
+      background: rgba(255,255,255,0.25);
+      border-radius: 20px;
+      padding: 0 8px;
+      font-size: 11px;
+    }
     
-    /* Sortowanie rajdów - poprawione */
     .rally-sort-container {
       display: flex;
       flex-direction: column;
@@ -643,16 +662,18 @@
       border-radius: 12px; 
       color: white; 
       z-index: 4000; 
-      animation: slideOut 2.5s ease forwards; 
+      animation: slideOut 3s ease forwards; 
       font-size: 14px;
       font-weight: 500;
+      max-width: 400px;
     }
     .toast-success { background: #10b981; }
     .toast-error { background: #ef4444; }
     .toast-pending { background: #f59e0b; }
+    .toast-info { background: #3b82f6; }
     @keyframes slideOut {
       0% { opacity: 1; transform: translateX(0); }
-      70% { opacity: 1; transform: translateX(0); }
+      80% { opacity: 1; transform: translateX(0); }
       100% { opacity: 0; transform: translateX(100px); }
     }
     
@@ -670,7 +691,6 @@
       margin-bottom: 20px;
     }
     
-    /* Styl dla anulowanego statusu w adminie */
     .status-badge-cancelled {
       background: #dc2626;
       color: white;
@@ -678,6 +698,31 @@
       border-radius: 20px;
       font-size: 11px;
       font-weight: 600;
+    }
+    
+    .save-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-muted);
+      padding: 4px 12px;
+      background: var(--section-bg);
+      border-radius: 20px;
+    }
+    .save-indicator .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .save-indicator .dot.saved { background: #10b981; }
+    .save-indicator .dot.pending { background: #f59e0b; animation: pulse 1s infinite; }
+    .save-indicator .dot.saving { background: #3b82f6; animation: pulse 0.5s infinite; }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
     }
     
     @media (max-width: 900px) {
@@ -789,7 +834,17 @@
         <div class="admin-container">
           <div class="admin-header">
             <h1><i class="fas fa-database"></i> Zarządzanie danymi</h1>
-            <button class="admin-logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Wyloguj</button>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+              <span class="save-indicator" id="saveIndicator">
+                <span class="dot saved" id="saveDot"></span>
+                <span id="saveStatusText">Zapisano</span>
+              </span>
+              <button class="admin-btn-flush" id="flushBtn" onclick="flushNow()" style="display:none;">
+                <i class="fas fa-save"></i> Zapisz wszystko
+                <span class="badge" id="pendingBadge">0</span>
+              </button>
+              <button class="admin-logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Wyloguj</button>
+            </div>
           </div>
 
           <div class="admin-layout">
@@ -912,1365 +967,1602 @@
   <script src="config.js"></script>
   <script src="api.js"></script>
   <script>
+    // ============================================================
+    // SAVE QUEUE - System kolejkowania zapisów
+    // ============================================================
+    class SaveQueue {
+        constructor() {
+            this.pending = [];
+            this.timeout = null;
+            this.isSaving = false;
+            this.lastSaveData = null;
+            this.lastSaveTime = 0;
+            this.DEBOUNCE_DELAY = 1500;
+            this.MIN_SAVE_INTERVAL = 500;
+            this._updateUI = null;
+        }
+
+        setUICallback(callback) {
+            this._updateUI = callback;
+        }
+
+        add(data, message = 'Zapisano!', onSuccess = null, onError = null) {
+            const dataStr = JSON.stringify(data);
+            const now = Date.now();
+            
+            if (this.lastSaveData === dataStr && (now - this.lastSaveTime) < this.MIN_SAVE_INTERVAL) {
+                console.log('[SaveQueue] Pominięto duplikat zapisu');
+                return;
+            }
+
+            const existingIndex = this.pending.findIndex(item => 
+                JSON.stringify(item.data) === dataStr
+            );
+            
+            if (existingIndex !== -1) {
+                this.pending[existingIndex].message = message;
+                this.pending[existingIndex].onSuccess = onSuccess || this.pending[existingIndex].onSuccess;
+                this.pending[existingIndex].onError = onError || this.pending[existingIndex].onError;
+            } else {
+                this.pending.push({ 
+                    data: JSON.parse(JSON.stringify(data)), 
+                    message, 
+                    onSuccess, 
+                    onError,
+                    timestamp: now 
+                });
+            }
+
+            clearTimeout(this.timeout);
+            this.timeout = setTimeout(() => this.flush(), this.DEBOUNCE_DELAY);
+            
+            this._updateUI && this._updateUI();
+        }
+
+        async flushNow() {
+            clearTimeout(this.timeout);
+            return this.flush();
+        }
+
+        async flush() {
+            if (this.isSaving || this.pending.length === 0) {
+                return;
+            }
+
+            this.isSaving = true;
+            clearTimeout(this.timeout);
+            this._updateUI && this._updateUI();
+
+            const changes = [...this.pending];
+            this.pending = [];
+
+            try {
+                const lastChange = changes[changes.length - 1];
+                const dataToSave = lastChange.data;
+                
+                const success = await api.saveData(dataToSave);
+                
+                if (success) {
+                    this.lastSaveData = JSON.stringify(dataToSave);
+                    this.lastSaveTime = Date.now();
+                    
+                    const messages = changes.map(c => c.message).filter(Boolean);
+                    const uniqueMessages = [...new Set(messages)];
+                    const finalMessage = uniqueMessages.length > 1 
+                        ? `Zapisano ${changes.length} zmian` 
+                        : uniqueMessages[0] || 'Zapisano!';
+                    
+                    showToast(finalMessage, 'success');
+                    
+                    changes.forEach(c => {
+                        if (c.onSuccess) c.onSuccess();
+                    });
+                    
+                    try {
+                        const ch = new BroadcastChannel('wrc-data-invalidate');
+                        ch.postMessage({ action: 'invalidate', ts: Date.now() });
+                        ch.close();
+                    } catch (_) {}
+                    
+                } else {
+                    throw new Error('Błąd zapisu danych');
+                }
+            } catch (error) {
+                console.error('[SaveQueue] Błąd zapisu:', error);
+                showToast('Błąd zapisu, spróbuj ponownie', 'error');
+                
+                this.pending = [...changes, ...this.pending];
+                
+                changes.forEach(c => {
+                    if (c.onError) c.onError(error);
+                });
+            } finally {
+                this.isSaving = false;
+                this._updateUI && this._updateUI();
+                
+                if (this.pending.length > 0) {
+                    this.timeout = setTimeout(() => this.flush(), this.DEBOUNCE_DELAY);
+                }
+            }
+        }
+
+        clear() {
+            clearTimeout(this.timeout);
+            this.pending = [];
+            this.isSaving = false;
+            this._updateUI && this._updateUI();
+        }
+
+        get pendingCount() {
+            return this.pending.length;
+        }
+
+        get saving() {
+            return this.isSaving;
+        }
+    }
+
+    // ============================================================
+    // GLOBALNE ZMIENNE I FUNKCJE
+    // ============================================================
     let Cache = {
-      calendar: [],
-      drivers: [],
-      teams: [],
-      rallyResults: new Map(),
-      currentRallyId: null,
-      currentStageIndex: 0,
-      currentStagesList: [],
-      resultsData: null,
-      _rawData: null,
-      sortMode: false
+        calendar: [],
+        drivers: [],
+        teams: [],
+        rallyResults: new Map(),
+        currentRallyId: null,
+        currentStageIndex: 0,
+        currentStagesList: [],
+        resultsData: null,
+        _rawData: null,
+        sortMode: false
     };
     
     let currentEditingId = null;
     let currentEditingType = null;
 
-    function showToast(msg, type = 'success') {
-      const existing = document.querySelector('.toast');
-      if (existing) existing.remove();
-      const toast = document.createElement('div');
-      toast.className = `toast toast-${type}`;
-      toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'pending' ? 'spinner fa-pulse' : 'exclamation-circle'}"></i> ${msg}`;
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 2500);
-    }
+    // Inicjalizacja kolejki
+    const saveQueue = new SaveQueue();
 
-    async function saveToServer(dataToSave, successMessage) {
-      const season = dataToSave?.seasons?.[dataToSave?.settings?.currentSeason];
-      if (season) {
-        Cache.calendar = [...(season.calendar || [])];
-        Cache.drivers = [...(season.drivers || [])];
-        Cache.teams = [...(season.teams || [])];
-        if (season.rallyResults) {
-          Cache.rallyResults.clear();
-          Object.keys(season.rallyResults).forEach(key => {
-            Cache.rallyResults.set(key, season.rallyResults[key]);
-          });
-        }
-      }
-      
-      api.data = dataToSave;
-      if (api._l1) {
-        api._l1.data = dataToSave;
-        api._l1Time = Date.now();
-      }
-      if (typeof api._persistToStorage === 'function') api._persistToStorage();
-      
-      try {
-        const ok = await api.saveData(dataToSave);
-        if (ok) showToast(successMessage || 'Zapisano!', 'success');
-        else showToast('Błąd synchronizacji', 'error');
-      } catch (err) {
-        console.error('Błąd zapisu:', err);
-        showToast('Błąd zapisu, spróbuj ponownie', 'error');
-      }
-    }
-
-    function _getLocalData() {
-      if (Cache._rawData) return Cache._rawData;
-      const defaultData = {
-        seasons: { "2025": { calendar: [], drivers: [], teams: [], rallyResults: {}, calendarOrder: {} } },
-        settings: { 
-          currentSeason: "2025", 
-          adminPassword: "",
-          teamPointsCount: 2, 
-          pointsSystem: [25,18,15,12,10,8,6,4,2,1], 
-          powerStagePoints: [5,4,3,2,1], 
-          driverLaurels: {} 
-        }
-      };
-      
-      if (api && api.data) {
-        return api.data;
-      }
-      
-      return defaultData;
-    }
-
-    function _getLocalSeason() {
-      const data = _getLocalData();
-      return data?.seasons?.[data?.settings?.currentSeason];
-    }
-    
-    // ==================== SORTOWANIE RAJDÓW ====================
-    function getCalendarGroupedByDate() {
-      const groups = {};
-      Cache.calendar.forEach(rally => {
-        const dateKey = rally.startDate;
-        if (!groups[dateKey]) groups[dateKey] = [];
-        groups[dateKey].push(rally);
-      });
-      const sortedDates = Object.keys(groups).sort();
-      return { groups, sortedDates };
-    }
-    
-    function getStoredOrderForDate(dateKey) {
-      const data = _getLocalData();
-      const season = _getLocalSeason();
-      const order = season?.calendarOrder || {};
-      return order[dateKey] || [];
-    }
-    
-    function saveOrderForDate(dateKey, orderedIds) {
-      const data = _getLocalData();
-      const season = _getLocalSeason();
-      if (!season.calendarOrder) season.calendarOrder = {};
-      season.calendarOrder[dateKey] = orderedIds;
-      Cache._rawData = data;
-      saveToServer(data, 'Kolejność zapisana!');
-    }
-    
-    function getSortedCalendar() {
-      const { groups, sortedDates } = getCalendarGroupedByDate();
-      const result = [];
-      
-      for (const date of sortedDates) {
-        const rallies = groups[date];
-        const storedOrder = getStoredOrderForDate(date);
+    // ============================================================
+    // FUNKCJE ZAPISU Z KOLEJKĄ
+    // ============================================================
+    function saveToServer(dataToSave, successMessage, onSuccess = null, onError = null) {
+        const isCritical = successMessage && (
+            successMessage.includes('Hasło') || 
+            successMessage.includes('Ustawienia') ||
+            successMessage.includes('System punktacji') ||
+            successMessage.includes('Kolejność')
+        );
         
-        if (storedOrder.length === rallies.length && storedOrder.every(id => rallies.some(r => r.id === id))) {
-          const ordered = [];
-          for (const id of storedOrder) {
-            const rally = rallies.find(r => r.id === id);
-            if (rally) ordered.push(rally);
-          }
-          for (const rally of rallies) {
-            if (!ordered.includes(rally)) ordered.push(rally);
-          }
-          result.push(...ordered);
-        } else {
-          result.push(...rallies.sort((a, b) => a.name.localeCompare(b.name)));
+        if (isCritical) {
+            return saveImmediate(dataToSave, successMessage, onSuccess, onError);
         }
-      }
-      return result;
-    }
-    
-    function enableRallySorting() {
-      Cache.sortMode = true;
-      renderRallyList();
-      const btn = document.getElementById('sortRallyBtn');
-      btn.innerHTML = '<i class="fas fa-check"></i> Zapisz kolejność';
-      btn.onclick = finishRallySorting;
-      btn.classList.remove('admin-btn-sort');
-      btn.classList.add('admin-btn-save');
-    }
-    
-    function finishRallySorting() {
-      Cache.sortMode = false;
-      
-      const groups = {};
-      const containers = document.querySelectorAll('.rally-sort-group');
-      
-      containers.forEach(container => {
-        const dateKey = container.dataset.date;
-        const items = container.querySelectorAll('.rally-sort-item');
-        const order = Array.from(items).map(item => item.dataset.rallyId);
-        if (order.length > 0) {
-          groups[dateKey] = order;
-        }
-      });
-      
-      const data = _getLocalData();
-      const season = _getLocalSeason();
-      if (!season.calendarOrder) season.calendarOrder = {};
-      Object.assign(season.calendarOrder, groups);
-      Cache._rawData = data;
-      
-      saveToServer(data, 'Kolejność rajdów zapisana!');
-      renderRallyList();
-      
-      const btn = document.getElementById('sortRallyBtn');
-      btn.innerHTML = '<i class="fas fa-sort-amount-down"></i> Zmień kolejność';
-      btn.onclick = enableRallySorting;
-      btn.classList.remove('admin-btn-save');
-      btn.classList.add('admin-btn-sort');
-    }
-    
-    function moveRallyInGroup(container, index, direction) {
-      const items = container.querySelectorAll('.rally-sort-item');
-      if (direction === 'up' && index === 0) return;
-      if (direction === 'down' && index === items.length - 1) return;
-      
-      const parent = items[0].parentNode;
-      if (direction === 'up') {
-        parent.insertBefore(items[index], items[index - 1]);
-      } else {
-        parent.insertBefore(items[index + 1], items[index]);
-      }
+        
+        saveQueue.add(dataToSave, successMessage, onSuccess, onError);
     }
 
-    async function login() {
-      const pwd = document.getElementById('adminPasswordInput').value;
-      const btn = document.querySelector('.admin-login-card button');
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Łączenie...';
-      try {
-        if (await api.checkAdminPassword(pwd)) {
-          document.getElementById('loginOverlay').style.display = 'none';
-          document.getElementById('adminContent').style.display = 'block';
-          await loadAllData();
-        } else {
-          document.getElementById('loginError').innerHTML = '<i class="fas fa-exclamation-circle"></i> Nieprawidłowe hasło';
+    async function saveImmediate(dataToSave, successMessage, onSuccess = null, onError = null) {
+        try {
+            const success = await api.saveData(dataToSave);
+            
+            if (success) {
+                showToast(successMessage || 'Zapisano!', 'success');
+                if (onSuccess) onSuccess();
+                
+                try {
+                    const ch = new BroadcastChannel('wrc-data-invalidate');
+                    ch.postMessage({ action: 'invalidate', ts: Date.now() });
+                    ch.close();
+                } catch (_) {}
+            } else {
+                throw new Error('Błąd zapisu');
+            }
+        } catch (error) {
+            console.error('Błąd zapisu:', error);
+            showToast('Błąd zapisu, spróbuj ponownie', 'error');
+            if (onError) onError(error);
         }
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Zaloguj się';
-      }
+    }
+
+    async function flushNow() {
+        if (saveQueue.pendingCount > 0) {
+            await saveQueue.flushNow();
+        } else {
+            showToast('Brak oczekujących zmian', 'info');
+        }
+    }
+
+    function updateSaveUI() {
+        const count = saveQueue.pendingCount;
+        const isSaving = saveQueue.saving;
+        
+        const indicator = document.getElementById('saveIndicator');
+        const dot = document.getElementById('saveDot');
+        const statusText = document.getElementById('saveStatusText');
+        const flushBtn = document.getElementById('flushBtn');
+        const badge = document.getElementById('pendingBadge');
+        
+        if (isSaving) {
+            dot.className = 'dot saving';
+            statusText.textContent = 'Zapisywanie...';
+        } else if (count > 0) {
+            dot.className = 'dot pending';
+            statusText.textContent = `${count} zmian oczekuje`;
+        } else {
+            dot.className = 'dot saved';
+            statusText.textContent = 'Zapisano';
+        }
+        
+        if (count > 0) {
+            flushBtn.style.display = 'inline-flex';
+            badge.textContent = count;
+        } else {
+            flushBtn.style.display = 'none';
+        }
+    }
+
+    // ============================================================
+    // TOAST
+    // ============================================================
+    function showToast(msg, type = 'success') {
+        const existing = document.querySelector('.toast');
+        if (existing) existing.remove();
+        const toast = document.createElement('div');
+        const icons = {
+            success: 'fa-check-circle',
+            error: 'fa-exclamation-circle',
+            pending: 'fa-spinner fa-pulse',
+            info: 'fa-info-circle'
+        };
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `<i class="fas ${icons[type] || icons.success}"></i> ${msg}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    // ============================================================
+    // LOGOWANIE
+    // ============================================================
+    async function login() {
+        const pwd = document.getElementById('adminPasswordInput').value;
+        const btn = document.querySelector('.admin-login-card button');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Łączenie...';
+        try {
+            if (await api.checkAdminPassword(pwd)) {
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'block';
+                await loadAllData();
+            } else {
+                document.getElementById('loginError').innerHTML = '<i class="fas fa-exclamation-circle"></i> Nieprawidłowe hasło';
+            }
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Zaloguj się';
+        }
     }
 
     document.getElementById('adminPasswordInput').addEventListener('keydown', e => {
-      if (e.key === 'Enter') login();
+        if (e.key === 'Enter') login();
     });
 
     function logout() {
-      document.getElementById('loginOverlay').style.display = 'flex';
-      document.getElementById('adminContent').style.display = 'none';
+        if (saveQueue.pendingCount > 0) {
+            if (confirm('Masz niezapisane zmiany. Zapisać je przed wylogowaniem?')) {
+                saveQueue.flushNow();
+            }
+        }
+        document.getElementById('loginOverlay').style.display = 'flex';
+        document.getElementById('adminContent').style.display = 'none';
     }
 
+    // ============================================================
+    // ŁADOWANIE DANYCH
+    // ============================================================
     async function loadAllData() {
-      try {
-        const rawData = await api.loadData();
-        Cache._rawData = rawData;
-        const season = rawData?.seasons?.[rawData?.settings?.currentSeason];
-        
-        Cache.calendar = season?.calendar ? [...season.calendar] : [];
-        Cache.drivers = season?.drivers ? [...season.drivers] : [];
-        Cache.teams = season?.teams ? [...season.teams] : [];
-        
-        if (season?.rallyResults) {
-          Cache.rallyResults.clear();
-          Object.keys(season.rallyResults).forEach(key => {
-            Cache.rallyResults.set(key, season.rallyResults[key]);
-          });
+        try {
+            const rawData = await api.loadData();
+            Cache._rawData = rawData;
+            const season = rawData?.seasons?.[rawData?.settings?.currentSeason];
+            
+            Cache.calendar = season?.calendar ? [...season.calendar] : [];
+            Cache.drivers = season?.drivers ? [...season.drivers] : [];
+            Cache.teams = season?.teams ? [...season.teams] : [];
+            
+            if (season?.rallyResults) {
+                Cache.rallyResults.clear();
+                Object.keys(season.rallyResults).forEach(key => {
+                    Cache.rallyResults.set(key, season.rallyResults[key]);
+                });
+            }
+            
+            renderRallyList();
+            renderDriversList();
+            renderTeamsList();
+            renderRallySelect();
+            loadSettings();
+            loadLaurels();
+        } catch (error) {
+            console.error('Błąd ładowania danych:', error);
+            showToast('Błąd ładowania danych', 'error');
+        }
+    }
+
+    // ============================================================
+    // RENDEROWANIE LIST
+    // ============================================================
+    function renderRallyList() {
+        const sortedCalendar = getSortedCalendar();
+        if (!sortedCalendar.length) {
+            document.getElementById('rallyList').innerHTML = '<div class="loading-spinner">Brak rajdów</div>';
+            return;
         }
         
-        renderRallyList();
-        renderDriversList();
-        renderTeamsList();
-        renderRallySelect();
-        loadSettings();
-        loadLaurels();
-      } catch (error) {
-        console.error('Błąd ładowania danych:', error);
-        showToast('Błąd ładowania danych', 'error');
-      }
+        if (Cache.sortMode) {
+            renderRallySortMode(sortedCalendar);
+            return;
+        }
+        
+        let html = '<table class="admin-table"><thead><tr><th>ID</th><th>Nazwa</th><th>Kraj</th><th>Data</th><th>Status</th><th>OS</th><th>Akcje</th></tr></thead><tbody>';
+        sortedCalendar.forEach(rally => {
+            const statusDisplay = rally.status === 'cancelled' 
+                ? `<span class="status-badge-cancelled"><i class="fas fa-times-circle"></i> ANULOWANY</span>`
+                : rally.status;
+            html += `<tr>
+                <td>${escapeHtml(rally.id)}</td>
+                <td>${escapeHtml(rally.name)}</td>
+                <td><span class="fi fi-${rally.country}"></span> ${escapeHtml(rally.countryName)}</td>
+                <td>${rally.startDate} - ${rally.endDate}</td>
+                <td>${statusDisplay}</td>
+                <td>${rally.stages.length}</td>
+                <td class="admin-actions">
+                    <button class="admin-btn admin-btn-edit" onclick="editRally('${rally.id}')"><i class="fas fa-edit"></i> Edytuj</button>
+                    <button class="admin-btn admin-btn-delete" onclick="deleteRally('${rally.id}')"><i class="fas fa-trash"></i> Usuń</button>
+                </td>
+            </tr>`;
+        });
+        html += '</tbody></table>';
+        document.getElementById('rallyList').innerHTML = html;
     }
 
-    function renderRallyList() {
-      const sortedCalendar = getSortedCalendar();
-      if (!sortedCalendar.length) {
-        document.getElementById('rallyList').innerHTML = '<div class="loading-spinner">Brak rajdów</div>';
-        return;
-      }
-      
-      if (Cache.sortMode) {
+    function renderRallySortMode(sortedCalendar) {
         const { groups, sortedDates } = getCalendarGroupedByDate();
         let html = '<div class="rally-sort-container">';
         
         for (const date of sortedDates) {
-          const rallies = groups[date];
-          const storedOrder = getStoredOrderForDate(date);
-          
-          let orderedRallies = [...rallies];
-          if (storedOrder.length === rallies.length && storedOrder.every(id => rallies.some(r => r.id === id))) {
-            orderedRallies = [];
-            for (const id of storedOrder) {
-              const rally = rallies.find(r => r.id === id);
-              if (rally) orderedRallies.push(rally);
+            const rallies = groups[date];
+            const storedOrder = getStoredOrderForDate(date);
+            
+            let orderedRallies = [...rallies];
+            if (storedOrder.length === rallies.length && storedOrder.every(id => rallies.some(r => r.id === id))) {
+                orderedRallies = [];
+                for (const id of storedOrder) {
+                    const rally = rallies.find(r => r.id === id);
+                    if (rally) orderedRallies.push(rally);
+                }
+                for (const rally of rallies) {
+                    if (!orderedRallies.includes(rally)) orderedRallies.push(rally);
+                }
+            } else {
+                orderedRallies.sort((a, b) => a.name.localeCompare(b.name));
             }
-            for (const rally of rallies) {
-              if (!orderedRallies.includes(rally)) orderedRallies.push(rally);
-            }
-          } else {
-            orderedRallies.sort((a, b) => a.name.localeCompare(b.name));
-          }
-          
-          const formattedDate = new Date(date).toLocaleDateString('pl-PL', { year: 'numeric', month: 'long', day: 'numeric' });
-          
-          html += `
-            <div class="rally-sort-group" data-date="${date}">
-              <div class="rally-sort-group-title">
-                <i class="fas fa-calendar-day"></i>
-                ${formattedDate}
-              </div>
-              <div class="rally-sort-list">
-          `;
-          
-          orderedRallies.forEach((rally, idx) => {
+            
+            const formattedDate = new Date(date).toLocaleDateString('pl-PL', { year: 'numeric', month: 'long', day: 'numeric' });
+            
             html += `
-              <div class="rally-sort-item" data-rally-id="${rally.id}">
-                <i class="fas fa-grip-vertical rally-sort-handle"></i>
-                <div class="rally-sort-info">
-                  <span class="rally-sort-name">${escapeHtml(rally.name)}</span>
-                  <span class="rally-sort-date"><i class="fas fa-flag-checkered"></i> ${rally.countryName}</span>
-                </div>
-                <div class="rally-sort-buttons">
-                  <button class="sort-btn" onclick="moveRallyInGroup(this.closest('.rally-sort-group'), ${idx}, 'up')" ${idx === 0 ? 'disabled' : ''}><i class="fas fa-arrow-up"></i></button>
-                  <button class="sort-btn" onclick="moveRallyInGroup(this.closest('.rally-sort-group'), ${idx}, 'down')" ${idx === orderedRallies.length - 1 ? 'disabled' : ''}><i class="fas fa-arrow-down"></i></button>
-                </div>
-              </div>
+                <div class="rally-sort-group" data-date="${date}">
+                    <div class="rally-sort-group-title">
+                        <i class="fas fa-calendar-day"></i>
+                        ${formattedDate}
+                    </div>
+                    <div class="rally-sort-list">
             `;
-          });
-          
-          html += `</div></div>`;
+            
+            orderedRallies.forEach((rally, idx) => {
+                html += `
+                    <div class="rally-sort-item" data-rally-id="${rally.id}">
+                        <i class="fas fa-grip-vertical rally-sort-handle"></i>
+                        <div class="rally-sort-info">
+                            <span class="rally-sort-name">${escapeHtml(rally.name)}</span>
+                            <span class="rally-sort-date"><i class="fas fa-flag-checkered"></i> ${rally.countryName}</span>
+                        </div>
+                        <div class="rally-sort-buttons">
+                            <button class="sort-btn" onclick="moveRallyInGroup(this.closest('.rally-sort-group'), ${idx}, 'up')" ${idx === 0 ? 'disabled' : ''}><i class="fas fa-arrow-up"></i></button>
+                            <button class="sort-btn" onclick="moveRallyInGroup(this.closest('.rally-sort-group'), ${idx}, 'down')" ${idx === orderedRallies.length - 1 ? 'disabled' : ''}><i class="fas fa-arrow-down"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `</div></div>`;
         }
         html += '</div><p style="margin-top:16px;font-size:12px;color:var(--text-muted);padding:12px;background:var(--section-bg);border-radius:8px;"><i class="fas fa-info-circle"></i> Rajdy są pogrupowane według daty rozpoczęcia. Możesz zmieniać kolejność tylko w obrębie tej samej daty.</p>';
         document.getElementById('rallyList').innerHTML = html;
-        return;
-      }
-      
-      let html = '<table class="admin-table"><thead><tr><th>ID</th><th>Nazwa</th><th>Kraj</th><th>Data</th><th>Status</th><th>OS</th><th>Akcje</th></tr></thead><tbody>';
-      sortedCalendar.forEach(rally => {
-        const statusDisplay = rally.status === 'cancelled' 
-          ? `<span class="status-badge-cancelled"><i class="fas fa-times-circle"></i> ANULOWANY</span>`
-          : rally.status;
-        html += `<tr>
-          <td>${escapeHtml(rally.id)}</td>
-          <td>${escapeHtml(rally.name)}</td>
-          <td><span class="fi fi-${rally.country}"></span> ${escapeHtml(rally.countryName)}</td>
-          <td>${rally.startDate} - ${rally.endDate}</td>
-          <td>${statusDisplay}</td>
-          <td>${rally.stages.length}</td>
-          <td class="admin-actions">
-            <button class="admin-btn admin-btn-edit" onclick="editRally('${rally.id}')"><i class="fas fa-edit"></i> Edytuj</button>
-            <button class="admin-btn admin-btn-delete" onclick="deleteRally('${rally.id}')"><i class="fas fa-trash"></i> Usuń</button>
-          </td>
-        </tr>`;
-      });
-      html += '</tbody></table>';
-      document.getElementById('rallyList').innerHTML = html;
     }
 
     function renderDriversList() {
-      if (!Cache.drivers.length) {
-        document.getElementById('driversList').innerHTML = '<div class="loading-spinner">Brak kierowców</div>';
-        return;
-      }
-      let html = '<table class="admin-table"><thead><tr><th>ID</th><th>Imię</th><th>Kraj</th><th>Zespół</th><th>Samochód</th><th>Zdjęcie</th><th>Akcje</th></tr></thead><tbody>';
-      Cache.drivers.forEach(driver => {
-        const team = Cache.teams.find(t => t.id === driver.teamId);
-        html += `<tr>
-          <td>${escapeHtml(driver.id)}</td>
-          <td>${escapeHtml(driver.name)}</td>
-          <td><span class="fi fi-${driver.country}"></span></td>
-          <td>${team ? escapeHtml(team.name) : '-'}</td>
-          <td>${escapeHtml(driver.carModel || '-')}</td>
-          <td>${driver.photo ? `<img src="${driver.photo}" style="width:36px;height:36px;object-fit:cover;border-radius:50%;">` : '-'}</td>
-          <td class="admin-actions">
-            <button class="admin-btn admin-btn-edit" onclick="editDriver('${driver.id}')"><i class="fas fa-edit"></i> Edytuj</button>
-            <button class="admin-btn admin-btn-delete" onclick="deleteDriver('${driver.id}')"><i class="fas fa-trash"></i> Usuń</button>
-          </td>
-        </tr>`;
-      });
-      html += '</tbody></table>';
-      document.getElementById('driversList').innerHTML = html;
+        if (!Cache.drivers.length) {
+            document.getElementById('driversList').innerHTML = '<div class="loading-spinner">Brak kierowców</div>';
+            return;
+        }
+        let html = '<table class="admin-table"><thead><tr><th>ID</th><th>Imię</th><th>Kraj</th><th>Zespół</th><th>Samochód</th><th>Zdjęcie</th><th>Akcje</th></tr></thead><tbody>';
+        Cache.drivers.forEach(driver => {
+            const team = Cache.teams.find(t => t.id === driver.teamId);
+            html += `<tr>
+                <td>${escapeHtml(driver.id)}</td>
+                <td>${escapeHtml(driver.name)}</td>
+                <td><span class="fi fi-${driver.country}"></span></td>
+                <td>${team ? escapeHtml(team.name) : '-'}</td>
+                <td>${escapeHtml(driver.carModel || '-')}</td>
+                <td>${driver.photo ? `<img src="${driver.photo}" style="width:36px;height:36px;object-fit:cover;border-radius:50%;">` : '-'}</td>
+                <td class="admin-actions">
+                    <button class="admin-btn admin-btn-edit" onclick="editDriver('${driver.id}')"><i class="fas fa-edit"></i> Edytuj</button>
+                    <button class="admin-btn admin-btn-delete" onclick="deleteDriver('${driver.id}')"><i class="fas fa-trash"></i> Usuń</button>
+                </td>
+            </tr>`;
+        });
+        html += '</tbody></table>';
+        document.getElementById('driversList').innerHTML = html;
     }
 
     function renderTeamsList() {
-      if (!Cache.teams.length) {
-        document.getElementById('teamsList').innerHTML = '<div class="loading-spinner">Brak zespołów</div>';
-        return;
-      }
-      let html = '<table class="admin-table"><thead><tr><th>ID</th><th>Nazwa</th><th>Logo</th><th>Zdjęcie auta</th><th>Lider</th><th>Kierowcy</th><th>Akcje</th></tr></thead><tbody>';
-      Cache.teams.forEach(team => {
-        const teamDrivers = Cache.drivers.filter(d => d.teamId === team.id).map(d => d.name).join(', ');
-        html += `<tr>
-          <td>${escapeHtml(team.id)}</td>
-          <td>${escapeHtml(team.name)}</td>
-          <td>${team.logo ? `<img src="${team.logo}" style="width:36px;height:36px;object-fit:contain;">` : '-'}</td>
-          <td>${team.carImage ? `<img src="${team.carImage}" style="width:50px;height:30px;object-fit:cover;">` : '-'}</td>
-          <td>${escapeHtml(team.principal || '-')}</td>
-          <td>${escapeHtml(teamDrivers || '-')}</td>
-          <td class="admin-actions">
-            <button class="admin-btn admin-btn-edit" onclick="editTeam('${team.id}')"><i class="fas fa-edit"></i> Edytuj</button>
-            <button class="admin-btn admin-btn-delete" onclick="deleteTeam('${team.id}')"><i class="fas fa-trash"></i> Usuń</button>
-          </td>
-        </tr>`;
-      });
-      html += '</tbody></table>';
-      document.getElementById('teamsList').innerHTML = html;
+        if (!Cache.teams.length) {
+            document.getElementById('teamsList').innerHTML = '<div class="loading-spinner">Brak zespołów</div>';
+            return;
+        }
+        let html = '<table class="admin-table"><thead><tr><th>ID</th><th>Nazwa</th><th>Logo</th><th>Zdjęcie auta</th><th>Lider</th><th>Kierowcy</th><th>Akcje</th></tr></thead><tbody>';
+        Cache.teams.forEach(team => {
+            const teamDrivers = Cache.drivers.filter(d => d.teamId === team.id).map(d => d.name).join(', ');
+            html += `<tr>
+                <td>${escapeHtml(team.id)}</td>
+                <td>${escapeHtml(team.name)}</td>
+                <td>${team.logo ? `<img src="${team.logo}" style="width:36px;height:36px;object-fit:contain;">` : '-'}</td>
+                <td>${team.carImage ? `<img src="${team.carImage}" style="width:50px;height:30px;object-fit:cover;">` : '-'}</td>
+                <td>${escapeHtml(team.principal || '-')}</td>
+                <td>${escapeHtml(teamDrivers || '-')}</td>
+                <td class="admin-actions">
+                    <button class="admin-btn admin-btn-edit" onclick="editTeam('${team.id}')"><i class="fas fa-edit"></i> Edytuj</button>
+                    <button class="admin-btn admin-btn-delete" onclick="deleteTeam('${team.id}')"><i class="fas fa-trash"></i> Usuń</button>
+                </td>
+            </tr>`;
+        });
+        html += '</tbody></table>';
+        document.getElementById('teamsList').innerHTML = html;
     }
 
     function renderRallySelect() {
-      const select = document.getElementById('resultsRallySelect');
-      const sortedCalendar = getSortedCalendar();
-      select.innerHTML = '<option value="">Wybierz rajd</option>' + 
-        sortedCalendar.map(r => `<option value="${r.id}">${escapeHtml(r.name)} (${r.startDate})</option>`).join('');
+        const select = document.getElementById('resultsRallySelect');
+        const sortedCalendar = getSortedCalendar();
+        select.innerHTML = '<option value="">Wybierz rajd</option>' + 
+            sortedCalendar.map(r => `<option value="${r.id}">${escapeHtml(r.name)} (${r.startDate})</option>`).join('');
     }
 
     function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
 
-    // ==================== RAJDY ====================
+    // ============================================================
+    // FUNKCJE POMOCNICZE SORTOWANIA
+    // ============================================================
+    function getCalendarGroupedByDate() {
+        const groups = {};
+        Cache.calendar.forEach(rally => {
+            const dateKey = rally.startDate;
+            if (!groups[dateKey]) groups[dateKey] = [];
+            groups[dateKey].push(rally);
+        });
+        const sortedDates = Object.keys(groups).sort();
+        return { groups, sortedDates };
+    }
+
+    function getStoredOrderForDate(dateKey) {
+        const data = Cache._rawData;
+        const season = data?.seasons?.[data?.settings?.currentSeason];
+        const order = season?.calendarOrder || {};
+        return order[dateKey] || [];
+    }
+
+    function getSortedCalendar() {
+        const { groups, sortedDates } = getCalendarGroupedByDate();
+        const result = [];
+        
+        for (const date of sortedDates) {
+            const rallies = groups[date];
+            const storedOrder = getStoredOrderForDate(date);
+            
+            if (storedOrder.length === rallies.length && storedOrder.every(id => rallies.some(r => r.id === id))) {
+                const ordered = [];
+                for (const id of storedOrder) {
+                    const rally = rallies.find(r => r.id === id);
+                    if (rally) ordered.push(rally);
+                }
+                for (const rally of rallies) {
+                    if (!ordered.includes(rally)) ordered.push(rally);
+                }
+                result.push(...ordered);
+            } else {
+                result.push(...rallies.sort((a, b) => a.name.localeCompare(b.name)));
+            }
+        }
+        return result;
+    }
+
+    function enableRallySorting() {
+        Cache.sortMode = true;
+        renderRallyList();
+        const btn = document.getElementById('sortRallyBtn');
+        btn.innerHTML = '<i class="fas fa-check"></i> Zapisz kolejność';
+        btn.onclick = finishRallySorting;
+        btn.classList.remove('admin-btn-sort');
+        btn.classList.add('admin-btn-save');
+    }
+
+    function finishRallySorting() {
+        Cache.sortMode = false;
+        
+        const groups = {};
+        const containers = document.querySelectorAll('.rally-sort-group');
+        
+        containers.forEach(container => {
+            const dateKey = container.dataset.date;
+            const items = container.querySelectorAll('.rally-sort-item');
+            const order = Array.from(items).map(item => item.dataset.rallyId);
+            if (order.length > 0) {
+                groups[dateKey] = order;
+            }
+        });
+        
+        const data = Cache._rawData;
+        const season = data?.seasons?.[data?.settings?.currentSeason];
+        if (!season.calendarOrder) season.calendarOrder = {};
+        Object.assign(season.calendarOrder, groups);
+        Cache._rawData = data;
+        
+        saveToServer(data, 'Kolejność rajdów zapisana!');
+        renderRallyList();
+        
+        const btn = document.getElementById('sortRallyBtn');
+        btn.innerHTML = '<i class="fas fa-sort-amount-down"></i> Zmień kolejność';
+        btn.onclick = enableRallySorting;
+        btn.classList.remove('admin-btn-save');
+        btn.classList.add('admin-btn-sort');
+    }
+
+    function moveRallyInGroup(container, index, direction) {
+        const items = container.querySelectorAll('.rally-sort-item');
+        if (direction === 'up' && index === 0) return;
+        if (direction === 'down' && index === items.length - 1) return;
+        
+        const parent = items[0].parentNode;
+        if (direction === 'up') {
+            parent.insertBefore(items[index], items[index - 1]);
+        } else {
+            parent.insertBefore(items[index + 1], items[index]);
+        }
+    }
+
+    // ============================================================
+    // RAJDY - CRUD
+    // ============================================================
     function showRallyModal() {
-      currentEditingType = 'rally';
-      currentEditingId = null;
-      showModal(`
-        <button class="close-modal-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
-        <h3 style="margin-bottom:20px;"><i class="fas fa-flag-checkered"></i> Dodaj nowy rajd</h3>
-        <div class="admin-form-grid">
-          <div class="admin-form-group"><label>ID (unikalne):</label><input type="text" id="rallyId" placeholder="np. monte-carlo"></div>
-          <div class="admin-form-group"><label>Nazwa:</label><input type="text" id="rallyName" placeholder="Rajd Monte-Carlo"></div>
-          <div class="admin-form-group"><label>Kraj (kod):</label><input type="text" id="rallyCountry" placeholder="mc"></div>
-          <div class="admin-form-group"><label>Nazwa kraju:</label><input type="text" id="rallyCountryName" placeholder="Monaco"></div>
-          <div class="admin-form-group"><label>Data rozpoczęcia:</label><input type="date" id="rallyStartDate"></div>
-          <div class="admin-form-group"><label>Data zakończenia:</label><input type="date" id="rallyEndDate"></div>
-          <div class="admin-form-group"><label>Status:</label>
-            <select id="rallyStatus">
-              <option value="upcoming">Nadchodzący</option>
-              <option value="ongoing">Trwa</option>
-              <option value="completed">Zakończony</option>
-              <option value="cancelled" style="color:#dc2626;">❌ Anulowany</option>
-            </select>
-          </div>
-          <div class="admin-form-group"><label>Logo (URL):</label><input type="text" id="rallyLogo" placeholder="assets/rallies/logos/logo.png"></div>
-          <div class="admin-form-group"><label>Zdjęcie hero (URL):</label><input type="text" id="rallyHeroImage" placeholder="assets/rallies/photo.jpg"></div>
-          <div class="admin-form-group"><label>Liczba OS:</label><input type="number" id="rallyStagesCount" min="1" max="20" value="4"></div>
-          <div class="admin-form-group"><label>Power Stage (numer OS):</label><input type="number" id="rallyPowerStage" min="1" max="20" value="4"></div>
-        </div>
-        <div class="modal-buttons"><button class="admin-btn admin-btn-save" onclick="saveRally()"><i class="fas fa-save"></i> Zapisz</button><button class="admin-btn admin-btn-cancel" onclick="closeModal()">Anuluj</button></div>
-      `);
+        currentEditingType = 'rally';
+        currentEditingId = null;
+        showModal(`
+            <button class="close-modal-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            <h3 style="margin-bottom:20px;"><i class="fas fa-flag-checkered"></i> Dodaj nowy rajd</h3>
+            <div class="admin-form-grid">
+                <div class="admin-form-group"><label>ID (unikalne):</label><input type="text" id="rallyId" placeholder="np. monte-carlo"></div>
+                <div class="admin-form-group"><label>Nazwa:</label><input type="text" id="rallyName" placeholder="Rajd Monte-Carlo"></div>
+                <div class="admin-form-group"><label>Kraj (kod):</label><input type="text" id="rallyCountry" placeholder="mc"></div>
+                <div class="admin-form-group"><label>Nazwa kraju:</label><input type="text" id="rallyCountryName" placeholder="Monaco"></div>
+                <div class="admin-form-group"><label>Data rozpoczęcia:</label><input type="date" id="rallyStartDate"></div>
+                <div class="admin-form-group"><label>Data zakończenia:</label><input type="date" id="rallyEndDate"></div>
+                <div class="admin-form-group"><label>Status:</label>
+                    <select id="rallyStatus">
+                        <option value="upcoming">Nadchodzący</option>
+                        <option value="ongoing">Trwa</option>
+                        <option value="completed">Zakończony</option>
+                        <option value="cancelled" style="color:#dc2626;">❌ Anulowany</option>
+                    </select>
+                </div>
+                <div class="admin-form-group"><label>Logo (URL):</label><input type="text" id="rallyLogo" placeholder="assets/rallies/logos/logo.png"></div>
+                <div class="admin-form-group"><label>Zdjęcie hero (URL):</label><input type="text" id="rallyHeroImage" placeholder="assets/rallies/photo.jpg"></div>
+                <div class="admin-form-group"><label>Liczba OS:</label><input type="number" id="rallyStagesCount" min="1" max="20" value="4"></div>
+                <div class="admin-form-group"><label>Power Stage (numer OS):</label><input type="number" id="rallyPowerStage" min="1" max="20" value="4"></div>
+            </div>
+            <div class="modal-buttons"><button class="admin-btn admin-btn-save" onclick="saveRally()"><i class="fas fa-save"></i> Zapisz</button><button class="admin-btn admin-btn-cancel" onclick="closeModal()">Anuluj</button></div>
+        `);
     }
 
     async function editRally(id) {
-      currentEditingType = 'rally';
-      currentEditingId = id;
-      const rally = Cache.calendar.find(r => r.id === id);
-      if (!rally) return;
-      
-      const statusOptions = `
-        <option value="upcoming" ${rally.status === 'upcoming' ? 'selected' : ''}>Nadchodzący</option>
-        <option value="ongoing" ${rally.status === 'ongoing' ? 'selected' : ''}>Trwa</option>
-        <option value="completed" ${rally.status === 'completed' ? 'selected' : ''}>Zakończony</option>
-        <option value="cancelled" ${rally.status === 'cancelled' ? 'selected' : ''} style="color:#dc2626;">❌ Anulowany</option>
-      `;
-      
-      showModal(`
-        <button class="close-modal-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
-        <h3 style="margin-bottom:20px;"><i class="fas fa-edit"></i> Edytuj rajd</h3>
-        <div class="admin-form-grid">
-          <div class="admin-form-group"><label>ID:</label><input type="text" id="rallyId" value="${escapeHtml(rally.id)}" readonly></div>
-          <div class="admin-form-group"><label>Nazwa:</label><input type="text" id="rallyName" value="${escapeHtml(rally.name)}"></div>
-          <div class="admin-form-group"><label>Kraj (kod):</label><input type="text" id="rallyCountry" value="${escapeHtml(rally.country)}"></div>
-          <div class="admin-form-group"><label>Nazwa kraju:</label><input type="text" id="rallyCountryName" value="${escapeHtml(rally.countryName)}"></div>
-          <div class="admin-form-group"><label>Data rozpoczęcia:</label><input type="date" id="rallyStartDate" value="${rally.startDate}"></div>
-          <div class="admin-form-group"><label>Data zakończenia:</label><input type="date" id="rallyEndDate" value="${rally.endDate}"></div>
-          <div class="admin-form-group"><label>Status:</label>
-            <select id="rallyStatus">${statusOptions}</select>
-          </div>
-          <div class="admin-form-group"><label>Logo (URL):</label><input type="text" id="rallyLogo" value="${rally.logo || ''}"></div>
-          <div class="admin-form-group"><label>Zdjęcie hero (URL):</label><input type="text" id="rallyHeroImage" value="${rally.heroImage || ''}"></div>
-          <div class="admin-form-group"><label>Liczba OS:</label><input type="number" id="rallyStagesCount" min="1" max="20" value="${rally.stages.length}"></div>
-          <div class="admin-form-group"><label>Power Stage (numer OS):</label><input type="number" id="rallyPowerStage" min="1" max="20" value="${parseInt(rally.powerStage.replace('OS', ''))}"></div>
-        </div>
-        <div class="modal-buttons"><button class="admin-btn admin-btn-save" onclick="saveRally()"><i class="fas fa-save"></i> Zapisz</button><button class="admin-btn admin-btn-cancel" onclick="closeModal()">Anuluj</button></div>
-      `);
+        currentEditingType = 'rally';
+        currentEditingId = id;
+        const rally = Cache.calendar.find(r => r.id === id);
+        if (!rally) return;
+        
+        const statusOptions = `
+            <option value="upcoming" ${rally.status === 'upcoming' ? 'selected' : ''}>Nadchodzący</option>
+            <option value="ongoing" ${rally.status === 'ongoing' ? 'selected' : ''}>Trwa</option>
+            <option value="completed" ${rally.status === 'completed' ? 'selected' : ''}>Zakończony</option>
+            <option value="cancelled" ${rally.status === 'cancelled' ? 'selected' : ''} style="color:#dc2626;">❌ Anulowany</option>
+        `;
+        
+        showModal(`
+            <button class="close-modal-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            <h3 style="margin-bottom:20px;"><i class="fas fa-edit"></i> Edytuj rajd</h3>
+            <div class="admin-form-grid">
+                <div class="admin-form-group"><label>ID:</label><input type="text" id="rallyId" value="${escapeHtml(rally.id)}" readonly></div>
+                <div class="admin-form-group"><label>Nazwa:</label><input type="text" id="rallyName" value="${escapeHtml(rally.name)}"></div>
+                <div class="admin-form-group"><label>Kraj (kod):</label><input type="text" id="rallyCountry" value="${escapeHtml(rally.country)}"></div>
+                <div class="admin-form-group"><label>Nazwa kraju:</label><input type="text" id="rallyCountryName" value="${escapeHtml(rally.countryName)}"></div>
+                <div class="admin-form-group"><label>Data rozpoczęcia:</label><input type="date" id="rallyStartDate" value="${rally.startDate}"></div>
+                <div class="admin-form-group"><label>Data zakończenia:</label><input type="date" id="rallyEndDate" value="${rally.endDate}"></div>
+                <div class="admin-form-group"><label>Status:</label>
+                    <select id="rallyStatus">${statusOptions}</select>
+                </div>
+                <div class="admin-form-group"><label>Logo (URL):</label><input type="text" id="rallyLogo" value="${rally.logo || ''}"></div>
+                <div class="admin-form-group"><label>Zdjęcie hero (URL):</label><input type="text" id="rallyHeroImage" value="${rally.heroImage || ''}"></div>
+                <div class="admin-form-group"><label>Liczba OS:</label><input type="number" id="rallyStagesCount" min="1" max="20" value="${rally.stages.length}"></div>
+                <div class="admin-form-group"><label>Power Stage (numer OS):</label><input type="number" id="rallyPowerStage" min="1" max="20" value="${parseInt(rally.powerStage.replace('OS', ''))}"></div>
+            </div>
+            <div class="modal-buttons"><button class="admin-btn admin-btn-save" onclick="saveRally()"><i class="fas fa-save"></i> Zapisz</button><button class="admin-btn admin-btn-cancel" onclick="closeModal()">Anuluj</button></div>
+        `);
     }
 
     async function saveRally() {
-      const id = document.getElementById('rallyId').value;
-      if (!id) { showToast('ID rajdu jest wymagane', 'error'); return; }
-      
-      const stagesCount = parseInt(document.getElementById('rallyStagesCount').value);
-      const psNum = parseInt(document.getElementById('rallyPowerStage').value);
-      const stages = Array.from({ length: stagesCount }, (_, i) => `OS${i + 1}`);
-      
-      const rally = {
-        id: id,
-        name: document.getElementById('rallyName').value,
-        country: document.getElementById('rallyCountry').value,
-        countryName: document.getElementById('rallyCountryName').value,
-        startDate: document.getElementById('rallyStartDate').value,
-        endDate: document.getElementById('rallyEndDate').value,
-        status: document.getElementById('rallyStatus').value,
-        logo: document.getElementById('rallyLogo').value || '',
-        heroImage: document.getElementById('rallyHeroImage').value || '',
-        stages: stages,
-        powerStage: `OS${psNum}`
-      };
-      
-      const data = _getLocalData();
-      const season = _getLocalSeason();
-      
-      if (!season.calendar) season.calendar = [];
-      if (!season.rallyResults) season.rallyResults = {};
-      
-      if (currentEditingId) {
-        const index = season.calendar.findIndex(r => r.id === currentEditingId);
-        if (index !== -1) {
-          // Jeśli status zmienia się na anulowany, usuń wyniki
-          const oldRally = season.calendar[index];
-          if (oldRally.status !== 'cancelled' && rally.status === 'cancelled') {
-            delete season.rallyResults[currentEditingId];
-            season.rallyResults[currentEditingId] = { stages: {}, extraPoints: {}, penalties: {} };
-          }
-          
-          const oldResults = season.rallyResults[currentEditingId];
-          season.calendar[index] = rally;
-          if (currentEditingId !== id && oldResults) {
-            delete season.rallyResults[currentEditingId];
-            season.rallyResults[id] = oldResults;
-          }
+        const id = document.getElementById('rallyId').value;
+        if (!id) { showToast('ID rajdu jest wymagane', 'error'); return; }
+        
+        const stagesCount = parseInt(document.getElementById('rallyStagesCount').value);
+        const psNum = parseInt(document.getElementById('rallyPowerStage').value);
+        const stages = Array.from({ length: stagesCount }, (_, i) => `OS${i + 1}`);
+        
+        const rally = {
+            id: id,
+            name: document.getElementById('rallyName').value,
+            country: document.getElementById('rallyCountry').value,
+            countryName: document.getElementById('rallyCountryName').value,
+            startDate: document.getElementById('rallyStartDate').value,
+            endDate: document.getElementById('rallyEndDate').value,
+            status: document.getElementById('rallyStatus').value,
+            logo: document.getElementById('rallyLogo').value || '',
+            heroImage: document.getElementById('rallyHeroImage').value || '',
+            stages: stages,
+            powerStage: `OS${psNum}`
+        };
+        
+        const data = Cache._rawData;
+        const season = data?.seasons?.[data?.settings?.currentSeason];
+        
+        if (!season.calendar) season.calendar = [];
+        if (!season.rallyResults) season.rallyResults = {};
+        
+        if (currentEditingId) {
+            const index = season.calendar.findIndex(r => r.id === currentEditingId);
+            if (index !== -1) {
+                const oldRally = season.calendar[index];
+                if (oldRally.status !== 'cancelled' && rally.status === 'cancelled') {
+                    delete season.rallyResults[currentEditingId];
+                    season.rallyResults[currentEditingId] = { stages: {}, extraPoints: {}, penalties: {} };
+                }
+                
+                const oldResults = season.rallyResults[currentEditingId];
+                season.calendar[index] = rally;
+                if (currentEditingId !== id && oldResults) {
+                    delete season.rallyResults[currentEditingId];
+                    season.rallyResults[id] = oldResults;
+                }
+            }
+        } else {
+            if (season.calendar.some(r => r.id === id)) {
+                showToast('Rajd o tym ID już istnieje', 'error');
+                return;
+            }
+            season.calendar.push(rally);
+            if (!season.rallyResults[id]) {
+                season.rallyResults[id] = { stages: {}, extraPoints: {}, penalties: {} };
+            }
         }
-      } else {
-        if (season.calendar.some(r => r.id === id)) {
-          showToast('Rajd o tym ID już istnieje', 'error');
-          return;
-        }
-        season.calendar.push(rally);
-        if (!season.rallyResults[id]) {
-          season.rallyResults[id] = { stages: {}, extraPoints: {}, penalties: {} };
-        }
-      }
-      
-      Cache.calendar = [...season.calendar];
-      Cache._rawData = data;
-      
-      renderRallyList();
-      renderRallySelect();
-      closeModal();
-      
-      await saveToServer(data, currentEditingId ? 'Rajd zaktualizowany!' : 'Rajd dodany!');
-      currentEditingId = null;
+        
+        Cache.calendar = [...season.calendar];
+        Cache._rawData = data;
+        
+        renderRallyList();
+        renderRallySelect();
+        closeModal();
+        
+        await saveToServer(data, currentEditingId ? 'Rajd zaktualizowany!' : 'Rajd dodany!');
+        currentEditingId = null;
     }
 
     async function deleteRally(id) {
-      if (!confirm(`Czy na pewno usunąć rajd? Tej operacji nie można cofnąć.`)) return;
-      
-      const data = _getLocalData();
-      const season = _getLocalSeason();
-      
-      const rallyToDelete = season.calendar.find(r => r.id === id);
-      const dateKey = rallyToDelete?.startDate;
-      
-      season.calendar = season.calendar.filter(r => r.id !== id);
-      delete season.rallyResults[id];
-      
-      if (dateKey && season.calendarOrder && season.calendarOrder[dateKey]) {
-        season.calendarOrder[dateKey] = season.calendarOrder[dateKey].filter(rid => rid !== id);
-        if (season.calendarOrder[dateKey].length === 0) {
-          delete season.calendarOrder[dateKey];
+        if (!confirm(`Czy na pewno usunąć rajd? Tej operacji nie można cofnąć.`)) return;
+        
+        const data = Cache._rawData;
+        const season = data?.seasons?.[data?.settings?.currentSeason];
+        
+        const rallyToDelete = season.calendar.find(r => r.id === id);
+        const dateKey = rallyToDelete?.startDate;
+        
+        season.calendar = season.calendar.filter(r => r.id !== id);
+        delete season.rallyResults[id];
+        
+        if (dateKey && season.calendarOrder && season.calendarOrder[dateKey]) {
+            season.calendarOrder[dateKey] = season.calendarOrder[dateKey].filter(rid => rid !== id);
+            if (season.calendarOrder[dateKey].length === 0) {
+                delete season.calendarOrder[dateKey];
+            }
         }
-      }
-      
-      Cache.calendar = [...season.calendar];
-      Cache.rallyResults.delete(id);
-      Cache._rawData = data;
-      
-      renderRallyList();
-      renderRallySelect();
-      
-      if (Cache.currentRallyId === id) {
-        Cache.currentRallyId = null;
-        document.getElementById('resultsEditor').innerHTML = '';
-      }
-      
-      await saveToServer(data, 'Rajd usunięty!');
+        
+        Cache.calendar = [...season.calendar];
+        Cache.rallyResults.delete(id);
+        Cache._rawData = data;
+        
+        renderRallyList();
+        renderRallySelect();
+        
+        if (Cache.currentRallyId === id) {
+            Cache.currentRallyId = null;
+            document.getElementById('resultsEditor').innerHTML = '';
+        }
+        
+        await saveToServer(data, 'Rajd usunięty!');
     }
 
-    // ==================== KIEROWCY ====================
+    // ============================================================
+    // KIEROWCY - CRUD
+    // ============================================================
     function showDriverModal() {
-      currentEditingType = 'driver';
-      currentEditingId = null;
-      const teamsOptions = '<option value="">-- Wybierz zespół --</option>' + 
-        Cache.teams.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
-      showModal(`
-        <button class="close-modal-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
-        <h3 style="margin-bottom:20px;"><i class="fas fa-user-plus"></i> Dodaj nowego kierowcę</h3>
-        <div class="admin-form-grid">
-          <div class="admin-form-group"><label>ID (unikalne):</label><input type="text" id="driverId" placeholder="np. kierowca1"></div>
-          <div class="admin-form-group"><label>Imię i nazwisko:</label><input type="text" id="driverName" placeholder="Jan Kowalski"></div>
-          <div class="admin-form-group"><label>Kraj (kod):</label><input type="text" id="driverCountry" placeholder="pl"></div>
-          <div class="admin-form-group"><label>Zespół:</label><select id="driverTeamId">${teamsOptions}</select></div>
-          <div class="admin-form-group"><label>Model samochodu:</label><input type="text" id="driverCarModel" placeholder="GR Yaris Rally1"></div>
-          <div class="admin-form-group"><label>Zdjęcie (URL):</label><input type="text" id="driverPhoto" placeholder="assets/drivers/photo.jpg"></div>
-        </div>
-        <div class="modal-buttons"><button class="admin-btn admin-btn-save" onclick="saveDriver()"><i class="fas fa-save"></i> Zapisz</button><button class="admin-btn admin-btn-cancel" onclick="closeModal()">Anuluj</button></div>
-      `);
+        currentEditingType = 'driver';
+        currentEditingId = null;
+        const teamsOptions = '<option value="">-- Wybierz zespół --</option>' + 
+            Cache.teams.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
+        showModal(`
+            <button class="close-modal-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            <h3 style="margin-bottom:20px;"><i class="fas fa-user-plus"></i> Dodaj nowego kierowcę</h3>
+            <div class="admin-form-grid">
+                <div class="admin-form-group"><label>ID (unikalne):</label><input type="text" id="driverId" placeholder="np. kierowca1"></div>
+                <div class="admin-form-group"><label>Imię i nazwisko:</label><input type="text" id="driverName" placeholder="Jan Kowalski"></div>
+                <div class="admin-form-group"><label>Kraj (kod):</label><input type="text" id="driverCountry" placeholder="pl"></div>
+                <div class="admin-form-group"><label>Zespół:</label><select id="driverTeamId">${teamsOptions}</select></div>
+                <div class="admin-form-group"><label>Model samochodu:</label><input type="text" id="driverCarModel" placeholder="GR Yaris Rally1"></div>
+                <div class="admin-form-group"><label>Zdjęcie (URL):</label><input type="text" id="driverPhoto" placeholder="assets/drivers/photo.jpg"></div>
+            </div>
+            <div class="modal-buttons"><button class="admin-btn admin-btn-save" onclick="saveDriver()"><i class="fas fa-save"></i> Zapisz</button><button class="admin-btn admin-btn-cancel" onclick="closeModal()">Anuluj</button></div>
+        `);
     }
 
     async function editDriver(id) {
-      currentEditingType = 'driver';
-      currentEditingId = id;
-      const driver = Cache.drivers.find(d => d.id === id);
-      if (!driver) return;
-      const teamsOptions = '<option value="">-- Wybierz zespół --</option>' + 
-        Cache.teams.map(t => `<option value="${t.id}" ${driver.teamId === t.id ? 'selected' : ''}>${escapeHtml(t.name)}</option>`).join('');
-      showModal(`
-        <button class="close-modal-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
-        <h3 style="margin-bottom:20px;"><i class="fas fa-user-edit"></i> Edytuj kierowcę</h3>
-        <div class="admin-form-grid">
-          <div class="admin-form-group"><label>ID:</label><input type="text" id="driverId" value="${escapeHtml(driver.id)}" readonly></div>
-          <div class="admin-form-group"><label>Imię i nazwisko:</label><input type="text" id="driverName" value="${escapeHtml(driver.name)}"></div>
-          <div class="admin-form-group"><label>Kraj (kod):</label><input type="text" id="driverCountry" value="${escapeHtml(driver.country)}"></div>
-          <div class="admin-form-group"><label>Zespół:</label><select id="driverTeamId">${teamsOptions}</select></div>
-          <div class="admin-form-group"><label>Model samochodu:</label><input type="text" id="driverCarModel" value="${escapeHtml(driver.carModel || '')}"></div>
-          <div class="admin-form-group"><label>Zdjęcie (URL):</label><input type="text" id="driverPhoto" value="${driver.photo || ''}"></div>
-        </div>
-        <div class="modal-buttons"><button class="admin-btn admin-btn-save" onclick="saveDriver()"><i class="fas fa-save"></i> Zapisz</button><button class="admin-btn admin-btn-cancel" onclick="closeModal()">Anuluj</button></div>
-      `);
+        currentEditingType = 'driver';
+        currentEditingId = id;
+        const driver = Cache.drivers.find(d => d.id === id);
+        if (!driver) return;
+        const teamsOptions = '<option value="">-- Wybierz zespół --</option>' + 
+            Cache.teams.map(t => `<option value="${t.id}" ${driver.teamId === t.id ? 'selected' : ''}>${escapeHtml(t.name)}</option>`).join('');
+        showModal(`
+            <button class="close-modal-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            <h3 style="margin-bottom:20px;"><i class="fas fa-user-edit"></i> Edytuj kierowcę</h3>
+            <div class="admin-form-grid">
+                <div class="admin-form-group"><label>ID:</label><input type="text" id="driverId" value="${escapeHtml(driver.id)}" readonly></div>
+                <div class="admin-form-group"><label>Imię i nazwisko:</label><input type="text" id="driverName" value="${escapeHtml(driver.name)}"></div>
+                <div class="admin-form-group"><label>Kraj (kod):</label><input type="text" id="driverCountry" value="${escapeHtml(driver.country)}"></div>
+                <div class="admin-form-group"><label>Zespół:</label><select id="driverTeamId">${teamsOptions}</select></div>
+                <div class="admin-form-group"><label>Model samochodu:</label><input type="text" id="driverCarModel" value="${escapeHtml(driver.carModel || '')}"></div>
+                <div class="admin-form-group"><label>Zdjęcie (URL):</label><input type="text" id="driverPhoto" value="${driver.photo || ''}"></div>
+            </div>
+            <div class="modal-buttons"><button class="admin-btn admin-btn-save" onclick="saveDriver()"><i class="fas fa-save"></i> Zapisz</button><button class="admin-btn admin-btn-cancel" onclick="closeModal()">Anuluj</button></div>
+        `);
     }
 
     async function saveDriver() {
-      const id = document.getElementById('driverId').value;
-      if (!id) { showToast('ID kierowcy jest wymagane', 'error'); return; }
-      
-      const driver = {
-        id: id,
-        name: document.getElementById('driverName').value,
-        country: document.getElementById('driverCountry').value,
-        teamId: document.getElementById('driverTeamId').value || '',
-        carModel: document.getElementById('driverCarModel').value || '',
-        photo: document.getElementById('driverPhoto').value || ''
-      };
-      
-      const data = _getLocalData();
-      const season = _getLocalSeason();
-      
-      if (!season.drivers) season.drivers = [];
-      
-      if (currentEditingId) {
-        const index = season.drivers.findIndex(d => d.id === currentEditingId);
-        if (index !== -1) {
-          season.drivers[index] = driver;
+        const id = document.getElementById('driverId').value;
+        if (!id) { showToast('ID kierowcy jest wymagane', 'error'); return; }
+        
+        const driver = {
+            id: id,
+            name: document.getElementById('driverName').value,
+            country: document.getElementById('driverCountry').value,
+            teamId: document.getElementById('driverTeamId').value || '',
+            carModel: document.getElementById('driverCarModel').value || '',
+            photo: document.getElementById('driverPhoto').value || ''
+        };
+        
+        const data = Cache._rawData;
+        const season = data?.seasons?.[data?.settings?.currentSeason];
+        
+        if (!season.drivers) season.drivers = [];
+        
+        if (currentEditingId) {
+            const index = season.drivers.findIndex(d => d.id === currentEditingId);
+            if (index !== -1) {
+                season.drivers[index] = driver;
+            }
+        } else {
+            if (season.drivers.some(d => d.id === id)) {
+                showToast('Kierowca o tym ID już istnieje', 'error');
+                return;
+            }
+            season.drivers.push(driver);
         }
-      } else {
-        if (season.drivers.some(d => d.id === id)) {
-          showToast('Kierowca o tym ID już istnieje', 'error');
-          return;
-        }
-        season.drivers.push(driver);
-      }
-      
-      Cache.drivers = [...season.drivers];
-      Cache._rawData = data;
-      
-      renderDriversList();
-      renderTeamsList();
-      closeModal();
-      
-      await saveToServer(data, currentEditingId ? 'Kierowca zaktualizowany!' : 'Kierowca dodany!');
-      currentEditingId = null;
+        
+        Cache.drivers = [...season.drivers];
+        Cache._rawData = data;
+        
+        renderDriversList();
+        renderTeamsList();
+        closeModal();
+        
+        await saveToServer(data, currentEditingId ? 'Kierowca zaktualizowany!' : 'Kierowca dodany!');
+        currentEditingId = null;
     }
 
     async function deleteDriver(id) {
-      if (!confirm(`Czy na pewno usunąć kierowcę? Spowoduje to również usunięcie go z zespołów.`)) return;
-      
-      const data = _getLocalData();
-      const season = _getLocalSeason();
-      
-      season.drivers = season.drivers.filter(d => d.id !== id);
-      
-      if (season.teams) {
-        season.teams.forEach(team => {
-          if (team.drivers) {
-            team.drivers = team.drivers.filter(driverId => driverId !== id);
-          }
-        });
-      }
-      
-      if (season.rallyResults) {
-        Object.keys(season.rallyResults).forEach(rallyId => {
-          const results = season.rallyResults[rallyId];
-          if (results.stages) {
-            Object.keys(results.stages).forEach(stage => {
-              results.stages[stage] = results.stages[stage].filter(r => r.driverId !== id);
+        if (!confirm(`Czy na pewno usunąć kierowcę? Spowoduje to również usunięcie go z zespołów.`)) return;
+        
+        const data = Cache._rawData;
+        const season = data?.seasons?.[data?.settings?.currentSeason];
+        
+        season.drivers = season.drivers.filter(d => d.id !== id);
+        
+        if (season.teams) {
+            season.teams.forEach(team => {
+                if (team.drivers) {
+                    team.drivers = team.drivers.filter(driverId => driverId !== id);
+                }
             });
-          }
-          if (results.extraPoints) delete results.extraPoints[id];
-          if (results.penalties) {
-            Object.keys(results.penalties).forEach(stage => {
-              delete results.penalties[stage]?.[id];
+        }
+        
+        if (season.rallyResults) {
+            Object.keys(season.rallyResults).forEach(rallyId => {
+                const results = season.rallyResults[rallyId];
+                if (results.stages) {
+                    Object.keys(results.stages).forEach(stage => {
+                        results.stages[stage] = results.stages[stage].filter(r => r.driverId !== id);
+                    });
+                }
+                if (results.extraPoints) delete results.extraPoints[id];
+                if (results.penalties) {
+                    Object.keys(results.penalties).forEach(stage => {
+                        delete results.penalties[stage]?.[id];
+                    });
+                }
             });
-          }
-        });
-      }
-      
-      Cache.drivers = [...season.drivers];
-      Cache._rawData = data;
-      
-      renderDriversList();
-      renderTeamsList();
-      
-      await saveToServer(data, 'Kierowca usunięty!');
+        }
+        
+        Cache.drivers = [...season.drivers];
+        Cache._rawData = data;
+        
+        renderDriversList();
+        renderTeamsList();
+        
+        await saveToServer(data, 'Kierowca usunięty!');
     }
 
-    // ==================== ZESPOŁY ====================
+    // ============================================================
+    // ZESPOŁY - CRUD
+    // ============================================================
     function buildDriverCheckboxes(drivers, teams, currentTeamId, selectedIds) {
-      return drivers.map(d => {
-        const takenByTeamId = d.teamId && d.teamId !== '' && d.teamId !== currentTeamId ? d.teamId : null;
-        const otherTeam = takenByTeamId ? teams.find(t => t.id === takenByTeamId) : null;
-        const isTaken = !!otherTeam;
-        const isChecked = selectedIds.includes(d.id);
-        const itemClass = isTaken ? ' driver-checkbox-item--taken' : (isChecked ? ' driver-checkbox-item--checked' : '');
-        const badge = isTaken ? `<span class="driver-checkbox-team-badge">${otherTeam.name}</span>` : '';
-        const carVal = (d.carModel || '').replace(/"/g, '&quot;');
-        const carInput = !isTaken ? `<input class="driver-checkbox-car" type="text" data-driver-id="${d.id}" placeholder="Model auta" value="${carVal}">` : '';
-        return `<label class="driver-checkbox-item${itemClass}" data-driver-id="${d.id}">
-          <input type="checkbox" value="${d.id}" ${isChecked ? 'checked' : ''} ${isTaken && !isChecked ? 'disabled' : ''} onchange="toggleDriverCheck(this)">
-          <span class="driver-checkbox-name">${d.name}</span>
-          ${badge}
-          ${carInput}
-        </label>`;
-      }).join('');
+        return drivers.map(d => {
+            const takenByTeamId = d.teamId && d.teamId !== '' && d.teamId !== currentTeamId ? d.teamId : null;
+            const otherTeam = takenByTeamId ? teams.find(t => t.id === takenByTeamId) : null;
+            const isTaken = !!otherTeam;
+            const isChecked = selectedIds.includes(d.id);
+            const itemClass = isTaken ? ' driver-checkbox-item--taken' : (isChecked ? ' driver-checkbox-item--checked' : '');
+            const badge = isTaken ? `<span class="driver-checkbox-team-badge">${otherTeam.name}</span>` : '';
+            const carVal = (d.carModel || '').replace(/"/g, '&quot;');
+            const carInput = !isTaken ? `<input class="driver-checkbox-car" type="text" data-driver-id="${d.id}" placeholder="Model auta" value="${carVal}">` : '';
+            return `<label class="driver-checkbox-item${itemClass}" data-driver-id="${d.id}">
+                <input type="checkbox" value="${d.id}" ${isChecked ? 'checked' : ''} ${isTaken && !isChecked ? 'disabled' : ''} onchange="toggleDriverCheck(this)">
+                <span class="driver-checkbox-name">${d.name}</span>
+                ${badge}
+                ${carInput}
+            </label>`;
+        }).join('');
     }
 
     function toggleDriverCheck(cb) {
-      const label = cb.closest('.driver-checkbox-item');
-      if (label) label.classList.toggle('driver-checkbox-item--checked', cb.checked);
+        const label = cb.closest('.driver-checkbox-item');
+        if (label) label.classList.toggle('driver-checkbox-item--checked', cb.checked);
     }
 
     function showTeamModal() {
-      currentEditingType = 'team';
-      currentEditingId = null;
-      const driverChecks = buildDriverCheckboxes(Cache.drivers, Cache.teams, null, []);
-      showModal(`
-        <button class="close-modal-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
-        <h3 style="margin-bottom:20px;"><i class="fas fa-building"></i> Dodaj nowy zespół</h3>
-        <div class="admin-form-grid">
-          <div class="admin-form-group"><label>ID (unikalne):</label><input type="text" id="teamId" placeholder="np. toyota"></div>
-          <div class="admin-form-group"><label>Nazwa zespołu:</label><input type="text" id="teamName" placeholder="Toyota Gazoo Racing"></div>
-          <div class="admin-form-group"><label>Logo (URL):</label><input type="text" id="teamLogo" placeholder="assets/teams/logo.png"></div>
-          <div class="admin-form-group"><label>Zdjęcie samochodu (URL):</label><input type="text" id="teamCarImage" placeholder="assets/cars/car.png"></div>
-          <div class="admin-form-group"><label>Lider zespołu:</label><input type="text" id="teamPrincipal" placeholder="Jari-Matti Latvala"></div>
-          <div class="admin-form-group" style="grid-column:1/-1"><label>Kierowcy:</label><div class="driver-checkbox-list">${driverChecks}</div></div>
-        </div>
-        <div class="modal-buttons"><button class="admin-btn admin-btn-save" onclick="saveTeam()"><i class="fas fa-save"></i> Zapisz</button><button class="admin-btn admin-btn-cancel" onclick="closeModal()">Anuluj</button></div>
-      `);
+        currentEditingType = 'team';
+        currentEditingId = null;
+        const driverChecks = buildDriverCheckboxes(Cache.drivers, Cache.teams, null, []);
+        showModal(`
+            <button class="close-modal-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            <h3 style="margin-bottom:20px;"><i class="fas fa-building"></i> Dodaj nowy zespół</h3>
+            <div class="admin-form-grid">
+                <div class="admin-form-group"><label>ID (unikalne):</label><input type="text" id="teamId" placeholder="np. toyota"></div>
+                <div class="admin-form-group"><label>Nazwa zespołu:</label><input type="text" id="teamName" placeholder="Toyota Gazoo Racing"></div>
+                <div class="admin-form-group"><label>Logo (URL):</label><input type="text" id="teamLogo" placeholder="assets/teams/logo.png"></div>
+                <div class="admin-form-group"><label>Zdjęcie samochodu (URL):</label><input type="text" id="teamCarImage" placeholder="assets/cars/car.png"></div>
+                <div class="admin-form-group"><label>Lider zespołu:</label><input type="text" id="teamPrincipal" placeholder="Jari-Matti Latvala"></div>
+                <div class="admin-form-group" style="grid-column:1/-1"><label>Kierowcy:</label><div class="driver-checkbox-list">${driverChecks}</div></div>
+            </div>
+            <div class="modal-buttons"><button class="admin-btn admin-btn-save" onclick="saveTeam()"><i class="fas fa-save"></i> Zapisz</button><button class="admin-btn admin-btn-cancel" onclick="closeModal()">Anuluj</button></div>
+        `);
     }
 
     async function editTeam(id) {
-      currentEditingType = 'team';
-      currentEditingId = id;
-      const team = Cache.teams.find(t => t.id === id);
-      if (!team) return;
-      const selected = team.drivers || [];
-      const driverChecks = buildDriverCheckboxes(Cache.drivers, Cache.teams, id, selected);
-      showModal(`
-        <button class="close-modal-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
-        <h3 style="margin-bottom:20px;"><i class="fas fa-edit"></i> Edytuj zespół</h3>
-        <div class="admin-form-grid">
-          <div class="admin-form-group"><label>ID:</label><input type="text" id="teamId" value="${escapeHtml(team.id)}" readonly></div>
-          <div class="admin-form-group"><label>Nazwa zespołu:</label><input type="text" id="teamName" value="${escapeHtml(team.name)}"></div>
-          <div class="admin-form-group"><label>Logo (URL):</label><input type="text" id="teamLogo" value="${team.logo || ''}"></div>
-          <div class="admin-form-group"><label>Zdjęcie samochodu (URL):</label><input type="text" id="teamCarImage" value="${team.carImage || ''}"></div>
-          <div class="admin-form-group"><label>Lider zespołu:</label><input type="text" id="teamPrincipal" value="${escapeHtml(team.principal || '')}"></div>
-          <div class="admin-form-group" style="grid-column:1/-1"><label>Kierowcy:</label><div class="driver-checkbox-list">${driverChecks}</div></div>
-        </div>
-        <div class="modal-buttons"><button class="admin-btn admin-btn-save" onclick="saveTeam()"><i class="fas fa-save"></i> Zapisz</button><button class="admin-btn admin-btn-cancel" onclick="closeModal()">Anuluj</button></div>
-      `);
+        currentEditingType = 'team';
+        currentEditingId = id;
+        const team = Cache.teams.find(t => t.id === id);
+        if (!team) return;
+        const selected = team.drivers || [];
+        const driverChecks = buildDriverCheckboxes(Cache.drivers, Cache.teams, id, selected);
+        showModal(`
+            <button class="close-modal-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            <h3 style="margin-bottom:20px;"><i class="fas fa-edit"></i> Edytuj zespół</h3>
+            <div class="admin-form-grid">
+                <div class="admin-form-group"><label>ID:</label><input type="text" id="teamId" value="${escapeHtml(team.id)}" readonly></div>
+                <div class="admin-form-group"><label>Nazwa zespołu:</label><input type="text" id="teamName" value="${escapeHtml(team.name)}"></div>
+                <div class="admin-form-group"><label>Logo (URL):</label><input type="text" id="teamLogo" value="${team.logo || ''}"></div>
+                <div class="admin-form-group"><label>Zdjęcie samochodu (URL):</label><input type="text" id="teamCarImage" value="${team.carImage || ''}"></div>
+                <div class="admin-form-group"><label>Lider zespołu:</label><input type="text" id="teamPrincipal" value="${escapeHtml(team.principal || '')}"></div>
+                <div class="admin-form-group" style="grid-column:1/-1"><label>Kierowcy:</label><div class="driver-checkbox-list">${driverChecks}</div></div>
+            </div>
+            <div class="modal-buttons"><button class="admin-btn admin-btn-save" onclick="saveTeam()"><i class="fas fa-save"></i> Zapisz</button><button class="admin-btn admin-btn-cancel" onclick="closeModal()">Anuluj</button></div>
+        `);
     }
 
     async function saveTeam() {
-      const id = document.getElementById('teamId').value;
-      if (!id) { showToast('ID zespołu jest wymagane', 'error'); return; }
-      
-      const checked = document.querySelectorAll('.driver-checkbox-list input[type="checkbox"]:checked');
-      const selectedDriverIds = Array.from(checked).map(c => c.value);
-      
-      const team = {
-        id: id,
-        name: document.getElementById('teamName').value,
-        logo: document.getElementById('teamLogo').value || '',
-        carImage: document.getElementById('teamCarImage').value || '',
-        principal: document.getElementById('teamPrincipal').value || '',
-        drivers: selectedDriverIds
-      };
-      
-      const data = _getLocalData();
-      const season = _getLocalSeason();
-      
-      if (!season.teams) season.teams = [];
-      
-      const carModelMap = {};
-      document.querySelectorAll('.driver-checkbox-car').forEach(inp => {
-        if (inp.dataset.driverId && inp.value.trim()) {
-          carModelMap[inp.dataset.driverId] = inp.value.trim();
-        }
-      });
-      
-      if (currentEditingId) {
-        const index = season.teams.findIndex(t => t.id === currentEditingId);
-        if (index !== -1) {
-          const oldTeamId = currentEditingId;
-          season.teams[index] = team;
-          
-          if (season.drivers) {
-            season.drivers.forEach(d => {
-              if (d.teamId === oldTeamId) d.teamId = '';
-            });
-            selectedDriverIds.forEach(driverId => {
-              const driver = season.drivers.find(d => d.id === driverId);
-              if (driver) {
-                driver.teamId = team.id;
-                if (carModelMap[driverId]) driver.carModel = carModelMap[driverId];
-              }
-            });
-          }
-        }
-      } else {
-        if (season.teams.some(t => t.id === id)) {
-          showToast('Zespół o tym ID już istnieje', 'error');
-          return;
-        }
-        season.teams.push(team);
+        const id = document.getElementById('teamId').value;
+        if (!id) { showToast('ID zespołu jest wymagane', 'error'); return; }
         
-        if (season.drivers) {
-          selectedDriverIds.forEach(driverId => {
-            const driver = season.drivers.find(d => d.id === driverId);
-            if (driver && !driver.teamId) {
-              driver.teamId = team.id;
-              if (carModelMap[driverId]) driver.carModel = carModelMap[driverId];
+        const checked = document.querySelectorAll('.driver-checkbox-list input[type="checkbox"]:checked');
+        const selectedDriverIds = Array.from(checked).map(c => c.value);
+        
+        const team = {
+            id: id,
+            name: document.getElementById('teamName').value,
+            logo: document.getElementById('teamLogo').value || '',
+            carImage: document.getElementById('teamCarImage').value || '',
+            principal: document.getElementById('teamPrincipal').value || '',
+            drivers: selectedDriverIds
+        };
+        
+        const data = Cache._rawData;
+        const season = data?.seasons?.[data?.settings?.currentSeason];
+        
+        if (!season.teams) season.teams = [];
+        
+        const carModelMap = {};
+        document.querySelectorAll('.driver-checkbox-car').forEach(inp => {
+            if (inp.dataset.driverId && inp.value.trim()) {
+                carModelMap[inp.dataset.driverId] = inp.value.trim();
             }
-          });
+        });
+        
+        if (currentEditingId) {
+            const index = season.teams.findIndex(t => t.id === currentEditingId);
+            if (index !== -1) {
+                const oldTeamId = currentEditingId;
+                season.teams[index] = team;
+                
+                if (season.drivers) {
+                    season.drivers.forEach(d => {
+                        if (d.teamId === oldTeamId) d.teamId = '';
+                    });
+                    selectedDriverIds.forEach(driverId => {
+                        const driver = season.drivers.find(d => d.id === driverId);
+                        if (driver) {
+                            driver.teamId = team.id;
+                            if (carModelMap[driverId]) driver.carModel = carModelMap[driverId];
+                        }
+                    });
+                }
+            }
+        } else {
+            if (season.teams.some(t => t.id === id)) {
+                showToast('Zespół o tym ID już istnieje', 'error');
+                return;
+            }
+            season.teams.push(team);
+            
+            if (season.drivers) {
+                selectedDriverIds.forEach(driverId => {
+                    const driver = season.drivers.find(d => d.id === driverId);
+                    if (driver && !driver.teamId) {
+                        driver.teamId = team.id;
+                        if (carModelMap[driverId]) driver.carModel = carModelMap[driverId];
+                    }
+                });
+            }
         }
-      }
-      
-      Cache.teams = [...season.teams];
-      Cache.drivers = [...(season.drivers || [])];
-      Cache._rawData = data;
-      
-      renderTeamsList();
-      renderDriversList();
-      closeModal();
-      
-      await saveToServer(data, currentEditingId ? 'Zespół zaktualizowany!' : 'Zespół dodany!');
-      currentEditingId = null;
+        
+        Cache.teams = [...season.teams];
+        Cache.drivers = [...(season.drivers || [])];
+        Cache._rawData = data;
+        
+        renderTeamsList();
+        renderDriversList();
+        closeModal();
+        
+        await saveToServer(data, currentEditingId ? 'Zespół zaktualizowany!' : 'Zespół dodany!');
+        currentEditingId = null;
     }
 
     async function deleteTeam(id) {
-      if (!confirm(`Czy na pewno usunąć zespół? Kierowcy zostaną odpięci od zespołu.`)) return;
-      
-      const data = _getLocalData();
-      const season = _getLocalSeason();
-      
-      season.teams = season.teams.filter(t => t.id !== id);
-      
-      if (season.drivers) {
-        season.drivers.forEach(d => {
-          if (d.teamId === id) d.teamId = '';
-        });
-      }
-      
-      Cache.teams = [...season.teams];
-      Cache.drivers = [...(season.drivers || [])];
-      Cache._rawData = data;
-      
-      renderTeamsList();
-      renderDriversList();
-      
-      await saveToServer(data, 'Zespół usunięty!');
+        if (!confirm(`Czy na pewno usunąć zespół? Kierowcy zostaną odpięci od zespołu.`)) return;
+        
+        const data = Cache._rawData;
+        const season = data?.seasons?.[data?.settings?.currentSeason];
+        
+        season.teams = season.teams.filter(t => t.id !== id);
+        
+        if (season.drivers) {
+            season.drivers.forEach(d => {
+                if (d.teamId === id) d.teamId = '';
+            });
+        }
+        
+        Cache.teams = [...season.teams];
+        Cache.drivers = [...(season.drivers || [])];
+        Cache._rawData = data;
+        
+        renderTeamsList();
+        renderDriversList();
+        
+        await saveToServer(data, 'Zespół usunięty!');
     }
 
-    // ==================== WYNIKI ====================
+    // ============================================================
+    // WYNIKI
+    // ============================================================
     async function loadResultsEditor() {
-      const rallyId = document.getElementById('resultsRallySelect').value;
-      if (!rallyId) { 
-        document.getElementById('resultsEditor').innerHTML = '<div class="admin-form" style="text-align:center; color:var(--text-muted);"><i class="fas fa-info-circle"></i> Wybierz rajd z listy powyżej</div>'; 
-        return; 
-      }
-      
-      // Sprawdź czy rajd jest anulowany
-      const rally = Cache.calendar.find(r => r.id === rallyId);
-      if (rally && rally.status === 'cancelled') {
-        document.getElementById('resultsEditor').innerHTML = `
-          <div class="admin-form" style="text-align:center; padding:40px;">
-            <i class="fas fa-ban" style="font-size:48px; color:#dc2626; display:block; margin-bottom:16px;"></i>
-            <h3 style="color:#dc2626;">Ten rajd został anulowany</h3>
-            <p style="color:var(--text-muted); margin-top:8px;">Nie można edytować wyników dla anulowanego rajdu.</p>
-            <p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Aby edytować wyniki, zmień status rajdu na inny.</p>
-          </div>
-        `;
-        return;
-      }
-      
-      Cache.currentRallyId = rallyId;
-      let results = Cache.rallyResults.get(rallyId);
-      
-      if (!results) {
-        results = await api.getRallyResults(rallyId);
-        if (!results) results = { stages: {}, extraPoints: {}, penalties: {} };
-        Cache.rallyResults.set(rallyId, results);
-      }
-      
-      if (!results.stages) results.stages = {};
-      if (!results.extraPoints) results.extraPoints = {};
-      if (!results.penalties) results.penalties = {};
-      
-      Cache.currentStagesList = [...rally.stages];
-      Cache.currentStageIndex = 0;
-      Cache.resultsData = { results, drivers: Cache.drivers, rally };
-      
-      for (const stage of rally.stages) {
-        if (!results.stages[stage]) {
-          results.stages[stage] = Cache.drivers.map(d => ({ driverId: d.id, time: '', status: 'OK', bonus: 0, tireChange: false }));
+        const rallyId = document.getElementById('resultsRallySelect').value;
+        if (!rallyId) { 
+            document.getElementById('resultsEditor').innerHTML = '<div class="admin-form" style="text-align:center; color:var(--text-muted);"><i class="fas fa-info-circle"></i> Wybierz rajd z listy powyżej</div>'; 
+            return; 
         }
-        if (!results.penalties[stage]) results.penalties[stage] = {};
-        for (const driver of Cache.drivers) {
-          if (results.penalties[stage][driver.id] === undefined) results.penalties[stage][driver.id] = 0;
-        }
-      }
-      renderStageEditor();
-    }
-    
-    function renderStageEditor() {
-      const { results, drivers, rally } = Cache.resultsData;
-      const stage = Cache.currentStagesList[Cache.currentStageIndex];
-      const isPowerStage = stage === rally.powerStage;
-      
-      let html = `<div class="results-editor-header">
-        <div class="stage-selector">
-          <label><i class="fas fa-road"></i> Odcinek specjalny:</label>
-          <select id="stageSelect" onchange="changeStage()">${Cache.currentStagesList.map((s, i) => 
-            `<option value="${i}" ${i === Cache.currentStageIndex ? 'selected' : ''}>${s === rally.powerStage ? '⭐ Power Stage' : s}</option>`
-          ).join('')}</select>
-        </div>
-        <div class="stage-nav">
-          <button class="stage-nav-btn" onclick="prevStage()" ${Cache.currentStageIndex === 0 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i></button>
-          <button class="stage-nav-btn" onclick="nextStage()" ${Cache.currentStageIndex === Cache.currentStagesList.length - 1 ? 'disabled' : ''}><i class="fas fa-chevron-right"></i></button>
-        </div>
-        <div style="margin-left:auto;font-weight:500;">${isPowerStage ? '⚡ Power Stage' : `OS ${Cache.currentStageIndex + 1} / ${Cache.currentStagesList.length}`}</div>
-      </div>
-      <div class="results-editor-table"><table class="admin-table"><thead><tr><th>Kierowca</th><th>Czas (mm:ss.ms)</th><th>Opona (-30s)</th><th>Status</th><th>Bonus PS</th><th>Kara (s)</th></tr></thead><tbody>`;
-      
-      for (const driver of drivers) {
-        const sr = results.stages[stage]?.find(r => r.driverId === driver.id) || { time: '', status: 'OK', bonus: 0, tireChange: false };
-        const penalty = results.penalties[stage]?.[driver.id] || 0;
         
-        html += `
-          <tr>
-            <td><strong>${escapeHtml(driver.name)}</strong><br><span style="font-size:11px;color:var(--text-muted);">${driver.id}</span></td>
-            <td><input type="text" class="stage-time" data-driver="${driver.id}" data-stage="${stage}" value="${sr.time}" placeholder="mm:ss.ms" style="width:110px"></td>
-            <td class="tire-cell">
-              <button type="button" class="tire-btn ${sr.tireChange ? 'active' : ''}" data-driver="${driver.id}" data-stage="${stage}" onclick="toggleTire(this)" title="${sr.tireChange ? 'Zmiana opony (−30s)' : 'Brak zmiany opony'}">
-                <svg class="tire-ok" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6" fill="white"/></svg>
-                <svg class="tire-swap" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15 7H9L12 2zM12 22L9 17H15L12 22zM5 12L10 9V15L5 12zM19 12L14 15V9L19 12z"/></svg>
-              </button>
-            </td>
-            <td><div class="status-buttons" data-driver="${driver.id}" data-stage="${stage}">
-              <button class="status-btn ${sr.status === 'OK' ? 'active' : ''}" data-status="OK">OK</button>
-              <button class="status-btn ${sr.status === 'DNF' ? 'active' : ''}" data-status="DNF">DNF</button>
-              <button class="status-btn ${sr.status === 'DNS' ? 'active' : ''}" data-status="DNS">DNS</button>
-              <button class="status-btn ${sr.status === 'DSQ' ? 'active' : ''}" data-status="DSQ">DSQ</button>
-              <button class="status-btn ${sr.status === 'RET' ? 'active' : ''}" data-status="RET">RET</button>
-            </div></td>
-            <td><div class="bonus-buttons" data-driver="${driver.id}" data-stage="${stage}">
-              <button class="bonus-btn ${sr.bonus === 2 ? 'active' : ''}" data-bonus="2">+2</button>
-              <button class="bonus-btn ${sr.bonus === 1 ? 'active' : ''}" data-bonus="1">+1</button>
-              <button class="bonus-btn ${sr.bonus === 0 ? 'active' : ''}" data-bonus="0">0</button>
-            </div></td>
-            <td><input type="number" class="stage-penalty" data-driver="${driver.id}" data-stage="${stage}" value="${penalty}" style="width:70px"></td>
-          </tr>`;
-      }
-      
-      html += `</tbody></table></div>
-      <div class="extra-points-section">
-        <div class="extra-points-header"><i class="fas fa-sliders-h"></i> <strong>Punkty wyrównawcze</strong></div>
-        <div class="extra-points-grid">`;
-      
-      for (const driver of drivers) {
-        const extra = results.extraPoints[driver.id] || 0;
-        html += `<div class="extra-points-row"><span>${escapeHtml(driver.name)}</span>
-          <div class="extra-points-input-wrap">
-            <button class="ep-btn ep-minus" onclick="adjustExtra(this,-1)">−</button>
-            <input type="number" class="extra-points" data-driver="${driver.id}" value="${extra}" style="width:50px">
-            <button class="ep-btn ep-plus" onclick="adjustExtra(this,1)">+</button>
-          </div>
-        </div>`;
-      }
-      html += `</div></div>`;
-      
-      document.getElementById('resultsEditor').innerHTML = html;
-      
-      document.querySelectorAll('.status-btn').forEach(btn => {
-        btn.onclick = function(e) {
-          e.stopPropagation();
-          this.closest('.status-buttons').querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
-          this.classList.add('active');
-        };
-      });
-      document.querySelectorAll('.bonus-btn').forEach(btn => {
-        btn.onclick = function(e) {
-          e.stopPropagation();
-          this.closest('.bonus-buttons').querySelectorAll('.bonus-btn').forEach(b => b.classList.remove('active'));
-          this.classList.add('active');
-        };
-      });
-    }
-    
-    function changeStage() {
-      const select = document.getElementById('stageSelect');
-      if (select && Cache.resultsData) {
-        _collectCurrentStageFromDOM(Cache.resultsData.results, Cache.resultsData.drivers, Cache.resultsData.rally);
-        Cache.currentStageIndex = parseInt(select.value);
-      }
-      renderStageEditor();
-    }
-    
-    function prevStage() {
-      if (Cache.currentStageIndex > 0 && Cache.resultsData) {
-        _collectCurrentStageFromDOM(Cache.resultsData.results, Cache.resultsData.drivers, Cache.resultsData.rally);
-        Cache.currentStageIndex--;
-        renderStageEditor();
-      }
-    }
-    
-    function nextStage() {
-      if (Cache.currentStageIndex < Cache.currentStagesList.length - 1 && Cache.resultsData) {
-        _collectCurrentStageFromDOM(Cache.resultsData.results, Cache.resultsData.drivers, Cache.resultsData.rally);
-        Cache.currentStageIndex++;
-        renderStageEditor();
-      }
-    }
-    
-    function toggleTire(btn) {
-      btn.classList.toggle('active');
-      const driverId = btn.dataset.driver;
-      const stage = btn.dataset.stage;
-      const timeInput = document.querySelector(`.stage-time[data-driver="${driverId}"][data-stage="${stage}"]`);
-      
-      if (timeInput && timeInput.value) {
-        let currentTime = timeInput.value.trim();
-        if (currentTime && currentTime !== '') {
-          let seconds = 0;
-          const match = currentTime.match(/^(\d+):(\d+)\.(\d+)$/);
-          if (match) {
-            seconds = parseInt(match[1]) * 60 + parseInt(match[2]) + parseInt(match[3]) / 1000;
-          } else {
-            seconds = parseFloat(currentTime);
-            if (isNaN(seconds)) return;
-          }
-          
-          seconds += btn.classList.contains('active') ? -30 : 30;
-          if (seconds < 0) seconds = 0;
-          
-          const minutes = Math.floor(seconds / 60);
-          const secs = Math.floor(seconds % 60);
-          const ms = Math.floor((seconds % 1) * 1000);
-          timeInput.value = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}.${ms.toString().padStart(3, '0')}`;
-        }
-      }
-    }
-    
-    function adjustExtra(btn, delta) {
-      const input = btn.closest('.extra-points-input-wrap').querySelector('.extra-points');
-      if (input) input.value = (parseInt(input.value) || 0) + delta;
-    }
-    
-    function clearAllResults() {
-      if (!Cache.currentRallyId) {
-        showToast('Wybierz rajd', 'error');
-        return;
-      }
-      
-      // Sprawdź czy rajd jest anulowany
-      const rally = Cache.calendar.find(r => r.id === Cache.currentRallyId);
-      if (rally && rally.status === 'cancelled') {
-        showToast('Nie można czyścić wyników anulowanego rajdu', 'error');
-        return;
-      }
-      
-      if (!confirm('Czy na pewno wyczyścić wszystkie wyniki dla tego rajdu? Tej operacji nie można cofnąć.')) return;
-      
-      const data = _getLocalData();
-      const season = _getLocalSeason();
-      
-      season.rallyResults[Cache.currentRallyId] = { stages: {}, extraPoints: {}, penalties: {} };
-      Cache.rallyResults.set(Cache.currentRallyId, { stages: {}, extraPoints: {}, penalties: {} });
-      Cache._rawData = data;
-      
-      loadResultsEditor();
-      saveToServer(data, 'Wszystkie wyniki wyczyszczone!');
-    }
-    
-    async function saveResults() {
-      if (!Cache.currentRallyId) {
-        showToast('Wybierz rajd', 'error');
-        return;
-      }
-      
-      // Sprawdź czy rajd jest anulowany
-      const rally = Cache.calendar.find(r => r.id === Cache.currentRallyId);
-      if (rally && rally.status === 'cancelled') {
-        showToast('Nie można zapisywać wyników anulowanego rajdu', 'error');
-        return;
-      }
-      
-      const { results, drivers, rally: rallyData } = Cache.resultsData;
-      _collectCurrentStageFromDOM(results, drivers, rallyData);
-      
-      Cache.rallyResults.set(Cache.currentRallyId, results);
-      
-      const data = _getLocalData();
-      const season = _getLocalSeason();
-      if (season && season.rallyResults) {
-        season.rallyResults[Cache.currentRallyId] = JSON.parse(JSON.stringify(results));
-      }
-      Cache._rawData = data;
-      
-      showToast('Zapisywanie wyników...', 'pending');
-      
-      const success = await api.saveRallyResults(Cache.currentRallyId, results);
-      if (success) {
-        showToast('Wyniki zapisane!', 'success');
-      } else {
-        showToast('Błąd zapisu wyników', 'error');
-      }
-    }
-    
-    function _collectCurrentStageFromDOM(results, drivers, rally) {
-      const stage = Cache.currentStagesList[Cache.currentStageIndex];
-      if (!stage) return;
-      
-      if (!results.stages[stage]) results.stages[stage] = [];
-      if (!results.penalties[stage]) results.penalties[stage] = {};
-      
-      for (const driver of drivers) {
-        const timeInput = document.querySelector(`.stage-time[data-driver="${driver.id}"][data-stage="${stage}"]`);
-        if (!timeInput) continue;
-        
-        const statusContainer = document.querySelector(`.status-buttons[data-driver="${driver.id}"][data-stage="${stage}"]`);
-        const bonusContainer = document.querySelector(`.bonus-buttons[data-driver="${driver.id}"][data-stage="${stage}"]`);
-        const penaltyInput = document.querySelector(`.stage-penalty[data-driver="${driver.id}"][data-stage="${stage}"]`);
-        const tireBtn = document.querySelector(`.tire-btn[data-driver="${driver.id}"][data-stage="${stage}"]`);
-        const epInput = document.querySelector(`.extra-points[data-driver="${driver.id}"]`);
-        
-        const status = statusContainer?.querySelector('.status-btn.active')?.dataset.status || 'OK';
-        const bonus = parseInt(bonusContainer?.querySelector('.bonus-btn.active')?.dataset.bonus ?? 0);
-        
-        let sr = results.stages[stage].find(r => r.driverId === driver.id);
-        if (!sr) {
-          sr = { driverId: driver.id };
-          results.stages[stage].push(sr);
-        }
-        sr.time = timeInput.value || '';
-        sr.status = status;
-        sr.bonus = bonus;
-        sr.tireChange = tireBtn?.classList.contains('active') || false;
-        
-        if (penaltyInput) results.penalties[stage][driver.id] = parseInt(penaltyInput.value) || 0;
-        if (epInput) results.extraPoints[driver.id] = parseInt(epInput.value) || 0;
-      }
-    }
-    
-    async function exportRallyData() {
-      if (!Cache.currentRallyId) {
-        showToast('Wybierz rajd', 'error');
-        return;
-      }
-      const rally = Cache.calendar.find(r => r.id === Cache.currentRallyId);
-      const results = Cache.rallyResults.get(Cache.currentRallyId);
-      const data = JSON.stringify({ rally, results }, null, 2);
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob([data], { type: 'application/json' }));
-      a.download = `${Cache.currentRallyId}_backup.json`;
-      a.click();
-      URL.revokeObjectURL(a.href);
-      showToast('Eksport zakończony');
-    }
-    
-    async function importRallyData(file) {
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        try {
-          const imported = JSON.parse(e.target.result);
-          
-          if (!imported.results) {
-            showToast('Nieprawidłowy format pliku - brak wyników', 'error');
+        const rally = Cache.calendar.find(r => r.id === rallyId);
+        if (rally && rally.status === 'cancelled') {
+            document.getElementById('resultsEditor').innerHTML = `
+                <div class="admin-form" style="text-align:center; padding:40px;">
+                    <i class="fas fa-ban" style="font-size:48px; color:#dc2626; display:block; margin-bottom:16px;"></i>
+                    <h3 style="color:#dc2626;">Ten rajd został anulowany</h3>
+                    <p style="color:var(--text-muted); margin-top:8px;">Nie można edytować wyników dla anulowanego rajdu.</p>
+                    <p style="color:var(--text-muted); font-size:12px; margin-top:4px;">Aby edytować wyniki, zmień status rajdu na inny.</p>
+                </div>
+            `;
             return;
-          }
-          
-          const data = _getLocalData();
-          const season = _getLocalSeason();
-          
-          if (season && imported.results) {
-            const existingResults = season.rallyResults[Cache.currentRallyId] || { stages: {}, extraPoints: {}, penalties: {} };
-            const newResults = imported.results;
-            
-            if (newResults.stages) {
-              if (!existingResults.stages) existingResults.stages = {};
-              Object.assign(existingResults.stages, newResults.stages);
-            }
-            
-            if (newResults.extraPoints) {
-              if (!existingResults.extraPoints) existingResults.extraPoints = {};
-              Object.assign(existingResults.extraPoints, newResults.extraPoints);
-            }
-            
-            if (newResults.penalties) {
-              if (!existingResults.penalties) existingResults.penalties = {};
-              Object.assign(existingResults.penalties, newResults.penalties);
-            }
-            
-            season.rallyResults[Cache.currentRallyId] = existingResults;
-            Cache.rallyResults.set(Cache.currentRallyId, existingResults);
-            Cache._rawData = data;
-            
-            showToast('Importowano, synchronizacja...', 'pending');
-            await saveToServer(data, 'Import zakończony!');
-            await loadResultsEditor();
-          }
-        } catch (err) {
-          showToast('Błąd importu - nieprawidłowy format JSON', 'error');
         }
-      };
-      reader.readAsText(file);
+        
+        Cache.currentRallyId = rallyId;
+        let results = Cache.rallyResults.get(rallyId);
+        
+        if (!results) {
+            results = await api.getRallyResults(rallyId);
+            if (!results) results = { stages: {}, extraPoints: {}, penalties: {} };
+            Cache.rallyResults.set(rallyId, results);
+        }
+        
+        if (!results.stages) results.stages = {};
+        if (!results.extraPoints) results.extraPoints = {};
+        if (!results.penalties) results.penalties = {};
+        
+        Cache.currentStagesList = [...rally.stages];
+        Cache.currentStageIndex = 0;
+        Cache.resultsData = { results, drivers: Cache.drivers, rally };
+        
+        for (const stage of rally.stages) {
+            if (!results.stages[stage]) {
+                results.stages[stage] = Cache.drivers.map(d => ({ driverId: d.id, time: '', status: 'OK', bonus: 0, tireChange: false }));
+            }
+            if (!results.penalties[stage]) results.penalties[stage] = {};
+            for (const driver of Cache.drivers) {
+                if (results.penalties[stage][driver.id] === undefined) results.penalties[stage][driver.id] = 0;
+            }
+        }
+        renderStageEditor();
     }
-    
-    // ==================== LAURY ====================
-    function laurelSVG(color) {
-      const c = color === 'gold' ? '#c8860a' : color === 'silver' ? '#8a98a8' : '#a0622a';
-      return `<svg width="16" height="14" viewBox="0 0 110 95" fill="${c}"><path d="M52 78 L38 72 L44 65 Z"/><path d="M48 68 L32 66 L40 58 Z"/><path d="M44 57 L28 58 L37 49 Z"/><path d="M42 46 L26 50 L36 40 Z"/><path d="M43 35 L27 41 L38 31 Z"/><path d="M47 25 L31 33 L43 22 Z"/><path d="M53 17 L38 27 L51 14 Z"/><path d="M59 11 L46 23 L60 9 Z"/><path d="M58 78 L72 72 L66 65 Z"/><path d="M62 68 L78 66 L70 58 Z"/><path d="M66 57 L82 58 L73 49 Z"/><path d="M68 46 L84 50 L74 40 Z"/><path d="M67 35 L83 41 L72 31 Z"/><path d="M63 25 L79 33 L67 22 Z"/><path d="M57 17 L72 27 L59 14 Z"/><path d="M51 11 L64 23 L50 9 Z"/><path d="M44 82 L36 92 L50 87 Z"/><path d="M66 82 L74 92 L60 87 Z"/><ellipse cx="55" cy="84" rx="9" ry="5.5"/></svg>`;
+
+    function renderStageEditor() {
+        const { results, drivers, rally } = Cache.resultsData;
+        const stage = Cache.currentStagesList[Cache.currentStageIndex];
+        const isPowerStage = stage === rally.powerStage;
+        
+        let html = `<div class="results-editor-header">
+            <div class="stage-selector">
+                <label><i class="fas fa-road"></i> Odcinek specjalny:</label>
+                <select id="stageSelect" onchange="changeStage()">${Cache.currentStagesList.map((s, i) => 
+                    `<option value="${i}" ${i === Cache.currentStageIndex ? 'selected' : ''}>${s === rally.powerStage ? '⭐ Power Stage' : s}</option>`
+                ).join('')}</select>
+            </div>
+            <div class="stage-nav">
+                <button class="stage-nav-btn" onclick="prevStage()" ${Cache.currentStageIndex === 0 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i></button>
+                <button class="stage-nav-btn" onclick="nextStage()" ${Cache.currentStageIndex === Cache.currentStagesList.length - 1 ? 'disabled' : ''}><i class="fas fa-chevron-right"></i></button>
+            </div>
+            <div style="margin-left:auto;font-weight:500;">${isPowerStage ? '⚡ Power Stage' : `OS ${Cache.currentStageIndex + 1} / ${Cache.currentStagesList.length}`}</div>
+        </div>
+        <div class="results-editor-table"><table class="admin-table"><thead><tr><th>Kierowca</th><th>Czas (mm:ss.ms)</th><th>Opona (-30s)</th><th>Status</th><th>Bonus PS</th><th>Kara (s)</th></tr></thead><tbody>`;
+        
+        for (const driver of drivers) {
+            const sr = results.stages[stage]?.find(r => r.driverId === driver.id) || { time: '', status: 'OK', bonus: 0, tireChange: false };
+            const penalty = results.penalties[stage]?.[driver.id] || 0;
+            
+            html += `
+                <tr>
+                    <td><strong>${escapeHtml(driver.name)}</strong><br><span style="font-size:11px;color:var(--text-muted);">${driver.id}</span></td>
+                    <td><input type="text" class="stage-time" data-driver="${driver.id}" data-stage="${stage}" value="${sr.time}" placeholder="mm:ss.ms" style="width:110px"></td>
+                    <td class="tire-cell">
+                        <button type="button" class="tire-btn ${sr.tireChange ? 'active' : ''}" data-driver="${driver.id}" data-stage="${stage}" onclick="toggleTire(this)" title="${sr.tireChange ? 'Zmiana opony (−30s)' : 'Brak zmiany opony'}">
+                            <svg class="tire-ok" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6" fill="white"/></svg>
+                            <svg class="tire-swap" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15 7H9L12 2zM12 22L9 17H15L12 22zM5 12L10 9V15L5 12zM19 12L14 15V9L19 12z"/></svg>
+                        </button>
+                    </td>
+                    <td><div class="status-buttons" data-driver="${driver.id}" data-stage="${stage}">
+                        <button class="status-btn ${sr.status === 'OK' ? 'active' : ''}" data-status="OK">OK</button>
+                        <button class="status-btn ${sr.status === 'DNF' ? 'active' : ''}" data-status="DNF">DNF</button>
+                        <button class="status-btn ${sr.status === 'DNS' ? 'active' : ''}" data-status="DNS">DNS</button>
+                        <button class="status-btn ${sr.status === 'DSQ' ? 'active' : ''}" data-status="DSQ">DSQ</button>
+                        <button class="status-btn ${sr.status === 'RET' ? 'active' : ''}" data-status="RET">RET</button>
+                    </div></td>
+                    <td><div class="bonus-buttons" data-driver="${driver.id}" data-stage="${stage}">
+                        <button class="bonus-btn ${sr.bonus === 2 ? 'active' : ''}" data-bonus="2">+2</button>
+                        <button class="bonus-btn ${sr.bonus === 1 ? 'active' : ''}" data-bonus="1">+1</button>
+                        <button class="bonus-btn ${sr.bonus === 0 ? 'active' : ''}" data-bonus="0">0</button>
+                    </div></td>
+                    <td><input type="number" class="stage-penalty" data-driver="${driver.id}" data-stage="${stage}" value="${penalty}" style="width:70px"></td>
+                </tr>`;
+        }
+        
+        html += `</tbody></table></div>
+        <div class="extra-points-section">
+            <div class="extra-points-header"><i class="fas fa-sliders-h"></i> <strong>Punkty wyrównawcze</strong></div>
+            <div class="extra-points-grid">`;
+        
+        for (const driver of drivers) {
+            const extra = results.extraPoints[driver.id] || 0;
+            html += `<div class="extra-points-row"><span>${escapeHtml(driver.name)}</span>
+                <div class="extra-points-input-wrap">
+                    <button class="ep-btn ep-minus" onclick="adjustExtra(this,-1)">−</button>
+                    <input type="number" class="extra-points" data-driver="${driver.id}" value="${extra}" style="width:50px">
+                    <button class="ep-btn ep-plus" onclick="adjustExtra(this,1)">+</button>
+                </div>
+            </div>`;
+        }
+        html += `</div></div>`;
+        
+        document.getElementById('resultsEditor').innerHTML = html;
+        
+        document.querySelectorAll('.status-btn').forEach(btn => {
+            btn.onclick = function(e) {
+                e.stopPropagation();
+                this.closest('.status-buttons').querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            };
+        });
+        document.querySelectorAll('.bonus-btn').forEach(btn => {
+            btn.onclick = function(e) {
+                e.stopPropagation();
+                this.closest('.bonus-buttons').querySelectorAll('.bonus-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            };
+        });
     }
-    
-    function loadLaurels() {
-      const wrap = document.getElementById('laurelsTableWrap');
-      if (!wrap) return;
-      const data = _getLocalData();
-      const saved = data?.settings?.driverLaurels || {};
-      
-      let html = '<table class="laurels-table"><thead><tr><th>Kierowca</th>';
-      html += `<th style="text-align:center;">${laurelSVG('gold')} Złote</th>`;
-      html += `<th style="text-align:center;">${laurelSVG('silver')} Srebrne</th>`;
-      html += `<th style="text-align:center;">${laurelSVG('bronze')} Brązowe</th></thead><tbody>`;
-      
-      for (const d of Cache.drivers) {
-        const lau = saved[d.id] || { gold: 0, silver: 0, bronze: 0 };
-        html += `<tr>
-          <td><span class="fi fi-${d.country}"></span> ${escapeHtml(d.name)}</td>
-          <td style="text-align:center;"><div class="laurel-counter"><button class="laurel-counter-btn lc-minus" onclick="adjLaurel('${d.id}','gold',-1)">−</button><input class="laurel-counter-val" id="lau_${d.id}_gold" type="number" value="${lau.gold}" min="0"><button class="laurel-counter-btn lc-plus" onclick="adjLaurel('${d.id}','gold',1)">+</button></div></td>
-          <td style="text-align:center;"><div class="laurel-counter"><button class="laurel-counter-btn lc-minus" onclick="adjLaurel('${d.id}','silver',-1)">−</button><input class="laurel-counter-val" id="lau_${d.id}_silver" type="number" value="${lau.silver}" min="0"><button class="laurel-counter-btn lc-plus" onclick="adjLaurel('${d.id}','silver',1)">+</button></div></td>
-          <td style="text-align:center;"><div class="laurel-counter"><button class="laurel-counter-btn lc-minus" onclick="adjLaurel('${d.id}','bronze',-1)">−</button><input class="laurel-counter-val" id="lau_${d.id}_bronze" type="number" value="${lau.bronze}" min="0"><button class="laurel-counter-btn lc-plus" onclick="adjLaurel('${d.id}','bronze',1)">+</button></div></td>
-        </tr>`;
-      }
-      html += '</tbody><table>';
-      wrap.innerHTML = html;
+
+    function changeStage() {
+        const select = document.getElementById('stageSelect');
+        if (select && Cache.resultsData) {
+            _collectCurrentStageFromDOM(Cache.resultsData.results, Cache.resultsData.drivers, Cache.resultsData.rally);
+            Cache.currentStageIndex = parseInt(select.value);
+        }
+        renderStageEditor();
     }
-    
-    function adjLaurel(driverId, tier, delta) {
-      const inp = document.getElementById(`lau_${driverId}_${tier}`);
-      if (inp) inp.value = Math.max(0, (parseInt(inp.value) || 0) + delta);
+
+    function prevStage() {
+        if (Cache.currentStageIndex > 0 && Cache.resultsData) {
+            _collectCurrentStageFromDOM(Cache.resultsData.results, Cache.resultsData.drivers, Cache.resultsData.rally);
+            Cache.currentStageIndex--;
+            renderStageEditor();
+        }
     }
-    
-    async function saveLaurels() {
-      const data = _getLocalData();
-      if (!data) return;
-      const laurels = {};
-      for (const d of Cache.drivers) {
-        const g = parseInt(document.getElementById(`lau_${d.id}_gold`)?.value) || 0;
-        const s = parseInt(document.getElementById(`lau_${d.id}_silver`)?.value) || 0;
-        const b = parseInt(document.getElementById(`lau_${d.id}_bronze`)?.value) || 0;
-        if (g > 0 || s > 0 || b > 0) laurels[d.id] = { gold: g, silver: s, bronze: b };
-      }
-      if (!data.settings) data.settings = {};
-      data.settings.driverLaurels = laurels;
-      Cache._rawData = data;
-      showToast('Zapisano lokalnie, synchronizacja...', 'pending');
-      saveToServer(data, 'Laury zapisane!');
+
+    function nextStage() {
+        if (Cache.currentStageIndex < Cache.currentStagesList.length - 1 && Cache.resultsData) {
+            _collectCurrentStageFromDOM(Cache.resultsData.results, Cache.resultsData.drivers, Cache.resultsData.rally);
+            Cache.currentStageIndex++;
+            renderStageEditor();
+        }
     }
-    
-    // ==================== USTAWIENIA ====================
-    function loadSettings() {
-      const data = _getLocalData();
-      if (data) {
-        document.getElementById('teamPointsCount').value = data.settings.teamPointsCount || 2;
-        document.getElementById('pointsSystem').value = (data.settings.pointsSystem || [25,18,15,12,10,8,6,4,2,1]).join(',');
-        document.getElementById('powerStagePoints').value = (data.settings.powerStagePoints || [5,4,3,2,1]).join(',');
-      }
+
+    function toggleTire(btn) {
+        btn.classList.toggle('active');
+        const driverId = btn.dataset.driver;
+        const stage = btn.dataset.stage;
+        const timeInput = document.querySelector(`.stage-time[data-driver="${driverId}"][data-stage="${stage}"]`);
+        
+        if (timeInput && timeInput.value) {
+            let currentTime = timeInput.value.trim();
+            if (currentTime && currentTime !== '') {
+                let seconds = 0;
+                const match = currentTime.match(/^(\d+):(\d+)\.(\d+)$/);
+                if (match) {
+                    seconds = parseInt(match[1]) * 60 + parseInt(match[2]) + parseInt(match[3]) / 1000;
+                } else {
+                    seconds = parseFloat(currentTime);
+                    if (isNaN(seconds)) return;
+                }
+                
+                seconds += btn.classList.contains('active') ? -30 : 30;
+                if (seconds < 0) seconds = 0;
+                
+                const minutes = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                const ms = Math.floor((seconds % 1) * 1000);
+                timeInput.value = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}.${ms.toString().padStart(3, '0')}`;
+            }
+        }
     }
-    
-    async function changePassword() {
-      const pwd = document.getElementById('settingsPassword').value;
-      if (!pwd) { showToast('Wprowadź hasło', 'error'); return; }
-      const data = _getLocalData();
-      if (!data) return;
-      data.settings.adminPassword = pwd;
-      document.getElementById('settingsPassword').value = '';
-      Cache._rawData = data;
-      showToast('Zapisano lokalnie, synchronizacja...', 'pending');
-      saveToServer(data, 'Hasło zmienione!');
+
+    function adjustExtra(btn, delta) {
+        const input = btn.closest('.extra-points-input-wrap').querySelector('.extra-points');
+        if (input) input.value = (parseInt(input.value) || 0) + delta;
     }
-    
-    async function updateTeamPointsCount() {
-      const val = parseInt(document.getElementById('teamPointsCount').value);
-      const data = _getLocalData();
-      if (!data) return;
-      data.settings.teamPointsCount = val;
-      Cache._rawData = data;
-      showToast('Zapisano lokalnie, synchronizacja...', 'pending');
-      saveToServer(data, 'Zapisano!');
+
+    function clearAllResults() {
+        if (!Cache.currentRallyId) {
+            showToast('Wybierz rajd', 'error');
+            return;
+        }
+        
+        const rally = Cache.calendar.find(r => r.id === Cache.currentRallyId);
+        if (rally && rally.status === 'cancelled') {
+            showToast('Nie można czyścić wyników anulowanego rajdu', 'error');
+            return;
+        }
+        
+        if (!confirm('Czy na pewno wyczyścić wszystkie wyniki dla tego rajdu? Tej operacji nie można cofnąć.')) return;
+        
+        const data = Cache._rawData;
+        const season = data?.seasons?.[data?.settings?.currentSeason];
+        
+        season.rallyResults[Cache.currentRallyId] = { stages: {}, extraPoints: {}, penalties: {} };
+        Cache.rallyResults.set(Cache.currentRallyId, { stages: {}, extraPoints: {}, penalties: {} });
+        Cache._rawData = data;
+        
+        loadResultsEditor();
+        saveToServer(data, 'Wszystkie wyniki wyczyszczone!');
     }
-    
-    async function updatePointsSystem() {
-      const val = document.getElementById('pointsSystem').value.split(',').map(v => parseInt(v.trim()));
-      const data = _getLocalData();
-      if (!data) return;
-      data.settings.pointsSystem = val;
-      Cache._rawData = data;
-      showToast('Zapisano lokalnie, synchronizacja...', 'pending');
-      saveToServer(data, 'Zapisano!');
+
+    async function saveResults() {
+        if (!Cache.currentRallyId) {
+            showToast('Wybierz rajd', 'error');
+            return;
+        }
+        
+        const rally = Cache.calendar.find(r => r.id === Cache.currentRallyId);
+        if (rally && rally.status === 'cancelled') {
+            showToast('Nie można zapisywać wyników anulowanego rajdu', 'error');
+            return;
+        }
+        
+        const { results, drivers, rally: rallyData } = Cache.resultsData;
+        _collectCurrentStageFromDOM(results, drivers, rallyData);
+        
+        Cache.rallyResults.set(Cache.currentRallyId, results);
+        
+        const data = Cache._rawData;
+        const season = data?.seasons?.[data?.settings?.currentSeason];
+        if (season && season.rallyResults) {
+            season.rallyResults[Cache.currentRallyId] = JSON.parse(JSON.stringify(results));
+        }
+        Cache._rawData = data;
+        
+        showToast('Zapisywanie wyników...', 'pending');
+        
+        saveQueue.add(data, 'Wyniki zapisane!', () => {
+            loadResultsEditor();
+        }, (error) => {
+            console.error('Błąd zapisu wyników:', error);
+            showToast('Błąd zapisu wyników', 'error');
+        });
     }
-    
-    async function updatePowerStagePoints() {
-      const val = document.getElementById('powerStagePoints').value.split(',').map(v => parseInt(v.trim()));
-      const data = _getLocalData();
-      if (!data) return;
-      data.settings.powerStagePoints = val;
-      Cache._rawData = data;
-      showToast('Zapisano lokalnie, synchronizacja...', 'pending');
-      saveToServer(data, 'Zapisano!');
+
+    function _collectCurrentStageFromDOM(results, drivers, rally) {
+        const stage = Cache.currentStagesList[Cache.currentStageIndex];
+        if (!stage) return;
+        
+        if (!results.stages[stage]) results.stages[stage] = [];
+        if (!results.penalties[stage]) results.penalties[stage] = {};
+        
+        for (const driver of drivers) {
+            const timeInput = document.querySelector(`.stage-time[data-driver="${driver.id}"][data-stage="${stage}"]`);
+            if (!timeInput) continue;
+            
+            const statusContainer = document.querySelector(`.status-buttons[data-driver="${driver.id}"][data-stage="${stage}"]`);
+            const bonusContainer = document.querySelector(`.bonus-buttons[data-driver="${driver.id}"][data-stage="${stage}"]`);
+            const penaltyInput = document.querySelector(`.stage-penalty[data-driver="${driver.id}"][data-stage="${stage}"]`);
+            const tireBtn = document.querySelector(`.tire-btn[data-driver="${driver.id}"][data-stage="${stage}"]`);
+            const epInput = document.querySelector(`.extra-points[data-driver="${driver.id}"]`);
+            
+            const status = statusContainer?.querySelector('.status-btn.active')?.dataset.status || 'OK';
+            const bonus = parseInt(bonusContainer?.querySelector('.bonus-btn.active')?.dataset.bonus ?? 0);
+            
+            let sr = results.stages[stage].find(r => r.driverId === driver.id);
+            if (!sr) {
+                sr = { driverId: driver.id };
+                results.stages[stage].push(sr);
+            }
+            sr.time = timeInput.value || '';
+            sr.status = status;
+            sr.bonus = bonus;
+            sr.tireChange = tireBtn?.classList.contains('active') || false;
+            
+            if (penaltyInput) results.penalties[stage][driver.id] = parseInt(penaltyInput.value) || 0;
+            if (epInput) results.extraPoints[driver.id] = parseInt(epInput.value) || 0;
+        }
     }
-    
-    async function exportAllData() {
-      if (typeof api.exportAllData === 'function') {
-        await api.exportAllData();
+
+    async function exportRallyData() {
+        if (!Cache.currentRallyId) {
+            showToast('Wybierz rajd', 'error');
+            return;
+        }
+        const rally = Cache.calendar.find(r => r.id === Cache.currentRallyId);
+        const results = Cache.rallyResults.get(Cache.currentRallyId);
+        const data = JSON.stringify({ rally, results }, null, 2);
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([data], { type: 'application/json' }));
+        a.download = `${Cache.currentRallyId}_backup.json`;
+        a.click();
+        URL.revokeObjectURL(a.href);
         showToast('Eksport zakończony');
-      }
     }
-    
+
+    async function importRallyData(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            try {
+                const imported = JSON.parse(e.target.result);
+                
+                if (!imported.results) {
+                    showToast('Nieprawidłowy format pliku - brak wyników', 'error');
+                    return;
+                }
+                
+                const data = Cache._rawData;
+                const season = data?.seasons?.[data?.settings?.currentSeason];
+                
+                if (season && imported.results) {
+                    const existingResults = season.rallyResults[Cache.currentRallyId] || { stages: {}, extraPoints: {}, penalties: {} };
+                    const newResults = imported.results;
+                    
+                    if (newResults.stages) {
+                        if (!existingResults.stages) existingResults.stages = {};
+                        Object.assign(existingResults.stages, newResults.stages);
+                    }
+                    
+                    if (newResults.extraPoints) {
+                        if (!existingResults.extraPoints) existingResults.extraPoints = {};
+                        Object.assign(existingResults.extraPoints, newResults.extraPoints);
+                    }
+                    
+                    if (newResults.penalties) {
+                        if (!existingResults.penalties) existingResults.penalties = {};
+                        Object.assign(existingResults.penalties, newResults.penalties);
+                    }
+                    
+                    season.rallyResults[Cache.currentRallyId] = existingResults;
+                    Cache.rallyResults.set(Cache.currentRallyId, existingResults);
+                    Cache._rawData = data;
+                    
+                    showToast('Importowano, synchronizacja...', 'pending');
+                    await saveToServer(data, 'Import zakończony!');
+                    await loadResultsEditor();
+                }
+            } catch (err) {
+                showToast('Błąd importu - nieprawidłowy format JSON', 'error');
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    // ============================================================
+    // LAURY
+    // ============================================================
+    function laurelSVG(color) {
+        const c = color === 'gold' ? '#c8860a' : color === 'silver' ? '#8a98a8' : '#a0622a';
+        return `<svg width="16" height="14" viewBox="0 0 110 95" fill="${c}"><path d="M52 78 L38 72 L44 65 Z"/><path d="M48 68 L32 66 L40 58 Z"/><path d="M44 57 L28 58 L37 49 Z"/><path d="M42 46 L26 50 L36 40 Z"/><path d="M43 35 L27 41 L38 31 Z"/><path d="M47 25 L31 33 L43 22 Z"/><path d="M53 17 L38 27 L51 14 Z"/><path d="M59 11 L46 23 L60 9 Z"/><path d="M58 78 L72 72 L66 65 Z"/><path d="M62 68 L78 66 L70 58 Z"/><path d="M66 57 L82 58 L73 49 Z"/><path d="M68 46 L84 50 L74 40 Z"/><path d="M67 35 L83 41 L72 31 Z"/><path d="M63 25 L79 33 L67 22 Z"/><path d="M57 17 L72 27 L59 14 Z"/><path d="M51 11 L64 23 L50 9 Z"/><path d="M44 82 L36 92 L50 87 Z"/><path d="M66 82 L74 92 L60 87 Z"/><ellipse cx="55" cy="84" rx="9" ry="5.5"/></svg>`;
+    }
+
+    function loadLaurels() {
+        const wrap = document.getElementById('laurelsTableWrap');
+        if (!wrap) return;
+        const data = Cache._rawData;
+        const saved = data?.settings?.driverLaurels || {};
+        
+        let html = '<table class="laurels-table"><thead><tr><th>Kierowca</th>';
+        html += `<th style="text-align:center;">${laurelSVG('gold')} Złote</th>`;
+        html += `<th style="text-align:center;">${laurelSVG('silver')} Srebrne</th>`;
+        html += `<th style="text-align:center;">${laurelSVG('bronze')} Brązowe</th></thead><tbody>`;
+        
+        for (const d of Cache.drivers) {
+            const lau = saved[d.id] || { gold: 0, silver: 0, bronze: 0 };
+            html += `<tr>
+                <td><span class="fi fi-${d.country}"></span> ${escapeHtml(d.name)}</td>
+                <td style="text-align:center;"><div class="laurel-counter"><button class="laurel-counter-btn lc-minus" onclick="adjLaurel('${d.id}','gold',-1)">−</button><input class="laurel-counter-val" id="lau_${d.id}_gold" type="number" value="${lau.gold}" min="0"><button class="laurel-counter-btn lc-plus" onclick="adjLaurel('${d.id}','gold',1)">+</button></div></td>
+                <td style="text-align:center;"><div class="laurel-counter"><button class="laurel-counter-btn lc-minus" onclick="adjLaurel('${d.id}','silver',-1)">−</button><input class="laurel-counter-val" id="lau_${d.id}_silver" type="number" value="${lau.silver}" min="0"><button class="laurel-counter-btn lc-plus" onclick="adjLaurel('${d.id}','silver',1)">+</button></div></td>
+                <td style="text-align:center;"><div class="laurel-counter"><button class="laurel-counter-btn lc-minus" onclick="adjLaurel('${d.id}','bronze',-1)">−</button><input class="laurel-counter-val" id="lau_${d.id}_bronze" type="number" value="${lau.bronze}" min="0"><button class="laurel-counter-btn lc-plus" onclick="adjLaurel('${d.id}','bronze',1)">+</button></div></td>
+            </tr>`;
+        }
+        html += '</tbody><table>';
+        wrap.innerHTML = html;
+    }
+
+    function adjLaurel(driverId, tier, delta) {
+        const inp = document.getElementById(`lau_${driverId}_${tier}`);
+        if (inp) inp.value = Math.max(0, (parseInt(inp.value) || 0) + delta);
+    }
+
+    async function saveLaurels() {
+        const data = Cache._rawData;
+        if (!data) return;
+        const laurels = {};
+        for (const d of Cache.drivers) {
+            const g = parseInt(document.getElementById(`lau_${d.id}_gold`)?.value) || 0;
+            const s = parseInt(document.getElementById(`lau_${d.id}_silver`)?.value) || 0;
+            const b = parseInt(document.getElementById(`lau_${d.id}_bronze`)?.value) || 0;
+            if (g > 0 || s > 0 || b > 0) laurels[d.id] = { gold: g, silver: s, bronze: b };
+        }
+        if (!data.settings) data.settings = {};
+        data.settings.driverLaurels = laurels;
+        Cache._rawData = data;
+        showToast('Zapisano lokalnie, synchronizacja...', 'pending');
+        saveToServer(data, 'Laury zapisane!');
+    }
+
+    // ============================================================
+    // USTAWIENIA
+    // ============================================================
+    function loadSettings() {
+        const data = Cache._rawData;
+        if (data) {
+            document.getElementById('teamPointsCount').value = data.settings.teamPointsCount || 2;
+            document.getElementById('pointsSystem').value = (data.settings.pointsSystem || [25,18,15,12,10,8,6,4,2,1]).join(',');
+            document.getElementById('powerStagePoints').value = (data.settings.powerStagePoints || [5,4,3,2,1]).join(',');
+        }
+    }
+
+    async function changePassword() {
+        const pwd = document.getElementById('settingsPassword').value;
+        if (!pwd) { showToast('Wprowadź hasło', 'error'); return; }
+        const data = Cache._rawData;
+        if (!data) return;
+        data.settings.adminPassword = pwd;
+        document.getElementById('settingsPassword').value = '';
+        Cache._rawData = data;
+        showToast('Zapisano lokalnie, synchronizacja...', 'pending');
+        saveToServer(data, 'Hasło zmienione!');
+    }
+
+    async function updateTeamPointsCount() {
+        const val = parseInt(document.getElementById('teamPointsCount').value);
+        const data = Cache._rawData;
+        if (!data) return;
+        data.settings.teamPointsCount = val;
+        Cache._rawData = data;
+        showToast('Zapisano lokalnie, synchronizacja...', 'pending');
+        saveToServer(data, 'Zapisano!');
+    }
+
+    async function updatePointsSystem() {
+        const val = document.getElementById('pointsSystem').value.split(',').map(v => parseInt(v.trim()));
+        const data = Cache._rawData;
+        if (!data) return;
+        data.settings.pointsSystem = val;
+        Cache._rawData = data;
+        showToast('Zapisano lokalnie, synchronizacja...', 'pending');
+        saveToServer(data, 'Zapisano!');
+    }
+
+    async function updatePowerStagePoints() {
+        const val = document.getElementById('powerStagePoints').value.split(',').map(v => parseInt(v.trim()));
+        const data = Cache._rawData;
+        if (!data) return;
+        data.settings.powerStagePoints = val;
+        Cache._rawData = data;
+        showToast('Zapisano lokalnie, synchronizacja...', 'pending');
+        saveToServer(data, 'Zapisano!');
+    }
+
+    // ============================================================
+    // BACKUP
+    // ============================================================
+    async function exportAllData() {
+        if (typeof api.exportAllData === 'function') {
+            await api.exportAllData();
+            showToast('Eksport zakończony');
+        }
+    }
+
     async function importAllData(file) {
-      if (file && typeof api.importAllData === 'function') {
-        await api.importAllData(file);
-        await loadAllData();
-        showToast('Import zakończony');
-      }
+        if (file && typeof api.importAllData === 'function') {
+            await api.importAllData(file);
+            await loadAllData();
+            showToast('Import zakończony');
+        }
     }
-    
+
+    // ============================================================
+    // MODAL
+    // ============================================================
     function showModal(content) {
-      document.getElementById('modalContent').innerHTML = content;
-      document.getElementById('modal').classList.add('active');
+        document.getElementById('modalContent').innerHTML = content;
+        document.getElementById('modal').classList.add('active');
     }
-    
+
     function closeModal() {
-      document.getElementById('modal').classList.remove('active');
-      currentEditingId = null;
-      currentEditingType = null;
+        document.getElementById('modal').classList.remove('active');
+        currentEditingId = null;
+        currentEditingType = null;
     }
-    
+
+    // ============================================================
+    // ZAKŁADKI
+    // ============================================================
     function switchTab(tabName) {
-      document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
-      const selectedTab = document.querySelector(`.admin-tab[data-tab="${tabName}"]`);
-      if (selectedTab) selectedTab.classList.add('active');
-      const selectedPanel = document.getElementById(`${tabName}Panel`);
-      if (selectedPanel) selectedPanel.classList.add('active');
-      if (tabName === 'results' && Cache.calendar.length) loadResultsEditor();
-      if (tabName === 'laurels') loadLaurels();
+        document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+        const selectedTab = document.querySelector(`.admin-tab[data-tab="${tabName}"]`);
+        if (selectedTab) selectedTab.classList.add('active');
+        const selectedPanel = document.getElementById(`${tabName}Panel`);
+        if (selectedPanel) selectedPanel.classList.add('active');
+        if (tabName === 'results' && Cache.calendar.length) loadResultsEditor();
+        if (tabName === 'laurels') loadLaurels();
     }
-    
+
     document.querySelectorAll('.admin-tab').forEach(tab => {
-      tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+        tab.addEventListener('click', () => switchTab(tab.dataset.tab));
     });
-    
+
+    // ============================================================
+    // INICJALIZACJA
+    // ============================================================
     (function() {
-      if (localStorage.getItem('wrc-theme') === 'dark') document.body.classList.add('dark');
-      document.getElementById('themeToggle')?.addEventListener('click', () => {
-        document.body.classList.toggle('dark');
-        localStorage.setItem('wrc-theme', document.body.classList.contains('dark') ? 'dark' : 'light');
-      });
+        // Motyw
+        if (localStorage.getItem('wrc-theme') === 'dark') document.body.classList.add('dark');
+        document.getElementById('themeToggle')?.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('wrc-theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+        });
+
+        // SaveQueue UI callback
+        saveQueue.setUICallback(updateSaveUI);
+        updateSaveUI();
+
+        // Auto-save co 30 sekund
+        setInterval(() => {
+            if (saveQueue.pendingCount > 0) {
+                saveQueue.flush();
+            }
+        }, 30000);
+
+        // Zapisz przed zamknięciem strony
+        window.addEventListener('beforeunload', (e) => {
+            if (saveQueue.pendingCount > 0) {
+                e.preventDefault();
+                e.returnValue = 'Masz niezapisane zmiany. Czy na pewno chcesz opuścić stronę?';
+                saveQueue.flushNow();
+            }
+        });
+
+        // Nadpisz oryginalny logout
+        const originalLogout = window.logout;
+        window.logout = async function() {
+            if (saveQueue.pendingCount > 0) {
+                if (confirm('Masz niezapisane zmiany. Zapisać je przed wylogowaniem?')) {
+                    await saveQueue.flushNow();
+                }
+            }
+            originalLogout.call(this);
+        };
+
+        // Przycisk "Zapisz wszystko" dostępny globalnie
+        window.flushNow = flushNow;
     })();
   </script>
 </body>
