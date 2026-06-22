@@ -398,7 +398,6 @@ select {
 
 /* =========================
    INDEX SECTION HEADER
-   Nagłówek panelu — poza results-card, tytuł + meta obok siebie
    ========================= */
 .index-tab-panel {
   display: none;
@@ -703,8 +702,8 @@ select {
     1.2fr
     46px
     repeat(9, 76px)
-    85px  /* SUMA */
-    85px; /* DIFF - reduced width */
+    85px
+    85px;
   align-items: center;
   min-height: 49px;
   padding: 0 20px;
@@ -746,7 +745,6 @@ select {
   justify-content: center;
   text-align: center;
   transform: translateX(1px);
-
 }
 
 .standings-table--championship .standings-table__head > div:nth-child(13) {
@@ -767,8 +765,8 @@ select {
     1.2fr
     46px
     repeat(9, 76px)
-    85px  /* SUMA - reduced width */
-    85px; /* DIFF */
+    85px
+    85px;
   align-items: center;
   min-height: 59px;
   padding: 0 20px;
@@ -825,8 +823,8 @@ select {
     64px
     100px
     repeat(9, 1fr)
-    85px  /* SUMA */
-    85px;  /* DIFF - reduced width */
+    85px
+    85px;
   align-items: center;
   min-height: 49px;
   padding: 0 20px;
@@ -881,8 +879,8 @@ select {
     64px
     100px
     repeat(9, 1fr)
-    85px  /* SUMA */
-    85px;  /* DIFF - reduced width */
+    85px
+    85px;
   align-items: center;
   min-height: 59px;
   padding: 0 20px;
@@ -915,7 +913,6 @@ select {
   text-align: center;
   padding: 0;
   transform: translateX(1.352px);
-
 }
 
 .standings-table--constructors .standings-row > div:nth-child(12) {
@@ -1901,17 +1898,17 @@ img {
 
 .view-toggle-label {
   font-family: "WRCCleanBold", Arial, sans-serif;
-  font-size: 30px;                
+  font-size: 30px;
   font-weight: 700;
   color: var(--text-dark);
   line-height: 1;
-  margin-right: 32px;             
+  margin-right: 32px;
 }
 
 .view-sub-tabs {
   display: flex;
   align-items: center;
-  gap: 32px;                      
+  gap: 32px;
 }
 
 .view-sub-tab {
@@ -1919,7 +1916,7 @@ img {
   background: transparent;
   border: none;
   font-family: "Biotif", Arial, sans-serif;
-  font-size: 17px;                
+  font-size: 17px;
   font-weight: 500;
   color: var(--text-muted);
   padding: 6px 0 12px;
@@ -1962,7 +1959,7 @@ img {
 }
 
 .tabs-section {
-  margin-bottom: 24px;           
+  margin-bottom: 24px;
 }
 
 .calendar-grid-section {
@@ -2028,7 +2025,6 @@ img {
   display: block;
   transition: transform 0.35s ease;
   opacity: 0.52;
-
 }
 
 .rally-card:hover .rally-bg {
@@ -2054,7 +2050,6 @@ img {
   justify-content: center;
   z-index: 2;
 }
-
 
 .rally-card__logo {
   max-width: 74%;
@@ -2895,7 +2890,7 @@ img {
   width: auto;
   max-width: 160px;
   object-fit: contain;
-  transform: translateY(22px); 
+  transform: translateY(22px);
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
 }
 
@@ -2945,7 +2940,6 @@ img {
 
 /* =========================
    SMOOTH THEME TRANSITION
-   Only fires on explicit toggle (not on page load)
    ========================= */
 
 body.no-transition,
@@ -3062,24 +3056,24 @@ body.theme-animating .index-section-header__meta {
    DARK MODE — ROOT VARIABLES
    ========================= */
 body.dark {
-  --bg-white: #1a1a1a;
-  --section-bg: #1a1a1a;
-  --text-main: #ffffff;
-  --text-dark: #ffffff;
-  --text-muted: #beb3ab;
+  --bg-white: #141516;
+  --section-bg: #141516;
+  --text-main: #e8e6e3;
+  --text-dark: #e8e6e3;
+  --text-muted: #c0bbb3;
   --line: rgba(60, 72, 88, 0.7);
-  --line-soft: #242424;
-  --tab-bg: #2a2a2a;
+  --line-soft: #1e1f20;
+  --tab-bg: #252627;
   --nav-white: rgba(255, 255, 255, 0.88);
   --sidebar-hover: rgba(255, 255, 255, 0.06);
-  background: #1a1a1a;
+  background: #141516;
 }
 
 /* =========================
    DARK MODE — GENERAL
    ========================= */
 body.dark .page {
-  background: #1a1a1a;
+  background: #141516;
 }
 
 body.dark .floating-logo {
@@ -3096,22 +3090,22 @@ body.dark .floating-logo.logo--dark {
 body.dark .hero__overlay {
   background: linear-gradient(
     to bottom,
-    rgba(26, 26, 26, 0.28) 0%,
-    rgba(26, 26, 26, 0.22) 20%,
-    rgba(26, 26, 26, 0.48) 50%,
-    rgba(26, 26, 26, 0.82) 78%,
-    rgba(26, 26, 26, 0.97) 100%
+    rgba(20, 21, 22, 0.28) 0%,
+    rgba(20, 21, 22, 0.22) 20%,
+    rgba(20, 21, 22, 0.48) 50%,
+    rgba(20, 21, 22, 0.82) 78%,
+    rgba(20, 21, 22, 0.97) 100%
   );
 }
 
 body.dark .hero__overlay--home {
   background: linear-gradient(
     to bottom,
-    rgba(26, 26, 26, 0.45) 0%,
-    rgba(26, 26, 26, 0.38) 18%,
-    rgba(26, 26, 26, 0.52) 38%,
-    rgba(26, 26, 26, 0.84) 70%,
-    rgba(26, 26, 26, 0.98) 100%
+    rgba(20, 21, 22, 0.45) 0%,
+    rgba(20, 21, 22, 0.38) 18%,
+    rgba(20, 21, 22, 0.52) 38%,
+    rgba(20, 21, 22, 0.84) 70%,
+    rgba(20, 21, 22, 0.98) 100%
   );
 }
 
@@ -3120,30 +3114,30 @@ body.dark .hero__overlay--home {
    ========================= */
 body.dark .main,
 body.dark .main--home {
-  background: #1a1a1a;
+  background: #141516;
 }
 
 body.dark .home-section {
-  background: #1a1a1a;
+  background: #141516;
 }
 
 body.dark .home-section--light {
-  background: #202020;
+  background: #1a1b1c;
 }
 
 body.dark .footer-spacer {
-  background: #1a1a1a;
+  background: #141516;
 }
 
 /* =========================
    DARK MODE — TABS
    ========================= */
 body.dark .tabs {
-  background: #2a2a2a;
+  background: #252627;
 }
 
 body.dark .tabs-section {
-  background: #181a1b;
+  background: #141516;
 }
 
 body.dark .tab {
@@ -3154,38 +3148,38 @@ body.dark .tab {
    DARK MODE — TABLES
    ========================= */
 body.dark .results-card {
-  background: #1a1a1a;
-  box-shadow: 0 7px 18px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.08);
+  background: #191a1b;
+  box-shadow: 0 7px 18px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.1);
 }
 
 body.dark .results-table__head,
 body.dark .standings-table__head,
 body.dark .standings-table--championship .standings-table__head,
 body.dark .standings-table--constructors .standings-table__head {
-  background: #2e2e2e;
-  color: #beb3ab;
+  background: #1e1f20;
+  color: #c0bbb3;
   border-bottom-color: rgba(60, 72, 88, 0.5);
 }
 
 body.dark .results-table__body,
 body.dark .standings-table__body {
-  background: #1a1a1a;
+  background: #191a1b;
 }
 
 body.dark .results-row,
 body.dark .standings-row {
-  background: #1e1e1e;
-  color: #c0c0c0;
+  background: #191a1b;
+  color: #e8e6e3;
 }
 
 body.dark .results-row:hover,
 body.dark .standings-row:hover {
-  background: #252525;
+  background: #1e1f20;
 }
 
 body.dark .results-row::after,
 body.dark .standings-row::after {
-  background: rgba(97, 93, 93, 0.5);
+  background: rgba(80, 78, 74, 0.4);
 }
 
 body.dark .col-pos,
@@ -3194,53 +3188,53 @@ body.dark .col-date,
 body.dark .col-status,
 body.dark .col-total,
 body.dark .col-diff {
-  color: #c0c0c0;
+  color: #e8e6e3;
 }
 
 body.dark .col-winner a,
 body.dark .col-results a {
-  color: #c0c0c0;
+  color: #e8e6e3;
 }
 
 body.dark .placeholder-panel {
-  background: #242424;
-  color: #8a7f72;
+  background: #1e1f20;
+  color: #c0bbb3;
 }
 
 /* =========================
    DARK MODE — HOME CARDS
    ========================= */
 body.dark .event-card {
-  background: #242424;
-  box-shadow: 0 10px 24px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.2);
+  background: #1e1f20;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.25);
 }
 
 body.dark .event-card__title {
-  color: #ffffff;
+  color: #e8e6e3;
 }
 
 body.dark .event-card__date {
-  color: #b8ad9e;
+  color: #c0bbb3;
 }
 
 body.dark .leader-card {
-  background: linear-gradient(180deg, #242424 0%, #202020 100%);
-  box-shadow: 0 10px 24px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.15);
+  background: linear-gradient(180deg, #1e1f20 0%, #191a1b 100%);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.2);
 }
 
 body.dark .leader-card__name {
-  color: #ffffff;
+  color: #e8e6e3;
 }
 
 body.dark .leader-card__points {
-  color: #ffffff;
+  color: #e8e6e3;
 }
 
 /* =========================
    DARK MODE — FOOTER
    ========================= */
 body.dark .site-footer {
-  background: #262626;
+  background: #1a1b1c;
 }
 
 /* =========================
@@ -3248,12 +3242,12 @@ body.dark .site-footer {
    ========================= */
 body.dark .championship-sub-tab,
 body.dark .view-sub-tab {
-  color: #beb3ab;
+  color: #c0bbb3;
 }
 
 body.dark .championship-sub-tab.active,
 body.dark .view-sub-tab.active {
-  color: #ffffff;
+  color: #e8e6e3;
 }
 
 /* =========================
@@ -3268,24 +3262,24 @@ body.dark .theme-toggle-btn .icon-sun  { display: none; }
 body.dark .archive-main,
 body.dark .archive-top,
 body.dark .archive-section {
-  background: #1a1a1a;
+  background: #141516;
 }
 
 body.dark .archive-section::before {
-  background: rgba(60, 72, 88, 0.35);
+  background: rgba(60, 72, 88, 0.3);
 }
 
 body.dark .archive-sidebar__title {
-  color: #f3f3f3;
+  color: #e8e6e3;
 }
 
 body.dark .archive-sidebar__label {
-  color: #9a9088;
-  border-bottom-color: rgba(60, 72, 88, 0.45);
+  color: #c0bbb3;
+  border-bottom-color: rgba(60, 72, 88, 0.4);
 }
 
 body.dark .archive-sidebar__item {
-  color: #c0c0c0;
+  color: #e8e6e3;
 }
 
 body.dark .archive-sidebar__item:hover {
@@ -3293,86 +3287,86 @@ body.dark .archive-sidebar__item:hover {
 }
 
 body.dark .archive-sidebar__num {
-  background: #333;
-  color: #c0c0c0;
+  background: #2a2b2c;
+  color: #e8e6e3;
 }
 
 body.dark .archive-intro__text p {
-  color: #c0c0c0;
+  color: #c0bbb3;
 }
 
 body.dark .archive-section__number,
 body.dark .archive-section__title {
-  color: #f3f3f3;
+  color: #e8e6e3;
 }
 
 body.dark .archive-section__text p {
-  color: #c0c0c0;
+  color: #c0bbb3;
 }
 
 body.dark .standings-copy {
-  color: #c0c0c0;
+  color: #c0bbb3;
 }
 
 body.dark .standings-copy h4 {
-  color: #f3f3f3;
+  color: #e8e6e3;
 }
 
 body.dark .standings-copy p {
-  color: #c0c0c0;
+  color: #c0bbb3;
 }
 
 body.dark .archive-season-select {
-  background: #2e2e2e;
-  border-color: rgba(60, 72, 88, 0.55);
-  color: #d0c8bc;
+  background: #1e1f20;
+  border-color: rgba(60, 72, 88, 0.5);
+  color: #e8e6e3;
 }
 
 body.dark .facts-card {
-  background: #1a1a1a;
-  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.28), 0 1px 4px rgba(0, 0, 0, 0.18);
+  background: #191a1b;
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.32), 0 1px 4px rgba(0, 0, 0, 0.2);
 }
 
 body.dark .facts-card__head {
-  background: #2e2e2e;
-  color: #9a9088;
+  background: #1e1f20;
+  color: #c0bbb3;
 }
 
 body.dark .facts-card__row {
-  background: #1e1e1e;
-  color: #c0c0c0;
-  border-bottom-color: rgba(60, 72, 88, 0.35);
+  background: #191a1b;
+  color: #e8e6e3;
+  border-bottom-color: rgba(60, 72, 88, 0.3);
 }
 
 body.dark .archive-table-card {
-  background: #1a1a1a;
-  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.28), 0 1px 4px rgba(0, 0, 0, 0.18);
+  background: #191a1b;
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.32), 0 1px 4px rgba(0, 0, 0, 0.2);
 }
 
 body.dark .archive-table__head {
-  background: #2e2e2e;
-  color: #9a9088;
+  background: #1e1f20;
+  color: #c0bbb3;
 }
 
 body.dark .archive-table__row {
-  background: #1e1e1e;
-  color: #c0c0c0;
+  background: #191a1b;
+  color: #e8e6e3;
 }
 
 body.dark .archive-table__row:hover {
-  background: #252525;
+  background: #1e1f20;
 }
 
 body.dark .archive-table__row::after {
-  background: rgba(60, 72, 88, 0.35);
+  background: rgba(60, 72, 88, 0.3);
 }
 
 body.dark .archive-hero-card__caption {
-  color: #b8ad9e;
+  color: #c0bbb3;
 }
 
 body.dark .archive-hero-card__copyright {
-  color: #606c78;
+  color: #6b6862;
 }
 
 /* =========================
@@ -3380,200 +3374,201 @@ body.dark .archive-hero-card__copyright {
    ========================= */
 body.dark .calendar-filters,
 body.dark .calendar-grid-section {
-  background: #1a1a1a;
+  background: #141516;
 }
 
 body.dark .calendar-filters {
-  background: #181a1b;
+  background: #141516;
 }
 
 body.dark .view-toggle-label {
-  color: #f3f3f3;
+  color: #e8e6e3;
 }
 
 body.dark .season-tabs {
-  background: #2a2a2a;
+  background: #252627;
 }
 
 body.dark .rally-card {
-  background: #242424;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.28), 0 1px 3px rgba(0,0,0,0.18);
+  background: #1e1f20;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.32), 0 1px 3px rgba(0,0,0,0.2);
 }
 
 body.dark .rally-card:hover {
-  box-shadow: 0 12px 32px rgba(0,0,0,0.38), 0 2px 6px rgba(0,0,0,0.22);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.42), 0 2px 6px rgba(0,0,0,0.25);
 }
 
 body.dark .rally-card__name {
-  color: #f3f3f3;
+  color: #e8e6e3;
 }
 
 body.dark .rally-card__date,
 body.dark .rally-card__status {
-  color: #b8ad9e;
+  color: #c0bbb3;
 }
 
 body.dark .rally-card__country {
-  color: #9a9088;
+  color: #c0bbb3;
 }
 
 body.dark .rally-card__status-divider {
-  background: rgba(60, 72, 88, 0.55);
+  background: rgba(60, 72, 88, 0.5);
 }
 
 body.dark .cal-list-head {
-  background: #2e2e2e;
-  color: #9a9088;
+  background: #1e1f20;
+  color: #c0bbb3;
 }
 
 body.dark .cal-list-row {
-  background: #1e1e1e;
+  background: #191a1b;
 }
 
 body.dark .cal-list-row:hover {
-  background: #252525;
+  background: #1e1f20;
 }
 
 body.dark .cal-list-row::after {
-  background: rgba(60, 72, 88, 0.5);
+  background: rgba(60, 72, 88, 0.4);
 }
 
 body.dark .cal-list-row .col-round,
 body.dark .cal-list-row .col-date,
 body.dark .cal-list-row .col-status {
-  color: #c0c0c0;
+  color: #e8e6e3;
 }
 
 body.dark .cal-list-row .col-results a {
-  color: #c0c0c0;
+  color: #e8e6e3;
 }
 
 body.dark .status-badge--upcoming {
-  color: #9a9088;
+  color: #c0bbb3;
 }
 
 body.dark .status-badge--completed {
-  color: #b8ad9e;
+  color: #c0bbb3;
 }
 
 body.dark .placeholder-cal {
-  background: #242424;
-  color: #8a7f72;
+  background: #1e1f20;
+  color: #c0bbb3;
 }
 
 /* =========================
    DARK MODE — TEAMY (overrides)
    ========================= */
 body.dark .teams-main {
-  background: #1a1a1a;
+  background: #141516;
 }
 
 body.dark .team-slides-clip {
-  background: #242424;
-  box-shadow: 0 6px 28px rgba(0,0,0,0.3), 0 1px 4px rgba(0,0,0,0.2);
+  background: #1e1f20;
+  box-shadow: 0 6px 28px rgba(0,0,0,0.35), 0 1px 4px rgba(0,0,0,0.22);
 }
 
 body.dark .team-car--hyundai {
-  background: radial-gradient(ellipse at 60% 60%, rgba(20, 100, 200, 0.14) 0%, #242424 70%);
+  background: radial-gradient(ellipse at 60% 60%, rgba(20, 100, 200, 0.14) 0%, #1e1f20 70%);
 }
 body.dark .team-car--toyota {
-  background: radial-gradient(ellipse at 60% 60%, rgba(200, 30, 30, 0.12) 0%, #242424 70%);
+  background: radial-gradient(ellipse at 60% 60%, rgba(200, 30, 30, 0.12) 0%, #1e1f20 70%);
 }
 body.dark .team-car--msport {
-  background: radial-gradient(ellipse at 60% 60%, rgba(0, 50, 140, 0.14) 0%, #242424 70%);
+  background: radial-gradient(ellipse at 60% 60%, rgba(0, 50, 140, 0.14) 0%, #1e1f20 70%);
 }
 
 body.dark .team-info__category {
-  color: #9a9088;
+  color: #c0bbb3;
 }
 
 body.dark .team-info__name {
-  color: #f3f3f3;
+  color: #e8e6e3;
 }
 
 body.dark .team-info__principal {
-  color: #9a9088;
+  color: #c0bbb3;
 }
 
 body.dark .team-info__principal strong {
-  color: #d0c8bc;
+  font-weight: 500;
+  color: #e8e6e3;
 }
 
 body.dark .team-stat__label {
-  color: #9a9088;
+  color: #c0bbb3;
 }
 
 body.dark .team-stat__value {
-  color: #f3f3f3;
+  color: #e8e6e3;
 }
 
 body.dark .team-stat__divider {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.08);
 }
 
 body.dark .team-progress__bar {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.08);
 }
 
 body.dark .team-progress__bar:hover {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.16);
 }
 
 body.dark .driver-card {
-  background: #242424;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.28), 0 1px 3px rgba(0,0,0,0.18);
+  background: #1e1f20;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.32), 0 1px 3px rgba(0,0,0,0.2);
 }
 
 body.dark .driver-card__role {
-  background: #242424;
-  color: #9a9088;
+  background: #252627;
+  color: #c0bbb3;
 }
 
 body.dark .driver-card__name {
-  color: #f3f3f3;
+  color: #e8e6e3;
 }
 
 body.dark .driver-card__country {
-  color: #9a9088;
+  color: #c0bbb3;
 }
 
 body.dark .driver-card__photo {
-  background: #333;
+  background: #2a2b2c;
 }
 
 /* =========================
    DARK MODE — WYNIKI (overrides)
    ========================= */
 body.dark .wyniki-section-header__title {
-  color: #f3f3f3;
+  color: #e8e6e3;
 }
 
 body.dark .wyniki-section-header__meta {
-  color: #9a9088;
+  color: #c0bbb3;
 }
 
 body.dark .standings-table--lacznie .standings-table__head,
 body.dark .standings-table--ss .standings-table__head {
-  background: #2e2e2e;
-  color: #beb3ab;
+  background: #1e1f20;
+  color: #c0bbb3;
 }
 
 body.dark .col-car-model,
 body.dark .col-pts,
 body.dark .col-penalty,
 body.dark .col-bonus {
-  color: #c0c0c0;
+  color: #e8e6e3;
 }
 
 /* =========================
    DARK MODE — INDEX SECTION HEADER
    ========================= */
 body.dark .index-section-header__title {
-  color: #f3f3f3;
+  color: #e8e6e3;
 }
 
 body.dark .index-section-header__meta {
-  color: #9a9088;
+  color: #c0bbb3;
 }
 
 /* =========================
@@ -3679,10 +3674,9 @@ body.dark .index-section-header__meta {
 }
 
 /* =========================
-   POPRAWKI DLA FLAG - NAGŁÓWKI I TREŚĆ
+   POPRAWKI DLA FLAG
 ========================= */
 
-/* Flagi w nagłówkach tabel - mniejsze i wyrównane */
 .standings-table__head .fi,
 .results-table__head .fi {
   font-size: 12px !important;
@@ -3691,7 +3685,6 @@ body.dark .index-section-header__meta {
   margin-right: 0px !important;
 }
 
-/* Flagi w treści jako emoji - wyrównane do tekstu */
 .flag-emoji {
   font-size: 1em;
   line-height: 1;
@@ -3700,7 +3693,6 @@ body.dark .index-section-header__meta {
   margin-right: 0px;
 }
 
-/* Flagi w kolumnie rajdów - mniejsze i wyrównane */
 .col-rally .fi,
 .col-rally .flag-emoji {
   font-size: 13px;
@@ -3709,7 +3701,6 @@ body.dark .index-section-header__meta {
   margin-right: 0px;
 }
 
-/* Flagi w kolumnie zwycięzcy */
 .col-winner .fi,
 .col-winner .flag-emoji {
   font-size: 11.55px;
@@ -3718,7 +3709,6 @@ body.dark .index-section-header__meta {
   margin-right: 0px;
 }
 
-/* Flagi w kolumnie kierowcy */
 .col-driver .fi,
 .col-driver .flag-emoji {
   font-size: 13px;
@@ -3727,7 +3717,6 @@ body.dark .index-section-header__meta {
   margin-right: 0px;
 }
 
-/* Flagi w kartach rajdów (kalendarz) */
 .rally-card__country .flag-emoji {
   font-size: 12px;
   line-height: 1;
@@ -3735,7 +3724,6 @@ body.dark .index-section-header__meta {
   margin-right: 0px;
 }
 
-/* Flagi w kartach kierowców */
 .driver-card__country .flag-emoji {
   font-size: 13px;
   line-height: 1;
@@ -3743,7 +3731,6 @@ body.dark .index-section-header__meta {
   margin-right: 0px;
 }
 
-/* Flagi w tabeli wyników rajdu */
 .standings-table .flag-emoji {
   font-size: 13px;
   line-height: 1;
@@ -3759,4 +3746,389 @@ body.dark .index-section-header__meta {
   font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
 }
 
+/* ====================================================================
+   RESPONSYWNOŚĆ MOBILNA
+   ==================================================================== */
 
+@media (max-width: 1400px) {
+  .page {
+    min-width: 0;
+    width: 100%;
+  }
+  html {
+    zoom: 1;
+  }
+  body {
+    transform: none;
+    width: 100%;
+    overflow-x: hidden;
+  }
+}
+
+@media (max-width: 900px) {
+  .home-container,
+  .start-container,
+  .drivers-section,
+  .team-stage,
+  .archive-intro__inner,
+  .archive-top__inner,
+  .archive-section,
+  .calendar-grid-wrap,
+  .view-toggle-wrap,
+  .calendar-filters,
+  .calendar-grid-section,
+  .table-section,
+  .tabs-section {
+    padding-left: 5%;
+    padding-right: 5%;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 600px) {
+  .home-container,
+  .start-container,
+  .drivers-section,
+  .archive-intro__inner,
+  .archive-top__inner,
+  .archive-section,
+  .calendar-grid-wrap,
+  .view-toggle-wrap {
+    padding-left: 4%;
+    padding-right: 4%;
+  }
+}
+
+@media (max-width: 1024px) {
+  .topbar {
+    grid-template-columns: 110px 1fr 110px;
+    height: 56px;
+  }
+  .topbar__center {
+    gap: 18px;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .topbar__center::-webkit-scrollbar {
+    display: none;
+  }
+  .topbar__link {
+    font-size: 13px;
+    height: 50px;
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    grid-template-columns: 56px 1fr 56px;
+    height: 50px;
+  }
+  .topbar__link {
+    font-size: 12px;
+  }
+  .rallytv-btn {
+    font-size: 12px;
+    padding: 0 12px;
+    height: 30px;
+  }
+}
+
+@media (max-width: 900px) {
+  .hero {
+    height: 260px;
+  }
+  .hero__content {
+    padding: 0 16px;
+    width: 100%;
+  }
+  .hero__title-wrap {
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 100%;
+    padding: 0 16px;
+  }
+  .hero__title {
+    font-size: 32px;
+    margin-left: 0;
+    white-space: normal;
+  }
+}
+
+@media (max-width: 540px) {
+  .hero {
+    height: 200px;
+  }
+  .hero__title {
+    font-size: 24px;
+  }
+  .hero__title-wrap {
+    bottom: 16px;
+  }
+}
+
+@media (max-width: 900px) {
+  .hero--home {
+    height: 560px;
+  }
+  .home-hero {
+    padding: 0 5% 48px;
+  }
+  .home-hero__title {
+    font-size: 38px;
+  }
+  .home-hero__desc {
+    font-size: 15px;
+  }
+  .home-hero__brand {
+    font-size: 16px;
+  }
+  .section-heading {
+    flex-wrap: wrap;
+  }
+  .section-heading h2 {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero--home {
+    height: 460px;
+  }
+  .home-hero__title {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 700px) {
+  .tabs-section {
+    justify-content: flex-start;
+  }
+  .tabs {
+    width: 100%;
+    max-width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 18px;
+    gap: 22px;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .tab {
+    font-size: 13px;
+  }
+
+  .championship-sub-tabs,
+  .view-sub-tabs {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 20px;
+  }
+  .championship-sub-tabs::-webkit-scrollbar,
+  .view-sub-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .view-toggle-wrap,
+  .view-toggle-left {
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .view-toggle-label {
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .index-section-header__title,
+  .wyniki-section-header__title {
+    font-size: 18px;
+  }
+  .table-section {
+    padding-top: 28px;
+  }
+}
+
+@media (max-width: 900px) {
+  .results-card,
+  .archive-table-card,
+  .calendar-list {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .results-table {
+    min-width: 620px;
+  }
+
+  .archive-table--calendar {
+    min-width: 620px;
+  }
+
+  .standings-table--championship,
+  .standings-table--constructors {
+    min-width: 980px;
+  }
+
+  .standings-table--lacznie {
+    min-width: 760px;
+  }
+
+  .standings-table--ss {
+    min-width: 680px;
+  }
+
+  .archive-table__head--standings,
+  .archive-table__row--standings {
+    min-width: 760px;
+  }
+
+  .cal-list-head,
+  .cal-list-row {
+    min-width: 560px;
+  }
+}
+
+@media (max-width: 480px) {
+  .standings-table--start-top5 .standings-table__head,
+  .standings-table--start-top5 .standings-row {
+    padding: 0 12px;
+  }
+  .col-team-logo .team-name-text {
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 1100px) {
+  .media-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .upcoming-grid,
+  .leaders-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .media-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .media-grid,
+  .upcoming-grid,
+  .leaders-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .media-card__thumb,
+  .media-card--large .media-card__thumb {
+    height: 190px;
+  }
+}
+
+@media (max-width: 860px) {
+  .archive-top__inner,
+  .archive-section__grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .archive-sidebar {
+    padding-top: 0;
+  }
+  .archive-section__number {
+    padding-top: 0;
+  }
+  .archive-intro__inner,
+  .archive-season-top {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 560px) {
+  .archive-sidebar__title,
+  .archive-section__title {
+    font-size: 24px;
+  }
+  .archive-section__number {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 760px) {
+  .site-footer {
+    padding: 50px 6% 24px;
+  }
+  .site-footer__sponsors,
+  .site-footer__sponsors--secondary {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 24px;
+    row-gap: 18px;
+  }
+  .site-footer__sponsors--secondary {
+    margin-top: 24px;
+  }
+  .footer-photo {
+    width: 130px;
+    height: 60px;
+  }
+  .footer-photo--sm {
+    width: 100px;
+    height: 46px;
+  }
+  .footer-divider {
+    width: 80%;
+    max-width: 280px;
+  }
+}
+
+@media (max-width: 600px) {
+  .floating-logo {
+    top: 10px;
+    left: 10px;
+  }
+  .floating-logo__img {
+    width: 84px;
+  }
+  .theme-toggle-btn {
+    width: 32px;
+    height: 32px;
+  }
+  .theme-toggle-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  .placeholder-panel,
+  .placeholder-cal {
+    min-height: 220px;
+    font-size: 17px;
+    padding: 16px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 560px) {
+  .team-info__stats {
+    flex-wrap: wrap;
+    row-gap: 16px;
+  }
+  .team-stat {
+    padding: 0 16px 0 0;
+  }
+  .team-stat__divider {
+    margin-right: 16px;
+  }
+}
