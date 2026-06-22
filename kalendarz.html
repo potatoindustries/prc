@@ -31,8 +31,8 @@
       margin-right: 0px;
     }
 
-    html.wrc-dark,html.wrc-dark body,html.wrc-dark .page{background:#1a1a1a!important}
-    
+html.wrc-dark,html.wrc-dark body,html.wrc-dark .page{background:#141516!important}
+
     .loading-spinner {
       text-align: center;
       padding: 60px;
@@ -337,7 +337,61 @@
     body.dark .status-cancelled .rally-card__name {
       text-decoration-color: #f87171;
     }
+<!-- ZNAJDŹ i ZAMIEŃ te linie w sekcji <style>: -->
 
+<!-- BYŁO: -->
+.rally-card__name {
+  color: #070c13 !important;
+<!-- ... -->
+}
+.rally-card__date,
+.rally-card__status {
+<!-- ... -->
+  color: black !important;
+<!-- ... -->
+}
+.rally-card__country {
+  color: #737477 !important;
+<!-- ... -->
+}
+body.dark .rally-card__name {
+  color: #e8ddd5 !important;
+}
+body.dark .rally-card__date,
+body.dark .rally-card__status {
+  color: #c8bdb5 !important;
+}
+body.dark .rally-card__country {
+  color: #a89d95 !important;
+}
+
+<!-- ZAMIEŃ NA: -->
+.rally-card__name {
+  color: #070c13 !important;
+  font-family: "SebinoBold", Arial, sans-serif !important;
+  font-weight: normal !important;
+}
+.rally-card__date,
+.rally-card__status {
+  font-family: "SebinoMedium", Arial, sans-serif !important;
+  color: black !important;
+  font-weight: 500 !important;
+}
+.rally-card__country {
+  color: #737477 !important;
+  font-size: 13px;
+  font-weight: 520 !important;
+}
+body.dark .rally-card__name {
+  color: #e8e6e3 !important;
+}
+body.dark .rally-card__date,
+body.dark .rally-card__status {
+  color: #c0bbb3 !important;
+}
+body.dark .rally-card__country {
+  color: #c0bbb3 !important;
+}
   </style>
   <script>
     if(localStorage.getItem('wrc-theme')==='dark')document.documentElement.classList.add('wrc-dark');
