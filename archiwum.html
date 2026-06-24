@@ -216,6 +216,11 @@
             font-weight: 500;
             min-height: 44px;
             transition: background .38s, color .28s;
+            display: grid;
+            grid-template-columns: 60px 1fr 1.2fr 1.2fr 1.2fr;
+            gap: 8px;
+            padding: 0 18px;
+            align-items: center;
         }
         
         body.dark .stats-card--calendar .stats-card__head--calendar {
@@ -231,6 +236,12 @@
             border-bottom: 1px solid rgba(225, 231, 238, 0.8);
             transition: background .28s, color .28s, border-bottom-color .28s;
             box-sizing: border-box;
+            display: grid;
+            grid-template-columns: 60px 1fr 1.2fr 1.2fr 1.2fr;
+            gap: 8px;
+            padding: 0 18px;
+            align-items: center;
+            min-height: 48px;
         }
         
         body.dark .stats-card--calendar .stats-card__row--calendar {
@@ -251,23 +262,6 @@
             background: #252525;
         }
         
-        .stats-card--calendar .stats-card__head--calendar,
-        .stats-card--calendar .stats-card__row--calendar {
-            display: grid;
-            grid-template-columns: repeat(5, minmax(0, 1fr));
-            gap: 12px;
-            padding: 0 18px;
-            align-items: center;
-        }
-        
-        .stats-card--calendar .stats-card__head--calendar {
-            min-height: 44px;
-        }
-        
-        .stats-card--calendar .stats-card__row--calendar {
-            min-height: 48px;
-        }
-        
         .stats-card--calendar .stats-card__head--calendar > div,
         .stats-card--calendar .stats-card__row--calendar > div {
             text-align: left !important;
@@ -283,16 +277,7 @@
             font-weight: 500;
         }
         
-        /* Panel archiwum - przełączanie */
-        .archive-panel {
-            display: none;
-        }
-        
-        .archive-panel.active {
-            display: block;
-        }
-        
-        /* Responsywność */
+        /* Responsywność kalendarza */
         @media (max-width: 860px) {
             .stats-card--calendar .stats-card__head--calendar,
             .stats-card--calendar .stats-card__row--calendar {
@@ -303,6 +288,15 @@
                 white-space: normal;
                 word-break: break-word;
             }
+        }
+
+        /* Panel archiwum - przełączanie */
+        .archive-panel {
+            display: none;
+        }
+        
+        .archive-panel.active {
+            display: block;
         }
 
         /* ===== BIO & IMAGES ===== */
@@ -492,6 +486,336 @@
             max-width: 1100px;
             padding: 0 22px;
         }
+
+        /* ===== TABELA WYNIKÓW (klasyfikacja) ===== */
+        .standings-table {
+            width: 100%;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06);
+            margin-bottom: 32px;
+            transition: background .38s, box-shadow .32s;
+        }
+        body.dark .standings-table {
+            background: #1e1e1e;
+            box-shadow: 0 7px 18px rgba(0,0,0,.28);
+        }
+
+        .standings-table__head {
+            background: #f2f3f3;
+            color: #67727f;
+            font-family: "SebinoSoft", Arial, sans-serif;
+            font-size: 11px;
+            letter-spacing: .03em;
+            text-transform: uppercase;
+            font-weight: 500;
+            min-height: 44px;
+            display: grid;
+            align-items: center;
+            padding: 0 18px;
+            transition: background .38s, color .28s;
+        }
+        body.dark .standings-table__head {
+            background: #2e2e2e;
+            color: #9a9088;
+        }
+
+        .standings-table__row {
+            display: grid;
+            align-items: center;
+            min-height: 48px;
+            padding: 0 18px;
+            font-family: "SebinoSoft", Arial, sans-serif;
+            font-size: 13px;
+            color: #26384b;
+            border-bottom: 1px solid rgba(225, 231, 238, 0.8);
+            transition: background .28s, color .28s, border-bottom-color .28s;
+            background: #fff;
+        }
+        body.dark .standings-table__row {
+            background: #1e1e1e;
+            color: #c0c0c0;
+            border-bottom-color: rgba(60, 72, 88, 0.4);
+        }
+        .standings-table__row:last-child { border-bottom: none; }
+        .standings-table__row:hover { background: #fcfdff; }
+        body.dark .standings-table__row:hover { background: #252525; }
+
+        .standings-table__row > div:last-child {
+            font-weight: 500;
+        }
+
+        /* układy kolumn */
+        .arch-g3 {
+            grid-template-columns: 48px 1fr 90px;
+        }
+        .arch-g3c {
+            grid-template-columns: 48px 1fr 90px;
+        }
+        .arch-g4 {
+            grid-template-columns: 48px 1fr 130px 90px;
+        }
+
+        .arch-g3 > div:last-child,
+        .arch-g3c > div:last-child,
+        .arch-g4 > div:last-child {
+            justify-content: flex-end !important;
+            text-align: right !important;
+            padding-right: 16px !important;
+        }
+
+        .standings-table__head > div,
+        .standings-table__row > div {
+            display: flex;
+            align-items: center;
+            padding: 0 4px;
+        }
+        .standings-table__head > div:first-child,
+        .standings-table__row > div:first-child {
+            justify-content: flex-start;
+            text-align: left;
+        }
+        .standings-table__head > div:not(:first-child),
+        .standings-table__row > div:not(:first-child) {
+            justify-content: flex-start;
+            text-align: left;
+        }
+
+        /* ===== JEDNOLITY NAGŁÓWEK TABEL ===== */
+        .table-title {
+            font-family: "WRCCleanBold", Arial, sans-serif;
+            font-size: 28px;
+            margin: 44px 0 18px;
+            color: #26384b;
+            border-left: 4px solid var(--orange);
+            padding-left: 15px;
+            transition: color .28s;
+        }
+        body.dark .table-title { color: #f3f3f3; }
+        .table-title:first-of-type { margin-top: 0; }
+
+        .table-subtitle {
+            font-family: "WRCCleanBold", Arial, sans-serif;
+            font-size: 28px;
+            margin: 44px 0 18px;
+            color: #26384b;
+            border-left: 4px solid var(--orange);
+            padding-left: 15px;
+            transition: color .28s;
+        }
+        body.dark .table-subtitle { color: #f3f3f3; }
+
+        /* sidebar - ukryty */
+        .archive-sidebar {
+            display: none;
+        }
+
+        .rallytv-btn {
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 999px;
+            padding: 8px 18px;
+            color: #fff;
+            font-size: 14px;
+            text-decoration: none;
+            transition: background .2s;
+            display: inline-block;
+        }
+        .rallytv-btn:hover {
+            background: rgba(255,255,255,0.18);
+        }
+
+        /* poprawki dla kalendarza - równe szerokości */
+        .stats-card--calendar .stats-card__head--calendar > div,
+        .stats-card--calendar .stats-card__row--calendar > div {
+            min-width: 0;
+            width: 100%;
+        }
+        /* ===== KALENDARZ (5 równych kolumn) ===== */
+.stats-card--calendar {
+    overflow-x: auto;
+}
+
+.stats-card--calendar .stats-card__head--calendar {
+    background: #f2f3f3;
+    color: #67727f;
+    font-family: "SebinoSoft", Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    font-weight: 500;
+    min-height: 44px;
+    transition: background .38s, color .28s;
+    display: grid;
+    grid-template-columns: 85px 1fr 1.2fr 1.2fr 1.2fr;
+    gap: 8px;
+    padding: 0 18px;
+    align-items: center;
+}
+
+body.dark .stats-card--calendar .stats-card__head--calendar {
+    background: #2e2e2e;
+    color: #9a9088;
+}
+
+.stats-card--calendar .stats-card__row--calendar {
+    background: #fff;
+    font-family: "SebinoSoft", Arial, sans-serif;
+    font-size: 13px;
+    color: #26384b;
+    border-bottom: 1px solid rgba(225, 231, 238, 0.8);
+    transition: background .28s, color .28s, border-bottom-color .28s;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 85px 1fr 1.2fr 1.2fr 1.2fr;
+    gap: 8px;
+    padding: 0 18px;
+    align-items: center;
+    min-height: 48px;
+}
+
+body.dark .stats-card--calendar .stats-card__row--calendar {
+    background: #1e1e1e;
+    color: #c0c0c0;
+    border-bottom-color: rgba(60, 72, 88, 0.4);
+}
+
+.stats-card--calendar .stats-card__row--calendar:last-child {
+    border-bottom: none;
+}
+
+.stats-card--calendar .stats-card__row--calendar:hover {
+    background: #fcfdff;
+}
+
+body.dark .stats-card--calendar .stats-card__row--calendar:hover {
+    background: #252525;
+}
+
+/* Wyrównanie wszystkich komórek do lewej */
+.stats-card--calendar .stats-card__head--calendar > div,
+.stats-card--calendar .stats-card__row--calendar > div {
+    text-align: left !important;
+    justify-content: flex-start !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 8px 4px;
+}
+
+/* Pierwsza kolumna (Runda) - pogrubiona i z lekkim wcięciem */
+.stats-card--calendar .stats-card__head--calendar > div:first-child,
+.stats-card--calendar .stats-card__row--calendar > div:first-child {
+    font-weight: 500;
+    padding-left: 4px;
+}
+
+
+/* Responsywność */
+@media (max-width: 860px) {
+    .stats-card--calendar .stats-card__head--calendar,
+    .stats-card--calendar .stats-card__row--calendar {
+        min-width: 700px;
+    }
+    .stats-card--calendar .stats-card__head--calendar > div,
+    .stats-card--calendar .stats-card__row--calendar > div {
+        white-space: normal;
+        word-break: break-word;
+    }
+}
+/* ===== KALENDARZ (5 równych kolumn) ===== */
+.stats-card--calendar {
+    overflow-x: auto;
+}
+
+.stats-card--calendar .stats-card__head--calendar {
+    background: #f2f3f3;
+    color: #67727f;
+    font-family: "SebinoSoft", Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    font-weight: 500;
+    min-height: 44px;
+    transition: background .38s, color .28s;
+    display: grid;
+    grid-template-columns: 100px 1fr 1.2fr 1.2fr 1.2fr;
+    gap: 8px;
+    padding: 0 18px;
+    align-items: center;
+}
+
+body.dark .stats-card--calendar .stats-card__head--calendar {
+    background: #2e2e2e;
+    color: #9a9088;
+}
+
+.stats-card--calendar .stats-card__row--calendar {
+    background: #fff;
+    font-family: "SebinoSoft", Arial, sans-serif;
+    font-size: 13px;
+    color: #26384b;
+    border-bottom: 1px solid rgba(225, 231, 238, 0.8);
+    transition: background .28s, color .28s, border-bottom-color .28s;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 100px 1fr 1.2fr 1.2fr 1.2fr;
+    gap: 8px;
+    padding: 0 18px;
+    align-items: center;
+    min-height: 48px;
+}
+
+body.dark .stats-card--calendar .stats-card__row--calendar {
+    background: #1e1e1e;
+    color: #c0c0c0;
+    border-bottom-color: rgba(60, 72, 88, 0.4);
+}
+
+.stats-card--calendar .stats-card__row--calendar:last-child {
+    border-bottom: none;
+}
+
+.stats-card--calendar .stats-card__row--calendar:hover {
+    background: #fcfdff;
+}
+
+body.dark .stats-card--calendar .stats-card__row--calendar:hover {
+    background: #252525;
+}
+
+/* WSZYSTKIE komórki wyrównane do lewej */
+.stats-card--calendar .stats-card__head--calendar > div,
+.stats-card--calendar .stats-card__row--calendar > div {
+    text-align: left !important;
+    justify-content: flex-start !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 8px 4px;
+}
+
+/* Pierwsza kolumna (Runda) - pogrubiona */
+.stats-card--calendar .stats-card__head--calendar > div:first-child,
+.stats-card--calendar .stats-card__row--calendar > div:first-child {
+    font-weight: 500;
+}
+
+/* Responsywność */
+@media (max-width: 860px) {
+    .stats-card--calendar .stats-card__head--calendar,
+    .stats-card--calendar .stats-card__row--calendar {
+        min-width: 700px;
+    }
+    .stats-card--calendar .stats-card__head--calendar > div,
+    .stats-card--calendar .stats-card__row--calendar > div {
+        white-space: normal;
+        word-break: break-word;
+    }
+}
     </style>
 
     <script>
@@ -556,7 +880,8 @@
                     <button class="tab" type="button" data-tab="prc3">PRC #3</button>
                 </div>
             </section>
-            <!-- PANEL PRC #1 -->
+
+            <!-- ===== PANEL PRC #1 ===== -->
             <div id="panel-prc1" class="archive-panel active">
                 <img src="https://images.girardo.com/girardo/image/upload/2025/CS349%20-%201998%20Subaru%20Impreza%20WRC98%20-%20Lasagni/SubaruR7WRC-1920x1280-269.jpg" alt="Rally action" class="driver-footer-img animate-on-scroll" style="object-position: center 47%;" />
                 <div class="driver-img-caption animate-on-scroll">
@@ -635,9 +960,26 @@
                         <div>Rendi</div>
                     </div>
                 </div>
+
+                <!-- KLASYFIKACJA PRC #1 -->
+                <div class="table-title animate-on-scroll">Klasyfikacja Mistrzostw</div>
+                <div class="standings-table animate-on-scroll">
+                    <div class="standings-table__head arch-g3">
+                        <div>Poz.</div><div>Kierowca</div><div>Punkty</div>
+                    </div>
+                    <div class="standings-table__row arch-g3">
+                        <div>1.</div><div>Rendi</div><div>88</div>
+                    </div>
+                    <div class="standings-table__row arch-g3">
+                        <div>2.</div><div>White</div><div>60</div>
+                    </div>
+                    <div class="standings-table__row arch-g3">
+                        <div>3.</div><div>D4xan</div><div>55</div>
+                    </div>
+                </div>
             </div>
 
-            <!-- PANEL PRC #2 -->
+            <!-- ===== PANEL PRC #2 ===== -->
             <div id="panel-prc2" class="archive-panel">
                 <img src="https://www.gasolinasuper.es/wp-content/uploads/2015/03/imprezawrc2008_subaru_002.jpg" alt="Rally action" class="driver-footer-img animate-on-scroll" style="object-position: center 80%;"/>
                 <div class="driver-img-caption animate-on-scroll">
@@ -737,9 +1079,26 @@
                         <div>Rendi</div>
                     </div>
                 </div>
+
+                <!-- KLASYFIKACJA PRC #2 -->
+                <div class="table-title animate-on-scroll">Klasyfikacja Mistrzostw</div>
+                <div class="standings-table animate-on-scroll">
+                    <div class="standings-table__head arch-g3">
+                        <div>Poz.</div><div>Kierowca</div><div>Punkty</div>
+                    </div>
+                    <div class="standings-table__row arch-g3">
+                        <div>1.</div><div>Rendi</div><div>135</div>
+                    </div>
+                    <div class="standings-table__row arch-g3">
+                        <div>2.</div><div>Dombart</div><div>94</div>
+                    </div>
+                    <div class="standings-table__row arch-g3">
+                        <div>3.</div><div>White</div><div>77</div>
+                    </div>
+                </div>
             </div>
 
-            <!-- PANEL PRXC #1 -->
+            <!-- ===== PANEL PRXC #1 ===== -->
             <div id="panel-prxc" class="archive-panel">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/World_RX_-_2018_-_RD6_Sweden_%2829262747938%29.jpg/1280px-World_RX_-_2018_-_RD6_Sweden_%2829262747938%29.jpg" alt="Rally action" class="driver-footer-img animate-on-scroll" style="object-position: center 20%;" />
                 <div class="driver-img-caption animate-on-scroll">
@@ -805,9 +1164,26 @@
                         <div>30 Listopada 2025</div>
                     </div>
                 </div>
+
+                <!-- KLASYFIKACJA PRXC -->
+                <div class="table-title animate-on-scroll">Klasyfikacja Mistrzostw</div>
+                <div class="standings-table animate-on-scroll">
+                    <div class="standings-table__head arch-g3">
+                        <div>Poz.</div><div>Kierowca</div><div>Punkty</div>
+                    </div>
+                    <div class="standings-table__row arch-g3">
+                        <div>1.</div><div>Rendi</div><div>112</div>
+                    </div>
+                    <div class="standings-table__row arch-g3">
+                        <div>2.</div><div>Dombart</div><div>101</div>
+                    </div>
+                    <div class="standings-table__row arch-g3">
+                        <div>3.</div><div>Rusell</div><div>77</div>
+                    </div>
+                </div>
             </div>
 
-            <!-- PANEL PRC #3 -->
+            <!-- ===== PANEL PRC #3 ===== -->
             <div id="panel-prc3" class="archive-panel">
                 <img src="https://skoda-motorsport.s3.amazonaws.com/com/2020/01/Fabia-Turkey.jpg" alt="Rally action" class="driver-footer-img animate-on-scroll" style="object-position: center 77%;" />
                 <div class="driver-img-caption animate-on-scroll">
@@ -911,6 +1287,58 @@
                         <div>Rendi</div>
                     </div>
                 </div>
+
+                <!-- KLASYFIKACJA PRC #3 -->
+
+                <div class="table-subtitle animate-on-scroll">Klasyfikacja Kierowców</div>
+                <div class="standings-table animate-on-scroll">
+                    <div class="standings-table__head arch-g4">
+                        <div>Poz.</div><div>Kierowca</div><div>Zespół</div><div>Punkty</div>
+                    </div>
+                    <div class="standings-table__row arch-g4">
+                        <div>1.</div><div>Rendi</div><div>Ford</div><div>129</div>
+                    </div>
+                    <div class="standings-table__row arch-g4">
+                        <div>2.</div><div>Dombart</div><div>Mitsubishi</div><div>115</div>
+                    </div>
+                    <div class="standings-table__row arch-g4">
+                        <div>3.</div><div>D4xan</div><div>Škoda</div><div>93</div>
+                    </div>
+                    <div class="standings-table__row arch-g4">
+                        <div>4.</div><div>Lit3r</div><div>Mitsubishi</div><div>83</div>
+                    </div>
+                    <div class="standings-table__row arch-g4">
+                        <div>5.</div><div>Whit3</div><div>Volkswagen</div><div>54</div>
+                    </div>
+                    <div class="standings-table__row arch-g4">
+                        <div>6.</div><div>Barto</div><div>Škoda</div><div>49</div>
+                    </div>
+                    <div class="standings-table__row arch-g4">
+                        <div>7.</div><div>Rusell</div><div>Volkswagen</div><div>40</div>
+                    </div>
+                    <div class="standings-table__row arch-g4">
+                        <div>8.</div><div>Rambo</div><div>Ford</div><div>3</div>
+                    </div>
+                </div>
+
+                <div class="table-subtitle animate-on-scroll">Klasyfikacja Konstruktorów</div>
+                <div class="standings-table animate-on-scroll">
+                    <div class="standings-table__head arch-g3c">
+                        <div>Poz.</div><div>Konstruktor</div><div>Punkty</div>
+                    </div>
+                    <div class="standings-table__row arch-g3c">
+                        <div>1.</div><div>Mitsubishi</div><div>198</div>
+                    </div>
+                    <div class="standings-table__row arch-g3c">
+                        <div>2.</div><div>Škoda</div><div>142</div>
+                    </div>
+                    <div class="standings-table__row arch-g3c">
+                        <div>3.</div><div>Ford</div><div>132</div>
+                    </div>
+                    <div class="standings-table__row arch-g3c">
+                        <div>4.</div><div>Volkswagen</div><div>94</div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
@@ -941,7 +1369,6 @@
         });
     }, { threshold: 0.1 });
 
-    // Funkcja do obserwowania elementów w aktywnym panelu
     function observeActivePanelElements() {
         const activePanel = document.querySelector('.archive-panel.active');
         if (activePanel) {
@@ -950,53 +1377,34 @@
         }
     }
 
-    // Obserwuj początkowe elementy
     observeActivePanelElements();
 
-    // Przełączanie między panelami archiwum
     function switchArchivePanel(panelId) {
-        // Ukryj wszystkie panele
         document.querySelectorAll('.archive-panel').forEach(panel => {
             panel.classList.remove('active');
         });
-        // Pokaż wybrany panel
         const activePanel = document.getElementById(panelId);
         if (activePanel) {
             activePanel.classList.add('active');
         }
-        
-        // Obserwuj nowe elementy w aktywnym panelu
         setTimeout(() => {
             observeActivePanelElements();
         }, 100);
     }
 
-    // Obsługa kliknięć w zakładki
     document.querySelectorAll('.tab').forEach(tab => {
         tab.addEventListener('click', function() {
-            // Usuń active ze wszystkich zakładek
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            // Dodaj active do klikniętej
             this.classList.add('active');
             
-            // Pobierz ID panelu
             const tabId = this.getAttribute('data-tab');
             let panelId = '';
             switch(tabId) {
-                case 'prc1':
-                    panelId = 'panel-prc1';
-                    break;
-                case 'prc2':
-                    panelId = 'panel-prc2';
-                    break;
-                case 'prxc':
-                    panelId = 'panel-prxc';
-                    break;
-                case 'prc3':
-                    panelId = 'panel-prc3';
-                    break;
-                default:
-                    panelId = 'panel-prc1';
+                case 'prc1': panelId = 'panel-prc1'; break;
+                case 'prc2': panelId = 'panel-prc2'; break;
+                case 'prxc': panelId = 'panel-prxc'; break;
+                case 'prc3': panelId = 'panel-prc3'; break;
+                default: panelId = 'panel-prc1';
             }
             switchArchivePanel(panelId);
         });
