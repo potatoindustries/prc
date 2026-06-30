@@ -1336,9 +1336,11 @@ function getDriverLink(driverName, driverId) {
         if (result.status === 'DSQ') {
           timeDisplay = 'DSQ';
         } else if (isPowerStage) {
-          if (result.status === 'OK') {
+          if (result.status === 'OK' && result.time) {
             timeDisplay = result.time;
             if (result.tireChange) timeDisplay = `<span class="time-with-tire">${shortTime(result.time)}<span class="tire-icon" data-tooltip="Zmiana opony podczas OS"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="11.5"/><circle cx="12" cy="12" r="8.8" fill="var(--color-background-primary,#fff)"/><circle cx="12" cy="12" r="8.1"/><circle cx="12" cy="12" r="7.2" fill="var(--color-background-primary,#fff)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(45 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(90 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(135 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(180 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(225 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(270 12 12)"/><line x1="12" y1="7.4" x2="12" y2="4.0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" transform="rotate(315 12 12)"/><circle cx="12" cy="12" r="2.4" fill="var(--color-background-primary,#fff)"/><circle cx="12" cy="12" r="1.6"/></svg></span></span>`;
+          } else if (result.status === 'OK') {
+            timeDisplay = '—';
           } else timeDisplay = result.status;
         } else {
           if (result.status === 'DSQ') {
