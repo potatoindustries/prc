@@ -845,7 +845,7 @@ document.addEventListener('DOMContentLoaded', () => {
     style.textContent = `
         .rallytv-btn {
             display: inline-flex !important; align-items: center;
-            gap: 6px; padding: 0 14px 0 10px !important;
+            gap: 6px; padding: 0 14px 0 10px !important; 
             transition: background 0.35s, color 0.35s;
         }
         .rallytv-btn::before {
