@@ -1173,7 +1173,6 @@ function getDriverLink(driverName, driverId) {
       const powerStage    = rallyData.powerStage;
       const regularStages = rallyData.stages.filter(s => s !== powerStage);
       
-      // Znajdujemy indeks bieżącego etapu wśród regularnych etapów (dla PS będzie -1)
       const regularStageIndex = isPowerStage ? -1 : regularStages.indexOf(stageName);
       const stagesToSumPenalties = isPowerStage ? [stageName] : regularStages.slice(0, regularStageIndex + 1);
       const allDriverIds = stageResults.map(r => r.driverId);
@@ -1190,7 +1189,6 @@ function getDriverLink(driverName, driverId) {
       // ============================================================
       let cumulativeMap = {};
       if (!isPowerStage && regularStageIndex >= 0) {
-        // Najpierw znajdź najgorszy czas na każdym OS (tylko OK)
         const worstPerStage = {};
         for (let si = 0; si <= regularStageIndex; si++) {
           const sName = regularStages[si];
@@ -1202,7 +1200,6 @@ function getDriverLink(driverName, driverId) {
           worstPerStage[sName] = okTimes.length > 0 ? Math.max(...okTimes) : 9999;
         }
 
-        // Dla każdego kierowcy oblicz łączny czas z karami
         for (const driverId of allDriverIds) {
           let total = 0;
           let valid = true;
@@ -1214,7 +1211,6 @@ function getDriverLink(driverName, driverId) {
             const worst = worstPerStage[sName] || 9999;
             
             if (!dEntry) {
-              // DNS: najgorszy + 45s
               total += worst + 45;
               continue;
             }
@@ -1236,7 +1232,6 @@ function getDriverLink(driverName, driverId) {
               }
               total += t;
             } else {
-              // nieznany status - traktuj jak DNF
               total += worst + 30;
             }
           }
@@ -1249,11 +1244,9 @@ function getDriverLink(driverName, driverId) {
       // SORTOWANIE: DSQ na końcu, reszta według czasu (z karami)
       // ============================================================
       const sortedResults = [...stageResults].sort((a, b) => {
-        // DSQ zawsze na końcu
         if (a.status === 'DSQ' && b.status !== 'DSQ') return 1;
         if (b.status === 'DSQ' && a.status !== 'DSQ') return -1;
         
-        // Reszta według czasu (DNF, RET, DNS mają czas z karą)
         if (!isPowerStage) {
           const aTime = cumulativeMap[a.driverId] ?? Infinity;
           const bTime = cumulativeMap[b.driverId] ?? Infinity;
@@ -1266,7 +1259,6 @@ function getDriverLink(driverName, driverId) {
       for (let i = 0; i < sortedResults.length; i++) {
         const result = sortedResults[i];
         
-        // Użyj czasu z karami dla DNF/RET/DNS
         let useTime;
         if (isPowerStage) {
           useTime = timeToSeconds(result.time);
@@ -1303,9 +1295,35 @@ function getDriverLink(driverName, driverId) {
         prevCumTime = useTime;
       }
 
+      // ============================================================
+      // POPRAWKA: Pobieranie punktów Power Stage z właściwego miejsca
+      // ============================================================
       const powerStagePointsMap = {};
-      if (results.calculated?.powerStage) {
-        for (const ps of results.calculated.powerStage) powerStagePointsMap[ps.driverId] = ps.points;
+      
+      // Sprawdź, czy dane z Power Stage są w results.calculated
+      if (results.calculated && results.calculated.powerStage) {
+        for (const ps of results.calculated.powerStage) {
+          powerStagePointsMap[ps.driverId] = ps.points || 0;
+        }
+      } else {
+        // Jeśli nie ma, oblicz punkty dla Power Stage na podstawie pozycji (top 3: 3, 2, 1 pkt)
+        // Posortuj wyniki Power Stage według czasu
+        const psSorted = [...stageResults]
+          .filter(r => r.status === 'OK' && r.time)
+          .sort((a, b) => timeToSeconds(a.time) - timeToSeconds(b.time));
+        
+        // Przypisz punkty: 1. miejsce = 3 pkt, 2. miejsce = 2 pkt, 3. miejsce = 1 pkt
+        const pointsDistribution = [3, 2, 1];
+        for (let i = 0; i < Math.min(psSorted.length, 3); i++) {
+          powerStagePointsMap[psSorted[i].driverId] = pointsDistribution[i] || 0;
+        }
+        
+        // Dla pozostałych kierowców 0 punktów
+        for (const r of stageResults) {
+          if (!(r.driverId in powerStagePointsMap)) {
+            powerStagePointsMap[r.driverId] = 0;
+          }
+        }
       }
 
       const timeColLabel = isPowerStage ? 'CZAS OS' : 'ŁĄCZNY CZAS';
@@ -1346,7 +1364,6 @@ function getDriverLink(driverName, driverId) {
           if (result.status === 'DSQ') {
             timeDisplay = 'DSQ';
           } else {
-            // Dla DNF/RET/DNS pokazujemy czas z karą
             timeDisplay = (cumSecs !== Infinity && cumSecs !== undefined && !isNaN(cumSecs)) 
               ? secondsToTime(cumSecs) 
               : (result.status !== 'OK' ? result.status : '—');
@@ -1355,8 +1372,16 @@ function getDriverLink(driverName, driverId) {
 
         let bonusOrPointsDisplay = '—';
         if (isPowerStage) {
+          // Pobierz punkty z mapy
           const psPoints = powerStagePointsMap[result.driverId] || 0;
-          if (psPoints > 0) bonusOrPointsDisplay = `+${psPoints}`;
+          if (psPoints > 0) {
+            bonusOrPointsDisplay = `${psPoints}`;
+          } else {
+            // Sprawdź, czy kierowca ukończył PS (ma czas) - jeśli tak, pokaż 0
+            if (result.status === 'OK' && result.time) {
+              bonusOrPointsDisplay = '0';
+            }
+          }
         } else {
           let cumulativeBonus = 0;
           for (let si = 0; si <= regularStageIndex; si++) {
@@ -1385,11 +1410,16 @@ function getDriverLink(driverName, driverId) {
           ? (result.position !== null ? result.position : '—') 
           : buildPosCellHtml(result.position, prevPos);
 
+        // Dla Power Stage użyj czasu z etapu, a nie skumulowanego
+        const timeForData = isPowerStage 
+          ? (result.status === 'OK' && result.time ? timeToSeconds(result.time) : Infinity)
+          : dataTimeSecs;
+
         html += `
           <div class="standings-row"
             data-pos="${result.position !== null ? result.position : 999}"
             data-driver-name="${driver?.name || result.driverId}"
-            data-time-seconds="${dataTimeSecs}"
+            data-time-seconds="${timeForData}"
             data-penalty-value="${cumulativePenalty}"
             data-diff="${result.diff === Infinity || result.diff === null ? 999 : result.diff}"
             data-diff-prev="${result.diffPrev !== null && result.diffPrev !== undefined && result.diffPrev !== Infinity ? result.diffPrev : 999}"
@@ -1558,7 +1588,7 @@ function getDriverLink(driverName, driverId) {
           setTimeout(function(){ document.body.classList.remove('theme-animating'); }, 420);
         });
       }
-    })();
+    })(); 
     
     loadRallyResults();
   </script>
