@@ -822,6 +822,18 @@ html.wrc-dark,html.wrc-dark body,html.wrc-dark .page{background:#141516!importan
     function updateLogo() { logo.classList.toggle("logo--dark", hero.getBoundingClientRect().bottom <= 0); }
     window.addEventListener("scroll", updateLogo, { passive: true });
     updateLogo();
+
+    // W kodzie kalendarz.html znajdź funkcję ładującą dane i zmień:
+
+async function loadCalendar() {
+    try {
+        // ZMIANA: używamy getSortedCalendar() zamiast getCalendar()
+        const calendar = await api.getSortedCalendar();
+        // reszta kodu bez zmian...
+    } catch (error) {
+        console.error('Błąd ładowania kalendarza:', error);
+    }
+}
   </script>
 </body>
 </html>
