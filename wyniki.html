@@ -1375,7 +1375,7 @@ function getDriverLink(driverName, driverId) {
           // Pobierz punkty z mapy
           const psPoints = powerStagePointsMap[result.driverId] || 0;
           if (psPoints > 0) {
-            bonusOrPointsDisplay = `${psPoints}`;
+    bonusOrPointsDisplay = `+${psPoints}`; 
           } else {
             // Sprawdź, czy kierowca ukończył PS (ma czas) - jeśli tak, pokaż 0
             if (result.status === 'OK' && result.time) {
