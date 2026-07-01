@@ -1289,7 +1289,6 @@
             const pwd = document.getElementById('adminPasswordInput').value;
             const errorEl = document.getElementById('loginError');
             
-            // Blokada po zbyt wielu próbach
             if (Date.now() < loginBlockedUntil) {
                 const remaining = Math.ceil((loginBlockedUntil - Date.now()) / 1000);
                 errorEl.innerHTML = `<i class="fas fa-exclamation-circle"></i> Zbyt wiele prób. Spróbuj ponownie za ${remaining}s.`;
@@ -1313,7 +1312,7 @@
                     errorEl.innerHTML = `<i class="fas fa-exclamation-circle"></i> Nieprawidłowe hasło (próba ${loginAttempts}/${MAX_LOGIN_ATTEMPTS})`;
                     
                     if (loginAttempts >= MAX_LOGIN_ATTEMPTS) {
-                        loginBlockedUntil = Date.now() + 30000; // 30 sekund blokady
+                        loginBlockedUntil = Date.now() + 30000;
                         errorEl.innerHTML += `<br><i class="fas fa-clock"></i> Zablokowano na 30 sekund.`;
                     }
                 }
@@ -1353,7 +1352,8 @@
                 Cache._rawData = rawData;
                 const season = rawData?.seasons?.[rawData?.settings?.currentSeason];
                 
-                Cache.calendar = season?.calendar ? [...season.calendar] : [];
+                // Używamy posortowanego kalendarza z API
+                Cache.calendar = await api.getSortedCalendar();
                 Cache.drivers = season?.drivers ? [...season.drivers] : [];
                 Cache.teams = season?.teams ? [...season.teams] : [];
                 
@@ -1379,10 +1379,10 @@
         // ============================================================
         // RENDEROWANIE LIST
         // ============================================================
-        function renderRallyList() {
+        async function renderRallyList() {
             if (!isLoggedIn) return;
             
-            const sortedCalendar = getSortedCalendar();
+            const sortedCalendar = await api.getSortedCalendar();
             if (!sortedCalendar.length) {
                 document.getElementById('rallyList').innerHTML = '<div class="loading-spinner">Brak rajdów</div>';
                 return;
@@ -1416,7 +1416,7 @@
         }
 
         function renderRallySortMode(sortedCalendar) {
-            const { groups, sortedDates } = getCalendarGroupedByDate();
+            const { groups, sortedDates } = getCalendarGroupedByDate(sortedCalendar);
             let html = '<div class="rally-sort-container">';
             
             for (const date of sortedDates) {
@@ -1470,7 +1470,7 @@
             document.getElementById('rallyList').innerHTML = html;
         }
 
-        function renderDriversList() {
+        async function renderDriversList() {
             if (!isLoggedIn) return;
             
             if (!Cache.drivers.length) {
@@ -1497,7 +1497,7 @@
             document.getElementById('driversList').innerHTML = html;
         }
 
-        function renderTeamsList() {
+        async function renderTeamsList() {
             if (!isLoggedIn) return;
             
             if (!Cache.teams.length) {
@@ -1524,11 +1524,11 @@
             document.getElementById('teamsList').innerHTML = html;
         }
 
-        function renderRallySelect() {
+        async function renderRallySelect() {
             if (!isLoggedIn) return;
             
             const select = document.getElementById('resultsRallySelect');
-            const sortedCalendar = getSortedCalendar();
+            const sortedCalendar = await api.getSortedCalendar();
             select.innerHTML = '<option value="">Wybierz rajd</option>' + 
                 sortedCalendar.map(r => `<option value="${r.id}">${escapeHtml(r.name)} (${r.startDate})</option>`).join('');
         }
@@ -1536,9 +1536,9 @@
         // ============================================================
         // FUNKCJE POMOCNICZE SORTOWANIA
         // ============================================================
-        function getCalendarGroupedByDate() {
+        function getCalendarGroupedByDate(sortedCalendar) {
             const groups = {};
-            Cache.calendar.forEach(rally => {
+            sortedCalendar.forEach(rally => {
                 const dateKey = rally.startDate;
                 if (!groups[dateKey]) groups[dateKey] = [];
                 groups[dateKey].push(rally);
@@ -1554,31 +1554,6 @@
             return order[dateKey] || [];
         }
 
-        function getSortedCalendar() {
-            const { groups, sortedDates } = getCalendarGroupedByDate();
-            const result = [];
-            
-            for (const date of sortedDates) {
-                const rallies = groups[date];
-                const storedOrder = getStoredOrderForDate(date);
-                
-                if (storedOrder.length === rallies.length && storedOrder.every(id => rallies.some(r => r.id === id))) {
-                    const ordered = [];
-                    for (const id of storedOrder) {
-                        const rally = rallies.find(r => r.id === id);
-                        if (rally) ordered.push(rally);
-                    }
-                    for (const rally of rallies) {
-                        if (!ordered.includes(rally)) ordered.push(rally);
-                    }
-                    result.push(...ordered);
-                } else {
-                    result.push(...rallies.sort((a, b) => a.name.localeCompare(b.name)));
-                }
-            }
-            return result;
-        }
-
         function enableRallySorting() {
             if (!isLoggedIn) return;
             Cache.sortMode = true;
@@ -1590,7 +1565,7 @@
             btn.classList.add('admin-btn-save');
         }
 
-        function finishRallySorting() {
+        async function finishRallySorting() {
             if (!isLoggedIn) return;
             Cache.sortMode = false;
             
@@ -1611,6 +1586,10 @@
             if (!season.calendarOrder) season.calendarOrder = {};
             Object.assign(season.calendarOrder, groups);
             Cache._rawData = data;
+            
+            // Unieważnij cache sortowania w API
+            api._l1.sortedCalendar = null;
+            Cache.calendar = await api.getSortedCalendar();
             
             saveToServer(data, 'Kolejność rajdów zapisana!');
             renderRallyList();
@@ -1637,7 +1616,7 @@
         }
 
         // ============================================================
-        // RAJDY - CRUD (wszystkie funkcje są prywatne, dostępne tylko wewnątrz IIFE)
+        // RAJDY - CRUD
         // ============================================================
         function showRallyModal() {
             if (!isLoggedIn) return;
@@ -1762,7 +1741,9 @@
                 }
             }
             
-            Cache.calendar = [...season.calendar];
+            // Unieważnij cache sortowania i odśwież
+            api._l1.sortedCalendar = null;
+            Cache.calendar = await api.getSortedCalendar();
             Cache._rawData = data;
             
             renderRallyList();
@@ -1793,7 +1774,9 @@
                 }
             }
             
-            Cache.calendar = [...season.calendar];
+            // Unieważnij cache sortowania i odśwież
+            api._l1.sortedCalendar = null;
+            Cache.calendar = await api.getSortedCalendar();
             Cache.rallyResults.delete(id);
             Cache._rawData = data;
             
@@ -2633,9 +2616,8 @@
         }
 
         // ============================================================
-        // EKSPORT FUNKCJI DO GLOBALNEGO ZASIĘGU (TYLKO BEZPIECZNE)
+        // EKSPORT FUNKCJI DO GLOBALNEGO ZASIĘGU
         // ============================================================
-        // Tylko funkcje wywoływane z HTML muszą być globalne
         window.login = login;
         window.logout = logout;
         window.flushNow = flushNow;
@@ -2684,25 +2666,21 @@
             tab.addEventListener('click', () => switchTab(tab.dataset.tab));
         });
 
-        // Motyw
         if (localStorage.getItem('wrc-theme') === 'dark') document.body.classList.add('dark');
         document.getElementById('themeToggle')?.addEventListener('click', () => {
             document.body.classList.toggle('dark');
             localStorage.setItem('wrc-theme', document.body.classList.contains('dark') ? 'dark' : 'light');
         });
 
-        // SaveQueue UI callback
         saveQueue.setUICallback(updateSaveUI);
         updateSaveUI();
 
-        // Auto-save co 30 sekund
         setInterval(() => {
             if (isLoggedIn && saveQueue.pendingCount > 0) {
                 saveQueue.flush();
             }
         }, 30000);
 
-        // Zapisz przed zamknięciem strony
         window.addEventListener('beforeunload', (e) => {
             if (isLoggedIn && saveQueue.pendingCount > 0) {
                 e.preventDefault();
@@ -2711,13 +2689,11 @@
             }
         });
 
-        // Zabezpieczenie przed dostępem do panelu przez konsolę
         Object.defineProperty(window, 'isLoggedIn', {
             get: () => false,
             set: () => {}
         });
 
-        // Ukrywamy zmienne w konsoli
         Object.defineProperty(window, 'Cache', {
             get: () => undefined,
             set: () => {}
@@ -2726,7 +2702,7 @@
         console.log('%c⚠️ Panel administratora zabezpieczony', 'font-size: 16px; color: #f97316; font-weight: bold;');
         console.log('%cDostęp tylko po zalogowaniu.', 'font-size: 14px; color: #666;');
 
-    })(); // KONIEC IIFE
+    })();
   </script>
 </body>
 </html>
