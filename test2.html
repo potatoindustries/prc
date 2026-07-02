@@ -4,7 +4,7 @@
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PRC • Rajd Szwecji – podsumowanie 2. rundy</title>
+    <title>PRC • Finlandia i Katalonia</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css" />
     <link rel="stylesheet" href="css/archiwum.css" />
     <link rel="stylesheet" href="css/style.css" />
@@ -51,9 +51,9 @@
         /* ===== HERO BG ===== */
         .hero__bg {
             position: absolute; inset: 0;
-            background-image: url("https://pbs.twimg.com/media/GGNnSIbXAAAYZSr.jpg");
+            background-image: url("https://cdn-cpfgb.nitrocdn.com/dRxFEBZBvMUrSIsoXplluqPbGwZVXSCF/assets/images/optimized/rev-d89eba4/dirtfish-editorial.s3-accelerate.amazonaws.com/2020/06/11614_951023ESainz3rk.jpg");
             background-size: cover;
-            background-position: center 40%;
+            background-position: center 30%;
             background-repeat: no-repeat;
         }
         .hero {
@@ -133,13 +133,13 @@
             padding: 0 18px;
             min-height: 44px;
             display: grid;
-            grid-template-columns: 1fr 200px;
+            grid-template-columns: 40px 1fr 140px 80px;
             align-items: center;
             transition: background .38s, color .28s;
         }
         .stats-card__row--two {
             display: grid;
-            grid-template-columns: 1fr 200px;
+            grid-template-columns: 40px 1fr 140px 80px;
             align-items: center;
             padding: 0 18px;
             min-height: 48px;
@@ -331,6 +331,124 @@
             padding: 0 44px 10px;
         }
         body.dark .points-system { color: #999; }
+        /* ── STYLE NAVBAR ── */
+.topbar {
+  align-items: center !important;
+  grid-template-columns: 180px auto 170px !important;
+  justify-content: space-between !important;
+}
+
+.topbar__center {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: auto !important;
+  flex: 0 0 auto !important;
+  gap: 0 !important;
+  background: rgba(28, 28, 28, 0.58) !important;
+  backdrop-filter: blur(8px) saturate(1.3) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(1.3) !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  padding: 3px 20px !important;
+  transform: translateY(-3px) !important;
+}
+
+.topbar__link {
+  font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+  font-weight: 500 !important;
+  color: rgba(255,255,255,0.88) !important;
+  text-decoration: none !important;
+  font-size: 15px !important;
+  letter-spacing: 0.01em !important;
+  padding: 10px 20px !important;
+  height: auto !important;
+  border-radius: 999px !important;
+  transition: color 0.15s ease !important;
+  white-space: nowrap !important;
+  position: relative !important;
+  line-height: 1 !important;
+}
+
+.topbar__link::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,0.10) !important;
+  opacity: 0 !important;
+  transform: scale(0.82) !important;
+  transition: opacity 0.18s ease, transform 0.18s ease !important;
+  pointer-events: none !important;
+}
+
+.topbar__link:first-child {
+  border-radius: 999px !important;
+  margin-left: -7px !important;
+}
+.topbar__link:first-child::before {
+  left: -10px !important;
+  right: 0 !important;
+  border-radius: 999px !important;
+}
+.topbar__link:last-child {
+  border-radius: 999px !important;
+  margin-right: -7px !important;
+}
+.topbar__link:last-child::before {
+  right: -10px !important;
+  left: 0 !important;
+  border-radius: 999px !important;
+}
+
+.topbar__link:hover::before {
+  opacity: 1 !important;
+  transform: scale(1) !important;
+}
+
+.topbar__link:hover {
+  color: #fff !important;
+}
+
+.topbar__link::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 50% !important;
+  bottom: 1px !important;
+  width: 0 !important;
+  height: 2px !important;
+  border-radius: 1000px !important;
+  background: var(--orange) !important;
+  transform: translateX(-50%) !important;
+  opacity: 0 !important;
+  transition: width 0.24s ease, opacity 0.2s ease !important;
+  display: block !important;
+}
+
+.topbar__link:hover::after {
+  width: 0 !important;
+  opacity: 0 !important;
+}
+
+.topbar__link.active {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+.topbar__link.active::after {
+  width: calc(100% - 40px) !important;
+  opacity: 1 !important;
+}
+
+.tab {
+  font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+  font-weight: 500 !important;
+}
+
+.rallytv-btn {
+  font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+  font-weight: 500 !important;
+}
     </style>
 
     <script>
@@ -353,129 +471,132 @@
         <div class="hero__bg"></div>
         <div class="hero__overlay"></div>
         <div class="hero__content">
-            <nav class="topbar">
-                <div class="topbar__left"></div>
-                <div class="topbar__center">
-                    <a href="index.html" class="topbar__link">Strona główna</a>
-                    <a href="kalendarz.html" class="topbar__link">Kalendarz</a>
-                    <a href="tab.html" class="topbar__link">Wyniki i klasyfikacja</a>
-                    <a href="teams.html" class="topbar__link">Zespoły i kierowcy</a>
-                    <a href="archiwum.html" class="topbar__link">Archiwum</a>
-                </div>
-                <div class="topbar__right">
-                    <a href="#" class="rallytv-btn">PRC</a>
-                    <button class="theme-toggle-btn" id="themeToggle" aria-label="Przełącz motyw" type="button">
-                        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="5" />
-                            <line x1="12" y1="1" x2="12" y2="3" />
-                            <line x1="12" y1="21" x2="12" y2="23" />
-                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                            <line x1="1" y1="12" x2="3" y2="12" />
-                            <line x1="21" y1="12" x2="23" y2="12" />
-                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-                        </svg>
-                        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                        </svg>
-                    </button>
-                </div>
-            </nav>
+<nav class="topbar">
+  <div class="topbar__left"></div>
+  <div class="topbar__center">
+    <a href="index.html" class="topbar__link">Strona główna</a>
+    <a href="kalendarz.html" class="topbar__link">Kalendarz</a>
+    <a href="tab.html" class="topbar__link">Wyniki i klasyfikacja</a>
+    <a href="teams.html" class="topbar__link">Zespoły i kierowcy</a>
+    <a href="archiwum.html" class="topbar__link">Archiwum</a>
+  </div>
+  <div class="topbar__right">
+    <a href="#" class="rallytv-btn">PRC</a>
+    <button class="theme-toggle-btn" id="themeToggle" aria-label="Przełącz motyw" type="button">
+      <svg class="icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg class="icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></path></svg>
+    </button>
+  </div>
+</nav>
             <div class="hero__title-wrap">
-                <h1 class="hero__title">Szwecja – podsumowanie<br> <small>zimowe szaleństwo i nowy lider</small></h1>
+                <h1 class="hero__title">Finlandia i Katalonia<br> <small>Pojedynek rajdowych bogów</small></h1>
             </div>
         </div>
     </header>
     <main class="driver-main">
         <div class="driver-content">
-            <div id="panel-prc2" class="archive-panel active">
+            <div id="panel-prc1" class="archive-panel active">
 
                 <!-- Lead + meta -->
                 <div class="article-intro animate-on-scroll">
                     <p class="article-meta">
-                        5 min czytania • Opublikowano 29.06.2026 • 23:20 GMT+2 
+                        7 min czytania • Opublikowano 02.07.2026 • 22:30 GMT+2 
                     </p>
                 </div>
 
                 <!-- Wprowadzenie -->
-                <div class="driver-section-title animate-on-scroll">Śnieżna rewolucja w Szwecji</div>
+                <div class="driver-section-title animate-on-scroll">Prawdziwe oblicze rajdów</div>
                 <div class="driver-bio animate-on-scroll">
-                    <p>Rajd Szwecji dostarczył emocji, których brakowało w Monte Carlo. Zmiana nawierzchni z asfaltu na śnieg i lód totalnie odmieniła układ sił w PRC. <strong>White</strong> sięgnął po swoje pierwsze zwycięstwo w sezonie, wykorzystując świetną strategię oponową i problemy rywali. Za nim, ze stratą zaledwie 8,7 sekundy, finiszował <strong>Rendi</strong>, który po świetnym występie w Monte Carlo potwierdził swoją wysoką formę. Podium uzupełnił <strong>Beast</strong>, który w końcu pokazał pełnię możliwości Subaru.</p>
-                    <p>Rajd Szwecji od samego początku był nieprzewidywalny. Zmienne warunki, głęboki śnieg i oblodzone odcinki specjalne sprawiły, że wielu faworytów miało problemy. Dyxan, triumfator z Monte Carlo, już na pierwszym odcinku stracił ponad 20 sekund i przez cały rajd gonił stratę. Ostatecznie zajął czwarte miejsce, tracąc prowadzenie w klasyfikacji generalnej na rzecz White'a.</p>
+                    <p>Trzeci dzień rajdu przyniósł dwie zupełnie różne próby – Finlandię, królestwo szybkich odcinków szutrowych, oraz Katalonię, gdzie kluczowa okazała się precyzja na zmiennej nawierzchni. Dla kierowców był to jeden z najtrudniejszych testów w całym sezonie.</p>
+                    <p>W Finlandii najlepsze tempo pokazali kierowcy Forda. Rendi udowodnił, że Escort RS Cosworth jest maszyną stworzoną do szybkich odcinków, przejeżdżając cały rajd w niemalże perfekcyjnym stylu. Ostatecznie wygrał z przewagą prawie 6 sekund nad Beastem. Dombart, mimo dobrego tempa, stracił kilkanaście sekund po kilku wypadnięciach z trasy, co zmusiło go do walki o odrobienie strat. Ostatecznie ukończył rundę na trzecim miejscu. Russell, po problemach na ostatnim odcinku, zdołał ukończyć rywalizację na piątej pozycji, zdobywając cenne punkty w Power Stage.</p>
+                    <p>Katalonia postawiła przed zawodnikami zupełnie inne wyzwanie – zmienna przyczepność nawierzchni, wymagała nie tylko szybkości, ale i inteligentnego zarządzania oponami. Tu górą był Beast, który wygrał z przewagą ponad 10 sekund nad Dombartem. Rendi uzupełnił podium tracąc pozycje na ostatnim odcinku specjalnym, a Russell i Dyxan, mimo problemów, zdobyli punkty w Power Stage, co zapewniło Lancii lekki zastrzyk punktów do klasyfikacji konstruktorów.</p>
                 </div>
-
-                <!-- Zdjęcie 1 -->
-                <div class="driver-img-wrap animate-on-scroll">
-                    <img src="https://www.supercars.net/blog/wp-content/uploads/2016/04/1993_Subaru_Impreza5551.jpg" alt="Subaru Impreza w akcji na śniegu w Szwecji" style="object-position: center 60%;" />
-                    <p class="driver-img-caption">© FIA Potato Rally Championship</p>
+<br>
+                <!-- Zdjęcie 2 – pojedynek -->
+                <div class="driver-img-wrap animate-on-scroll" style="margin-top: 32px;">
+                    <img src="https://dirtfish-editorial.s3-accelerate.amazonaws.com/1995_rally_portugal_sainz_subaru.jpg" alt="Pojedynek w Finlandii" style="object-position: center 60%;" />
+                    <p class="driver-img-caption">© PRC</p>
                 </div>
 
                 <!-- Kluczowe momenty -->
-                <div class="driver-section-title animate-on-scroll">Lód, śnieg i łzy</div>
                 <div class="driver-bio animate-on-scroll">
-                    <p>Największym bohaterem drugiego dnia został <strong>White</strong>. Kierowca Mitsubishi, który w Monte Carlo zajął czwarte miejsce, w Szwecji odnalazł się jak ryba w wodzie. Już na trzecim OS-ie objął prowadzenie i kontrolował sytuację do mety. Jego jazda w śnieżnych warunkach była mistrzowska – płynna, pewna i niesamowicie szybka.</p>
-                    <p>Pechowcem rajdu został <strong>Rusell</strong>. Lider Lancii na jednym z odcinków specjalnych uderzył w zaspę i stracił blisko półtorej minuty. Mimo dzielnej walki zdołał awansować na piątą lokatę, ale strata do lidera klasyfikacji generalnej znacząco się powiększyła. Z kolei <strong>Dombart</strong> zaprezentował się z dobrej strony, kończąc rajd na szóstej pozycji i zdobywając cenne punkty dla Mitsubishi.</p>
-                    <p>Walka o trzecie miejsce była niesamowicie zacięta. Beast, Rendi i Dyxan wymieniali się pozycjami, a ostatecznie to kierowca Subaru okazał się lepszy o zaledwie 0.9 sekundy. To pokazuje, jak niewielkie różnice dzielą czołówkę PRC w tym sezonie.</p>
-                </div>
+                    <br>
+                    <p>Finlandia była areną zaciętej walki. Rendi, mimo presji ze strony Beasta, utrzymał zimną krew i sięgnął po zwycięstwo, umacniając swoją pozycję w klasyfikacji generalnej. Dombart, po zaciętej walce, zdołał utrzymać się w czołówce i zająć trzecie miejsce, jednak straty na trasie mogły być dla niego bolesne w kontekście walki o mistrzostwo. Ciekawym momentem fińskiej rundy okazał się Power Stage, gdzie Russell zdominował stawkę, zdobywając komplet punktów dla ekipy Lancii.</p>
+                    <p>W Katalonii Beast pokazał, że Subaru potrafi walczyć o najwyższe cele. Jego występ na zmiennej nawierzchni był niemal perfekcyjny, a przewaga nad drugim Dombartem przekroczyła 10 sekund. Dla tego kierowcy to był dzień rewanżu po nieudanym Monte Carlo. Z kolei Rendi, który w Finlandii był niepokonany, w Hiszpanii musiał zadowolić się trzecią lokatą, tracąc cenne punkty do Beasta, który dzięki zwycięstwu umocnił swoje prowadzenie w klasyfikacji generalnej.</p>
+                </div><br>
 
-                <!-- Tabela wyników czołówki -->
+                <!-- Zdjęcie 2 – pojedynek -->
+                <div class="driver-img-wrap animate-on-scroll" style="margin-top: 32px;">
+                    <img src="https://bxrepsol.s3.eu-west-1.amazonaws.com/static/2022/08/29091905/00_carlos_sainz_rally_argentina_subaru_impreza_repsol_1994-1.jpg" alt="Pojedynek w Katalonii" style="object-position: center 60%;" />
+                    <p class="driver-img-caption">© PRC</p>
+                </div>
+<br><br>
+                <!-- Tabela wyników Finlandii z czasami i punktami -->
                 <div class="stats-card animate-on-scroll">
-                    <div class="stats-card__head--two"><span>Miejsce</span><span>Kierowca / Zespół</span></div>
-                    <div class="stats-card__row--two"><span>1. </span><span>White (Mitsubishi Ralliart PRT)</span></div>
-                    <div class="stats-card__row--two"><span>2. </span><span>Rendi (Ford Motor PRT)</span></div>
-                    <div class="stats-card__row--two"><span>3. </span><span>Beast (Subaru PRT)</span></div>
-                    <div class="stats-card__row--two"><span>4.</span><span>Dyxan (Lancia Potato RT)</span></div>
-                    <div class="stats-card__row--two"><span>5.</span><span>Rusell (Lancia Potato RT)</span></div>
+                    <div class="stats-card__head--two"><span>#</span><span>Finlandia</span><span>Łączny czas</span><span>Punkty</span></div>
+                    <div class="stats-card__row--two"><span>1.</span><span>Rendi (Ford)</span><span>18:52.793</span><span>15 + 2</span></div>
+                    <div class="stats-card__row--two"><span>2.</span><span>Beast (Subaru)</span><span>18:58.534</span><span>12 + 2 + 1</span></div>
+                    <div class="stats-card__row--two"><span>3.</span><span>Dombart (Mitsubishi)</span><span>19:07.654</span><span>10 + 2 + 2</span></div>
+                    <div class="stats-card__row--two"><span>4.</span><span>White (Mitsubishi)</span><span>20:19.356</span><span>8</span></div>
+                    <div class="stats-card__row--two"><span>5.</span><span>Russell (Lancia)</span><span>21:29.554</span><span>6 + 3</span></div>
                 </div>
 
-                <!-- System punktacji -->
-                <div class="points-system animate-on-scroll">
+                <!-- Tabela wyników Katalonii z czasami i punktami -->
+                <div class="stats-card animate-on-scroll">
+                    <div class="stats-card__head--two"><span>#</span><span>Katalonia</span><span>Łączny czas</span><span>Punkty</span></div>
+                    <div class="stats-card__row--two"><span>1.</span><span>Beast (Subaru)</span><span>15:56.396</span><span>15 + 1 + 1</span></div>
+                    <div class="stats-card__row--two"><span>2.</span><span>Dombart (Mitsubishi)</span><span>16:06.721</span><span>12</span></div>
+                    <div class="stats-card__row--two"><span>3.</span><span>Rendi (Ford)</span><span>16:13.486</span><span>10 + 1</span></div>
+                    <div class="stats-card__row--two"><span>4.</span><span>Russell (Lancia)</span><span>17:26.824</span><span>8 + 2</span></div>
+                    <div class="stats-card__row--two"><span>5.</span><span>White (Mitsubishi)</span><span>20:59.751</span><span>6</span></div>
                 </div>
+                <br>
 
-                <!-- Cytat zwycięzcy -->
+                                <!-- Zdjęcie 2 – pojedynek -->
+                <div class="driver-img-wrap animate-on-scroll" style="margin-top: 32px;">
+                    <img src="https://rallysantadomenica.com/wp-content/uploads/2022/10/wald2021_01.jpg" alt="Pojedynek w Katalonii" style="object-position: center 60%;" />
+                    <p class="driver-img-caption">© PRC</p>
+                </div>
+<br><br>
+                
+                <!-- Cytat zwycięzcy Finlandii -->
                 <div class="article-quote animate-on-scroll">
                     <img src="https://i.imgur.com/niCQozh.png" alt="" class="article-quote__mark" />
-                    <p class="article-quote__text">To był mój rajd. Śnieg i lód to moja specjalność!</p>
-                    <a href="white.html" class="article-quote__author">Krzysztof Drozd</a>
+                    <p class="article-quote__text">Jebać to, albo zobaczę metę albo Boga</p>
+                    <a href="rendi.html" class="article-quote__author">Paweł Rajchel</a>
                 </div>
+                    <br>
+                    <br>
 
-                <!-- Zdjęcie 2 – podium -->
-                <div class="driver-img-wrap animate-on-scroll" style="margin-top: 32px;">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh7TrWO8JTCeN6a3PD8HDxwiAJ1hC5Jx5UsCVVpKaK0aHYMKqUE-RLtvF4sZ1h-oFh25EWae0PpBYhkM-k40iaGAyEo1XEcFHB1euAta4O-rg2E71X_yO6md5orh9wtOibWx6_DhlkkqXs/s1600/1leg1_5mos.jpg" alt="Podium rajdu Szwecji" style="object-position: center 50%;" />
-                    <p class="driver-img-caption">© FIA Potato Rally Championship</p>
-                </div>
-
-                <!-- Klasyfikacja po 2. rundzie -->
-                <div class="driver-section-title animate-on-scroll">Klasyfikacja PRC po Szwecji</div>
+                <!-- Klasyfikacja po dniu 2 -->
                 <div class="driver-bio animate-on-scroll">
-                    <p>Po drugiej rundzie liderem jest <strong>White</strong> z dorobkiem 26 punktów (8 z Monte Carlo + 18 ze Szwecji). Na drugiej pozycji <strong>Dyxan</strong> (18 pkt. z Monte Carlo + 6 pkt. za 4. miejsce = 24 pkt.), a trzecie miejsce zajmuje <strong>Rendi</strong> z 20 punktami (10 + 10). W klasyfikacji konstruktorów Lancia Potato Rally Team utrzymuje prowadzenie (Dyxan 24 pkt. + Rusell 18 pkt. = 42 pkt.), ale Mitsubishi Ralliart PRT zbliża się z 35 punktami, a Ford Motor PRT ma 33 punkty.</p>
-                </div>
 
-                <!-- Klasyfikacja punktowa z uwzględnieniem Power Stage -->
+                    <p>Po Finlandii i Katalonii w czołówce klasyfikacji generalnej zaszły lekkie zmiany. Beast umocnił prowadzenie, głównie dzięki zwycięstwu w Hiszpanii. Rendi utrzymał trzecie miejsce. Dyxan po słabszym dniu spadł na piąte miejsce za swojego kolegę zespołowego, a White pozostał szósty.</p>
+                    <p>Warto odnotować powrót Barto, który po nieobecności w pierwszym dniu rajdu, pojawił się na starcie w Finlandii. Mimo braku dobrego wyniku, dzięki ukończeniu całego etapu oraz nieobecności części rywali, zdobył 2 punkty. </p>
+                </div><br>
+
+                <!-- Klasyfikacja punktowa po 2 rundach -->
                 <div class="standings-list animate-on-scroll">
                     <ul style="padding-left: 0;">
-                        <li><span>1. White (Mitsubishi)</span> <span>26 pkt.</span></li>
-                        <li><span>2. Dyxan (Lancia)</span> <span>24 pkt.</span></li>
-                        <li><span>3. Rendi (Ford)</span> <span>20 pkt.</span></li>
-                        <li><span>4. Rusell (Lancia)</span> <span>18 pkt.</span></li>
-                        <li><span>5. Beast (Subaru)</span> <span>12 pkt.</span></li>
-                        <li><span>6. Dombart (Mitsubishi)</span> <span>7 pkt.</span></li>
-                        <li><span>7. Barto (Subaru)</span> <span>5 pkt.</span></li>
-                        <li><span>8. Rambo (Subaru)</span> <span>3 pkt.</span></li>
-                        <li><span>9. Pixelek (Ford)</span> <span>1 pkt.</span></li>
+                        <li><span>1. Beast (Subaru)</span> <span>63 pkt.</span></li>
+                        <li><span>2. Dombart (Mitsubishi)</span> <span>57 pkt.</span></li>
+                        <li><span>3. Rendi (Ford)</span> <span>51 pkt.</span></li>
+                        <li><span>4. Russell (Lancia)</span> <span>33 pkt.</span></li>
+                        <li><span>5. Dyxan (Lancia)</span> <span>28 pkt.</span></li>
+                        <li><span>6. White (Mitsubishi)</span> <span>20 pkt.</span></li>
+                        <li><span>7. Szpaku (Ford)</span> <span>13 pkt.</span></li>
+                        <li><span>8. Barto (Subaru)</span> <span>2 pkt.</span></li>
                     </ul>
                 </div>
 
-                <!-- Podsumowanie i zapowiedź -->
-                <div class="driver-section-title animate-on-scroll">Co dalej?</div>
+                <!-- NOWA SEKCJA: Russell – powrót do formy -->
                 <div class="driver-bio animate-on-scroll">
-                    <p>Rajd Szwecji całkowicie odmienił układ sił w PRC. White udowodnił, że potrafi wygrywać na śniegu, a Dyxan stracił prowadzenie w klasyfikacji generalnej. Już <strong>jutro</strong> kierowców czeka kolejne wyzwanie – <strong>Rajd Finlandii</strong>. Szybkie, szutrowe odcinki wśród fińskich lasów to prawdziwy sprawdzian odwagi i umiejętności. To tutaj liczy się przede wszystkim czysta prędkość i precyzja w pokonywaniu zakrętów na wysokich biegach.</p>
-                    <p>Czy White utrzyma prowadzenie w klasyfikacji? Czy Dyxan i Lancia odzyskają swoją dominację? A może tym razem to kierowcy Forda lub Subaru zaskoczą wszystkich? Zapraszamy do śledzenia naszych relacji z Rajdu Finlandii, który dostarczy kolejnych emocji i niespodzianek.</p>
-                    <p>Do zobaczenia na odcinkach!</p>
+                    <p>Russell na chwilę wrócił do gry. Jego dominacja w Power Stage w Finlandii, poparta czwartym miejscem w Katalonii, to sygnał, że Lancia wraca do walki o mistrzostwo. Kierowca ten jest na ten moment najlepszy pod względem punktów zdobytych na Power Stage'ach.</p>
                 </div>
-                <hr />
-
+                <!-- Podsumowanie i zapowiedź -->
+                <div class="driver-bio animate-on-scroll">
+                    <p>Kolejne rundy zapowiadają się niezwykle ekscytująco. Beast prowadzi, ale przewaga nad Dombartem i Rendim jest minimalna, Russell czeka na potknięcia rywali, a sezon wchodzi w decydującą fazę gdzie błąd może kosztować utratę szans na tytuł. Już niedługo zawodnicy zmierzą się z Rajdem Argentyny i Nowej Anglii, gdzie nawierzchnia znów zweryfikuje ich umiejętności.
+                </div>
             </div>
         </div>
     </main>
