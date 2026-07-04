@@ -239,6 +239,79 @@ class WRCAPI {
         return this._l1.calendar;
     }
 
+    // ── Sortowanie kalendarza ─────────────────────────────────────────────────────
+
+    async getSortedCalendar() {
+        if (this._l1.sortedCalendar) return this._l1.sortedCalendar;
+        
+        const calendar = await this.getCalendar();
+        if (!calendar || calendar.length === 0) {
+            this._l1.sortedCalendar = [];
+            return [];
+        }
+        
+        // Pobierz zapisaną kolejność
+        const season = await this.getCurrentSeason();
+        const order = season?.calendarOrder || {};
+        
+        // Grupuj rajdy według daty
+        const groups = {};
+        for (const rally of calendar) {
+            const dateKey = rally.startDate;
+            if (!groups[dateKey]) groups[dateKey] = [];
+            groups[dateKey].push(rally);
+        }
+        
+        // Sortuj daty
+        const sortedDates = Object.keys(groups).sort();
+        const sortedCalendar = [];
+        
+        for (const date of sortedDates) {
+            const rallies = groups[date];
+            const storedOrder = order[date] || [];
+            
+            // Jeśli jest zapisana kolejność dla tej daty
+            if (storedOrder.length === rallies.length && 
+                storedOrder.every(id => rallies.some(r => r.id === id))) {
+                // Posortuj według zapisanej kolejności
+                for (const id of storedOrder) {
+                    const rally = rallies.find(r => r.id === id);
+                    if (rally) sortedCalendar.push(rally);
+                }
+                // Dodaj brakujące (jeśli jakieś zostały pominięte)
+                for (const rally of rallies) {
+                    if (!sortedCalendar.includes(rally)) {
+                        sortedCalendar.push(rally);
+                    }
+                }
+            } else {
+                // Domyślnie posortuj po nazwie
+                rallies.sort((a, b) => a.name.localeCompare(b.name));
+                sortedCalendar.push(...rallies);
+            }
+        }
+        
+        this._l1.sortedCalendar = sortedCalendar;
+        return sortedCalendar;
+    }
+
+    // ── Pobieranie wyników rajdu ────────────────────────────────────────────────
+
+    async getRallyResults(rallyId) {
+        const data = await this.loadData();
+        if (!data) return null;
+        
+        const season = data.seasons[data.settings.currentSeason];
+        if (!season || !season.rallyResults) return null;
+        
+        return season.rallyResults[rallyId] || null;
+    }
+
+    async getRallyById(rallyId) {
+        const calendar = await this.getCalendar();
+        return calendar.find(r => r.id === rallyId) || null;
+    }
+
     async getRallyResults(rallyId) {
         const key = `rally_${rallyId}`;
         if (this._l1[key]) return this._l1[key];
