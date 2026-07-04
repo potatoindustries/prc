@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PRC • Dramatyczny zwrot akcji</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css" />
+    <link rel="stylesheet" href="css/archiwum.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="icon" href="https://i.imgur.com/CqBPD1t.png" />
+
+    <style>
+        @font-face {
+            font-family: "SebinoRegular";
+            src: url("assets/fonts/Sebino Regular.ttf") format("truetype");
+            font-weight: normal;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: "WRCCleanRoman";
+            src: url("assets/fonts/WRCCleanRoman.ttf") format("truetype");
+            font-weight: normal;
+            font-style: normal;
+        }
+        /* ===== PROGRESS BAR ===== */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: rgba(0, 0, 0, 0.1);
+            z-index: 10000;
+        }
+        .progress-bar {
+            height: 4px;
+            background: #ff6b00;
+            width: 0%;
+            transition: width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        body.dark .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .no-transition * { transition: none !important; }
+        .icon-moon { display: none; }
+        body.dark .icon-sun  { display: none; }
+        body.dark .icon-moon { display: block; }
+
+        /* ===== HERO BG ===== */
+        .hero__bg {
+            position: absolute; inset: 0;
+            background-image: url("https://hips.hearstapps.com/hmg-prod/images/gettyimages-1031684-1537452294.jpg");
+            background-size: cover;
+            background-position: center 40%;
+            background-repeat: no-repeat;
+        }
+        .hero {
+            min-height: 70vh;
+        }
+        .driver-main {
+            background: var(--section-bg);
+            transition: background-color .38s ease;
+        }
+        body.dark .driver-main { background: #1a1a1a; }
+
+        .driver-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 1px 0 80px;
+        }
+        .article-intro {
+            padding: 0 44px;
+        }
+        .article-lead {
+            font-family: "WRCCleanBold", Arial, sans-serif;
+            font-size: 22.5px;
+            line-height: 1.5;
+            color: #1a2635;
+            font-weight: 700;
+            margin: 32px 0 12px;
+        }
+        body.dark .article-lead { color: #e8eef4; }
+
+        .article-meta {
+            font-family: "SebinoRegular", Arial, sans-serif;
+            font-size: 13px;
+            color: #67727f;
+            margin-bottom: 36px;
+            line-height: 1.6;
+        }
+        body.dark .article-meta { color: #888; }
+        .article-meta strong {
+            display: block;
+            color: #26384b;
+        }
+        body.dark .article-meta strong { color: #aaa; }
+
+        .driver-section-title {
+            font-family: "WRCCleanBold", Arial, sans-serif;
+            font-size: 32px;
+            margin: 44px 44px 18px;
+            color: #26384b;
+            border-left: 4px solid #ff6b00;
+            padding-left: 15px;
+            transition: color .28s;
+        }
+        body.dark .driver-section-title { color: #f3f3f3; }
+
+        .stats-card {
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06);
+            margin: 0 44px 32px;
+            transition: background .38s, box-shadow .32s;
+            box-sizing: border-box;
+        }
+        body.dark .stats-card {
+            background: #1e1e1e;
+            box-shadow: 0 7px 18px rgba(0,0,0,.28);
+        }
+
+        .stats-card__head--two {
+            background: #f2f3f3;
+            color: #67727f;
+            font-family: "SebinoRegular", Arial, sans-serif;
+            font-size: 11px;
+            letter-spacing: .03em;
+            text-transform: uppercase;
+            font-weight: 500;
+            padding: 0 18px;
+            min-height: 44px;
+            display: grid;
+            grid-template-columns: 40px 1fr 140px 80px;
+            align-items: center;
+            transition: background .38s, color .28s;
+        }
+        .stats-card__row--two {
+            display: grid;
+            grid-template-columns: 40px 1fr 140px 80px;
+            align-items: center;
+            padding: 0 18px;
+            min-height: 48px;
+            background: #fff;
+            font-family: "SebinoRegular", Arial, sans-serif;
+            font-size: 13px;
+            color: #26384b;
+            border-bottom: 1px solid rgba(225, 231, 238, 0.8);
+            transition: background .28s, color .28s, border-bottom-color .28s;
+            box-sizing: border-box;
+        }
+        body.dark .stats-card__head--two {
+            background: #2e2e2e;
+            color: #9a9088;
+        }
+        body.dark .stats-card__row--two {
+            background: #1e1e1e;
+            color: #c0c0c0;
+            border-bottom-color: rgba(60, 72, 88, 0.4);
+        }
+        .stats-card__row--two:last-child {
+            border-bottom: none;
+        }
+        .stats-card__row--two:hover { background: #fcfdff; }
+        body.dark .stats-card__row--two:hover { background: #252525; }
+
+        .archive-panel {
+            display: none;
+        }
+        .archive-panel.active {
+            display: block;
+        }
+
+        .driver-bio {
+            padding: 0 44px;
+        }
+        .driver-bio p {
+            font-family: "SebinoRegular", Arial, sans-serif !important;
+            font-size: 18.5px;
+            line-height: 1.75;
+            color: #26384b;
+            margin-bottom: 16px;
+        }
+        body.dark .driver-bio p { color: #c0c0c0; }
+
+        .driver-img-wrap {
+            margin: 28px 0 0;
+            padding-left: 44px;
+            overflow: visible;
+        }
+        .driver-img-wrap img {
+            display: block;
+            width: 1098px;
+            max-width: none;
+            height: 731.84px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .driver-img-caption {
+            font-family: "SebinoRegular", Arial, sans-serif;
+            font-size: 12px;
+            color: #67727f;
+            margin-top: 15px;
+            margin-left: 2px;
+        }
+        .driver-img-copyright {
+            display: block;
+            font-size: 11px;
+            color: #aaa;
+            margin-top: 2px;
+        }
+
+        .animate-on-scroll { opacity: 0; transform: translateY(18px); transition: opacity .5s ease, transform .5s ease; }
+        .animate-on-scroll.visible { opacity: 1; transform: none; }
+
+        .highlight-box {
+            background: rgba(0,0,0,0.03);
+            border-left: 3px solid #ff6b00;
+            padding: 16px 24px;
+            margin: 24px 44px;
+            border-radius: 8px;
+        }
+        body.dark .highlight-box {
+            background: rgba(255,255,255,0.05);
+        }
+        hr {
+            margin: 32px 44px;
+            border: none;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #ccc, transparent);
+        }
+        body.dark hr {
+            background: linear-gradient(to right, transparent, #444, transparent);
+        }
+        .article-quote {
+            margin: 10px 44px 10px;
+            padding: 18px 22px 14px;
+            border-radius: 20px;
+            text-align: center;
+        }
+        body.dark .article-quote {
+            background: #222;
+        }
+        .article-quote__mark {
+            display: block;
+            width: 48px;
+            height: auto;
+            margin: 0 auto 20px auto;
+        }
+        .article-quote__text {
+            font-family: "WRCCleanBold", Arial, sans-serif !important;
+            font-size: 50px !important;
+            line-height: 1.25 !important;
+            color: #1a2635 !important;
+            margin: 0 0 15px !important;
+        }
+        body.dark .article-quote__text {
+            color: #e8eef4 !important;
+        }
+        .article-quote__author {
+            display: inline-block;
+            font-family: "WRCCleanBold", Arial, sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            color: #26384b;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(38,56,75,0.3);
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .article-quote__author:hover {
+            color: #ff6b00;
+            border-color: #ff6b00;
+        }
+        body.dark .article-quote__author {
+            color: #c0c0c0;
+            border-color: rgba(192,192,192,0.3);
+        }
+        body.dark .article-quote__author:hover {
+            color: #ff6b00;
+            border-color: #ff6b00;
+        }
+        .verdict-badge {
+            background: #0a2a3b;
+            color: white;
+            padding: 24px 32px;
+            border-radius: 20px;
+            margin: 48px 44px 24px;
+        }
+        body.dark .verdict-badge {
+            background: #0f212e;
+        }
+        .verdict-badge h3 {
+            margin-top: 0;
+            font-size: 28px;
+        }
+        .hero__title-wrap {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 44px;
+        }
+        .hero__title {
+            font-size: 57px;
+        }
+        .topbar__link {
+            font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+            font-weight: 550 !important;
+        }
+        .standings-list {
+            padding: 0 44px 20px;
+        }
+        .standings-list li {
+            font-family: "SebinoRegular", Arial, sans-serif;
+            font-size: 17px;
+            line-height: 2;
+            color: #26384b;
+            border-bottom: 1px solid #eee;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+        }
+        body.dark .standings-list li {
+            color: #c0c0c0;
+            border-bottom-color: #2a2a2a;
+        }
+        .points-system {
+            font-family: "SebinoRegular", Arial, sans-serif;
+            font-size: 15px;
+            color: #67727f;
+            padding: 0 44px 10px;
+        }
+        body.dark .points-system { color: #999; }
+        /* ── STYLE NAVBAR ── */
+.topbar {
+  align-items: center !important;
+  grid-template-columns: 180px auto 170px !important;
+  justify-content: space-between !important;
+}
+
+.topbar__center {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: auto !important;
+  flex: 0 0 auto !important;
+  gap: 0 !important;
+  background: rgba(28, 28, 28, 0.58) !important;
+  backdrop-filter: blur(8px) saturate(1.3) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(1.3) !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  padding: 3px 20px !important;
+  transform: translateY(-3px) !important;
+}
+
+.topbar__link {
+  font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+  font-weight: 500 !important;
+  color: rgba(255,255,255,0.88) !important;
+  text-decoration: none !important;
+  font-size: 15px !important;
+  letter-spacing: 0.01em !important;
+  padding: 10px 20px !important;
+  height: auto !important;
+  border-radius: 999px !important;
+  transition: color 0.15s ease !important;
+  white-space: nowrap !important;
+  position: relative !important;
+  line-height: 1 !important;
+}
+
+.topbar__link::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,0.10) !important;
+  opacity: 0 !important;
+  transform: scale(0.82) !important;
+  transition: opacity 0.18s ease, transform 0.18s ease !important;
+  pointer-events: none !important;
+}
+
+.topbar__link:first-child {
+  border-radius: 999px !important;
+  margin-left: -7px !important;
+}
+.topbar__link:first-child::before {
+  left: -10px !important;
+  right: 0 !important;
+  border-radius: 999px !important;
+}
+.topbar__link:last-child {
+  border-radius: 999px !important;
+  margin-right: -7px !important;
+}
+.topbar__link:last-child::before {
+  right: -10px !important;
+  left: 0 !important;
+  border-radius: 999px !important;
+}
+
+.topbar__link:hover::before {
+  opacity: 1 !important;
+  transform: scale(1) !important;
+}
+
+.topbar__link:hover {
+  color: #fff !important;
+}
+
+.topbar__link::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 50% !important;
+  bottom: 1px !important;
+  width: 0 !important;
+  height: 2px !important;
+  border-radius: 1000px !important;
+  background: var(--orange) !important;
+  transform: translateX(-50%) !important;
+  opacity: 0 !important;
+  transition: width 0.24s ease, opacity 0.2s ease !important;
+  display: block !important;
+}
+
+.topbar__link:hover::after {
+  width: 0 !important;
+  opacity: 0 !important;
+}
+
+.topbar__link.active {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+.topbar__link.active::after {
+  width: calc(100% - 40px) !important;
+  opacity: 1 !important;
+}
+
+.tab {
+  font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+  font-weight: 500 !important;
+}
+
+.rallytv-btn {
+  font-family: "SebinoMedium", "SebinoSoft", Arial, sans-serif !important;
+  font-weight: 500 !important;
+}
+    </style>
+
+    <script>
+        if (localStorage.getItem("wrc-theme") === "dark")
+            document.documentElement.classList.add("wrc-dark");
+    </script>
+    <script src="theme.js"></script>
+</head>
+<body>
+<div class="progress-container">
+    <div class="progress-bar" id="scrollProgressBar"></div>
+</div>
+
+<a href="index.html" class="floating-logo" aria-label="Home">
+    <img src="assets/logo.png" alt="Logo" class="floating-logo__img" />
+</a>
+
+<div class="page">
+    <header class="hero">
+        <div class="hero__bg"></div>
+        <div class="hero__overlay"></div>
+        <div class="hero__content">
+<nav class="topbar">
+  <div class="topbar__left"></div>
+  <div class="topbar__center">
+    <a href="index.html" class="topbar__link">Strona główna</a>
+    <a href="kalendarz.html" class="topbar__link">Kalendarz</a>
+    <a href="tab.html" class="topbar__link">Wyniki i klasyfikacja</a>
+    <a href="teams.html" class="topbar__link">Zespoły i kierowcy</a>
+    <a href="archiwum.html" class="topbar__link">Archiwum</a>
+  </div>
+  <div class="topbar__right">
+    <a href="#" class="rallytv-btn">PRC</a>
+    <button class="theme-toggle-btn" id="themeToggle" aria-label="Przełącz motyw" type="button">
+      <svg class="icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg class="icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</nav>
+            <div class="hero__title-wrap">
+                <h1 class="hero__title">Emocjonujący finał<br> <small>do którego nigdy nie doszło</small></h1>
+            </div>
+        </div>
+    </header>
+    <main class="driver-main">
+        <div class="driver-content">
+            <div id="panel-prc1" class="archive-panel active">
+
+                <!-- Lead + meta -->
+                <div class="article-intro animate-on-scroll">
+                    <p class="article-meta">
+                        12 min czytania • Opublikowano 06.07.2026 • 20:15 GMT+2 
+                    </p>
+                </div>
+
+                <!-- Wprowadzenie -->
+                <div class="driver-section-title animate-on-scroll">Gorzkie zakończenie sezonu</div>
+                <div class="driver-bio animate-on-scroll">
+                    <p>To miało być święto... finałowy dzień turnieju PRC, na który czekaliśmy od tygodni. Napięcie sięgało zenitu, a emocje gwarantowały jeden z najlepszych finałów w historii. Niestety, zamiast spektakularnej walki o mistrzostwo, otrzymaliśmy decyzję, która pozostawiła gorzki posmak. Ostatni dzień rywalizacji został anulowany.</p>
+                    <p>Powód? Za namową samych kierowców, którzy zgłosili swoje obawy dotyczące słabego zaangażowania i mizernej obecności na ostatnich odcinkach specjalnych. Nagłe spotkania, problemy i brak odpowiedniej organizacji sprawiły, że atmosfera wśród zawodników była daleka od tej, która powinna towarzyszyć finałowej walce. Decyzja zapadła szybko, ale jej konsekwencje są ogromne.</p>
+                    <p>Dla nas wszystkich - utrata szansy na zobaczenie, jak kończy się jeden z najciekawszych sezonów w historii PRC. W chwili odwołania różnice w klasyfikacji generalnej były tak minimalne, że każdy odcinek mógł zmienić wszystko.</p>
+                </div>
+<br>
+                <!-- Zdjęcie – symboliczne -->
+                <div class="driver-img-wrap animate-on-scroll" style="margin-top: 32px;">
+                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh57LXWldVPasnFeB3YYWC5AwRtZsxtfwkXu3DD6oSqXKjHhiSogi-wfqe7a5mCQoOQQhMuJn_gT6OAvK50zgsFi2p27M8btSJxIsKcJTUVhjlG0i9qRLHSx2k6TidxBJI6zxxKxE8N__c/s1600/w9c.jpg" alt="Puste oesy" style="object-position: center 50%;" />
+                    <p class="driver-img-caption">© PRC</p>
+                </div>
+
+                <!-- Kluczowe liczby przed finałem -->
+                <div class="driver-bio animate-on-scroll">
+                    <br>
+                    <p>Zanim zapadła decyzja, sytuacja w czołówce była elektryzująca. Dombart prowadził, ale jego przewaga nad Beastem wynosiła zaledwie 2 punkty. To oznaczało, że ostatni dzień mógł przynieść zmianę lidera na ostatnim odcinku. Co więcej, różnica między trzecim a piątym miejscem - odpowiednio Rendim, Rusellem i Dyxanem to tylko 7 punktów. Każda sekunda, każdy błąd, każdy Power Stage mógł przetasować całą stawkę.</p>
+                    <p>Byliśmy świadkami sytuacji, która w rajdach nie zdarza się za często. Walka o mistrzostwo była tak wyrównana, że żaden z faworytów nie mógł czuć się pewnie. To właśnie te niewielkie różnice sprawiają, że decyzja o anulowaniu finału boli podwójnie.</p>
+                </div><br>
+
+                <!-- Zdjęcie 2 – smutek -->
+                <div class="driver-img-wrap animate-on-scroll" style="margin-top: 32px;">
+                    <img src="https://www.goodwood.com/globalassets/.road--racing/race/historic/2025/12-december/sainz-vs-mcrae-rivalry/sainz-vs-mcrae-rivalries-1994-greece-sainz-copy.jpg?rxy=0.5,0.5" alt="Kierowcy po decyzji" style="object-position: center 60%;" />
+                    <p class="driver-img-caption">© PRC</p>
+                </div>
+<br><br>
+                <!-- Komunikat oficjalny -->
+                <div class="stats-card animate-on-scroll">
+                    <div class="stats-card__head--two" style="grid-template-columns: 1fr; text-align: center; padding: 14px 18px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.06em;">
+                        <span>Oficjalne stanowisko PRC</span>
+                    </div>
+                    <div style="padding: 24px 28px; font-family: 'SebinoRegular', Arial, sans-serif; font-size: 16px; line-height: 1.7; color: #26384b; background: #fff; transition: background .38s, color .28s;">
+                        <p style="margin: 0;">Z głębokim żalem informujemy, że ostatni dzień turnieju PRC został odwołany na wniosek kierowców. Powodem jest niewystarczające zaangażowanie i problemy z obecnością, które uniemożliwiły rozegranie finałowych odcinków w godnych warunkach. Ostateczny wynik zostanie zatwierdzony na podstawie aktualnej klasyfikacji, chyba że w ciągu najbliższych kilku tygodni uda się znaleźć alternatywny termin.</p>
+                    </div>
+                </div>
+<br>
+                <!-- Tabela – klasyfikacja przed finałem (stan obecny) -->
+                <div class="stats-card animate-on-scroll">
+                    <div class="stats-card__head--two"><span>#</span><span>Klasyfikacja generalna (stan przed finałem)</span><span>Punkty</span><span>Strata</span></div>
+                    <div class="stats-card__row--two"><span>1.</span><span>Dombart (Mitsubishi)</span><span>86</span><span>–</span></div>
+                    <div class="stats-card__row--two"><span>2.</span><span>Beast (Subaru)</span><span>84</span><span>-2</span></div>
+                    <div class="stats-card__row--two"><span>3.</span><span>Rendi (Ford)</span><span>66</span><span>-20</span></div>
+                    <div class="stats-card__row--two"><span>4.</span><span>Rusell (Lancia)</span><span>63</span><span>-23</span></div>
+                    <div class="stats-card__row--two"><span>5.</span><span>Dyxan (Lancia)</span><span>59</span><span>-27</span></div>
+                    <div class="stats-card__row--two"><span>6.</span><span>White (Mitsubishi)</span><span>41</span><span>-45</span></div>
+                </div>
+                <br>
+
+                <!-- Cytat kierowcy (Beast) -->
+                <div class="article-quote animate-on-scroll">
+                    <img src="https://i.imgur.com/niCQozh.png" alt="" class="article-quote__mark" />
+                    <p class="article-quote__text">Nie tak miał wyglądać finał. Zaangażowanie jest tragiczne, co zjebało cały klimat turnieju</p>
+                    <a href="beast.html" class="article-quote__author">Bartosz Stanisz</a>
+                </div>
+                    <br>
+                    <br>
+
+
+                <!-- Klasyfikacja po 4 rundach (powtórzenie, ale w formie listy z komentarzem) -->
+                <div class="standings-list animate-on-scroll">
+                    <ul style="padding-left: 0;">
+                        <li><span>1. Dombart (Mitsubishi)</span> <span>86 pkt.</span></li>
+                        <li><span>2. Beast (Subaru)</span> <span>84 pkt.</span></li>
+                        <li><span>3. Rendi (Ford)</span> <span>66 pkt.</span></li>
+                        <li><span>4. Rusell (Lancia)</span> <span>63 pkt.</span></li>
+                        <li><span>5. Dyxan (Lancia)</span> <span>59 pkt.</span></li>
+                        <li><span>6. White (Mitsubishi)</span> <span>41 pkt.</span></li>
+                        <li><span>7. Szpaku (Ford)</span> <span>13 pkt.</span></li>
+                        <li><span>8. Barto (Subaru)</span> <span>4 pkt.</span></li>
+                        <li><span>9. Rambo (Subaru)</span> <span>1 pkt.</span></li>
+                    </ul>
+                </div>
+                <br>
+
+                <!-- NOWA SEKCJA: Dombart – lider mimo wszystko -->
+                <div class="driver-bio animate-on-scroll">
+                    <p>Dombart może czuć się usatysfakcjonowany, ale z pewnością nie w pełni. Tytuł mistrzowski zdobyty w takich okolicznościach zawsze będzie miał cień wątpliwości. Jego przewaga nad Beastem to zaledwie 2 punkty - to mniej niż wartość jednego odcinka specjalnego.</p>
+                    <p>Gdyby finał został dokończony, mógłby stracić wszystko, ale też mógłby przypieczętować swoje mistrzostwo w wielkim stylu. Niestety, tego nie dowiemy się nigdy.</p>
+                </div>
+
+                <!-- NOWA SEKCJA: Klasyfikacja konstruktorów -->
+                <div class="driver-bio animate-on-scroll">
+                    <p>Równie emocjonująco przedstawia się sytuacja w klasyfikacji konstruktorów. Tu także różnice są minimalne, a zawieszenie finału pozostawia wiele znaków zapytania.</p>
+                </div>
+                <div class="stats-card animate-on-scroll">
+                    <div class="stats-card__head--two"><span>#</span><span>Klasyfikacja konstruktorów (stan przed finałem)</span><span>Punkty</span><span>Strata</span></div>
+                    <div class="stats-card__row--two"><span>1.</span><span>Mitsubishi</span><span>127</span><span>-</span></div>
+                    <div class="stats-card__row--two"><span>2.</span><span>Lancia</span><span>122</span><span>-5</span></div>
+                    <div class="stats-card__row--two"><span>3.</span><span>Ford</span><span>79</span><span>-48</span></div>
+                    <div class="stats-card__row--two"><span>4.</span><span>Subaru</span><span>84*</span><span>-43</span></div>
+                </div>
+                <div class="driver-bio animate-on-scroll">
+                    <p>Mitsubishi prowadzi z przewagą zaledwie 5 punktów nad Lancią. To oznacza, że ostatni dzień mógł przynieść zmianę lidera również wśród producentów. Ford i Subaru pozostają w grze, choć ich straty są już większe. Walka o tytuł konstruktorski jest równie zacięta jak rywalizacja kierowców.</p>
+                    <p>Jeśli finał zostanie dokończony, każdy zespół będzie miał szansę na poprawę swojej pozycji. Jeśli jednak klasyfikacja zostanie zatwierdzona na obecnym etapie, Mitsubishi może świętować podwójny tytuł - zarówno wśród kierowców, jak i konstruktorów. Losy obu trofeów wciąż wiszą na włosku.</p>
+                </div>
+                <br>
+
+                <!-- Podsumowanie i zapowiedź -->
+
+                <br>
+                <!-- Dodatkowa infografika (symboliczne zdjęcie) -->
+                <div class="driver-img-wrap animate-on-scroll" style="margin-top: 10px; padding-left: 44px;">
+                    <img src="https://hips.hearstapps.com/hmg-prod/images/gettyimages-1031684-1537452294.jpg" alt="Koniec sezonu" style="object-position: center 40%;" />
+                    <p class="driver-img-caption">© PRC</p>
+                </div><br>
+                                <div class="driver-bio animate-on-scroll">
+                    <p>Sezon PRC 2026 zapisze się w historii jako jeden z najbardziej emocjonujących, ale też najbardziej kontrowersyjnych. Walka o tytuł została przerwana w momencie, gdy wszystko było jeszcze możliwe. Czy uda się dokończyć finał za dwa tygodnie? Organizatorzy nie wykluczają takiej opcji.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div class="footer-spacer"></div>
+
+<footer class="site-footer">
+    <div class="site-footer__sponsors"><div class="footer-photo"><img src="https://i.imgur.com/JSWXXPK.png" alt="" /></div><div class="footer-photo"><img src="https://i.imgur.com/3e0jqkQ.png" alt="" /></div><div class="footer-photo"><img src="https://i.imgur.com/BQ7N4GM.png" alt="" /></div></div>
+    <div class="footer-divider"></div>
+    <p class="footer-copyright">&copy; 2026 PRC. All rights reserved.</p>
+</footer>
+
+<script>
+    window.addEventListener('scroll', function() {
+        const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (winScroll / height) * 100;
+        document.getElementById('scrollProgressBar').style.width = scrolled + '%';
+    });
+
+    const logo = document.querySelector(".floating-logo");
+    const hero = document.querySelector(".hero");
+    window.addEventListener("scroll", () => {
+        if (hero.getBoundingClientRect().bottom <= 0) logo.classList.add("logo--dark");
+        else logo.classList.remove("logo--dark");
+    }, { passive: true });
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((e) => { 
+            if (e.isIntersecting) { 
+                e.target.classList.add("visible"); 
+                observer.unobserve(e.target); 
+            } 
+        });
+    }, { threshold: 0.1 });
+
+    function observeActivePanelElements() {
+        const activePanel = document.querySelector('.archive-panel.active');
+        if (activePanel) {
+            const elements = activePanel.querySelectorAll('.animate-on-scroll:not(.visible)');
+            elements.forEach((el) => observer.observe(el));
+        }
+    }
+    observeActivePanelElements();
+
+    (function () {
+        if (localStorage.getItem("wrc-theme") === "dark") document.body.classList.add("dark");
+        var btn = document.getElementById("themeToggle");
+        if (btn) {
+            btn.addEventListener("click", function () {
+                var isDark = document.body.classList.toggle("dark");
+                localStorage.setItem("wrc-theme", isDark ? "dark" : "light");
+            });
+        }
+    })();
+</script>
+</body>
+</html>
