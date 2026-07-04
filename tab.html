@@ -555,16 +555,12 @@
       return `<a href="${slug}.html" class="driver-link">${driverName}</a>`;
     }
 
-    // Funkcja do pobierania URL loga z obsługą błędów - BEZ WYWOŁYWANIA BŁĘDÓW 404
+    // Funkcja do pobierania URL loga z obsługą błędów
     function getTeamLogoHtml(teamLogo, teamName) {
-      // Jeśli nie ma loga lub logo jest puste, zwróć fallback tekstowy
       if (!teamLogo || teamLogo === '') {
         const firstLetter = teamName ? teamName.charAt(0).toUpperCase() : '?';
         return `<div class="team-logo-fallback">${firstLetter}</div>`;
       }
-      
-      // Jeśli logo to pełny URL lub ścieżka względna
-      // Używamy data-src zamiast src aby uniknąć natychmiastowego ładowania
       return `<img src="${teamLogo}" alt="${teamName}" 
         onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'team-logo-fallback\'>${teamName ? teamName.charAt(0).toUpperCase() : '?'}</div>';" 
         style="width:28px;height:28px;object-fit:contain;border-radius:4px;" />`;
@@ -913,7 +909,7 @@
         switch(status) {
             case 'completed': return 'ZAKOŃCZONY';
             case 'ongoing': return 'TRWA';
-            case 'cancelled': return 'ANULOWANY';  // <-- NOWY
+            case 'cancelled': return 'ANULOWANY';
             default: return '';
         }
     }
@@ -998,6 +994,7 @@
       await loadTabData(activeTabName);
     })();
 
+    
     
   </script>
 </body>
