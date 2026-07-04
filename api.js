@@ -1,6 +1,16 @@
 // ============================================================
 // WRCAPI – v2 – zoptymalizowany cache wielopoziomowy
 // ============================================================
+// Poziomy cache (od najszybszego):
+//   L1 – in-memory (ta sama zakładka, ta sama sesja)
+//   L2 – localStorage (między zakładkami, między stronami)
+//   L3 – JSONBin (tylko gdy L2 wygasł lub force=true)
+//
+// Obliczenia (championship, constructors, power stage) są
+// cache'owane osobno i unieważniane TYLKO gdy dane się zmieniły.
+// Status połączenia pochodzi z odpowiedzi loadData()
+// – żadnych osobnych zapytań HEAD.
+// ============================================================
 
 class WRCAPI {
     constructor() {
@@ -59,7 +69,7 @@ class WRCAPI {
         try {
             localStorage.setItem(this._LS_DATA, JSON.stringify(this.data));
             localStorage.setItem(this._LS_META, JSON.stringify({ ts: this._l1Time, etag: this._etag }));
-            localStorage.removeItem(this._LS_CALC);
+            localStorage.removeItem(this._LS_CALC); // dane zmienione – obliczenia nieaktualne
         } catch (_) {}
     }
 
@@ -200,61 +210,6 @@ class WRCAPI {
         } finally { this.isLoading = false; }
     }
 
-    // ── NOWA FUNKCJA: Pobieranie posortowanego kalendarza ────────────────────
-    // UWZGLĘDNIA KOLEJNOŚĆ USTAWIONĄ W PANELU ADMINA
-
-    async getSortedCalendar() {
-        const cacheKey = 'sortedCalendar';
-        if (this._l1[cacheKey]) return this._l1[cacheKey];
-
-        const season = await this.getCurrentSeason();
-        if (!season || !season.calendar) {
-            this._l1[cacheKey] = [];
-            return [];
-        }
-
-        const calendar = [...season.calendar];
-        const calendarOrder = season.calendarOrder || {};
-
-        // Grupuj rajdy według daty rozpoczęcia
-        const groups = {};
-        calendar.forEach(rally => {
-            const dateKey = rally.startDate;
-            if (!groups[dateKey]) groups[dateKey] = [];
-            groups[dateKey].push(rally);
-        });
-
-        const sortedDates = Object.keys(groups).sort();
-        const result = [];
-
-        for (const date of sortedDates) {
-            const rallies = groups[date];
-            const storedOrder = calendarOrder[date] || [];
-
-            // Jeśli zapisana kolejność pasuje do liczby rajdów w tej dacie
-            if (storedOrder.length === rallies.length && 
-                storedOrder.every(id => rallies.some(r => r.id === id))) {
-                const ordered = [];
-                for (const id of storedOrder) {
-                    const rally = rallies.find(r => r.id === id);
-                    if (rally) ordered.push(rally);
-                }
-                // Dodaj ewentualne brakujące rajdy (na wypadek gdyby coś się rozjechało)
-                for (const rally of rallies) {
-                    if (!ordered.includes(rally)) ordered.push(rally);
-                }
-                result.push(...ordered);
-            } else {
-                // Domyślne sortowanie alfabetyczne
-                result.push(...rallies.sort((a, b) => a.name.localeCompare(b.name)));
-            }
-        }
-
-        // Zachowaj w cache
-        this._l1[cacheKey] = result;
-        return result;
-    }
-
     // ── Pomocnicze gettery (L1) ───────────────────────────────────────────────
 
     async getCurrentSeason() {
@@ -304,13 +259,131 @@ class WRCAPI {
         delete this._l1.championship;
         delete this._l1.constructors;
         delete this._l1.powerStage;
-        delete this._l1.sortedCalendar; // <- unieważnij cache posortowanego kalendarza
         return await this.saveData(data);
     }
 
     // ── Sprawdzanie czy rajd jest anulowany ──────────────────────────────────
     _isRallyCancelled(rally) {
         return rally && rally.status === 'cancelled';
+    }
+
+    // ── FUNKCJE TIE-BREAKER ──────────────────────────────────────────────────
+    //
+    // Działanie: tworzymy kod składający się z liczby 1. miejsc, 2. miejsc, 3. miejsc, ...
+    // Każda liczba jest zapisana na 3 cyfrach (np. 001, 002, 010)
+    // Im większy kod, tym lepszy wynik.
+    //
+    // Przykład:
+    //   Kierowca A: 1 zwycięstwo, 2 drugie miejsca → kod: 001002000...
+    //   Kierowca B: 0 zwycięstw, 3 drugie miejsca  → kod: 000003000...
+    //   001002... > 000003... → Kierowca A jest wyżej
+
+    _calculateDriverTieBreaker(driverId, calendar) {
+        // Zbieramy wszystkie pozycje tego kierowcy w ukończonych rajdach
+        const positions = [];
+        for (const rally of calendar) {
+            if (rally.status !== 'completed') continue;
+            const calc = this._l1[`calc_${rally.id}`];
+            if (!calc?.overall) continue;
+            
+            const dr = calc.overall.find(r => r.driverId === driverId);
+            if (!dr || dr.status === '—' || dr.status === 'CANCELLED' || dr.status === 'DSQ') continue;
+            
+            const pos = dr.position;
+            if (pos !== null && pos > 0) {
+                positions.push(pos);
+            }
+        }
+        
+        // Liczymy wystąpienia każdej pozycji (od 1 do 20)
+        const positionCounts = {};
+        for (const pos of positions) {
+            positionCounts[pos] = (positionCounts[pos] || 0) + 1;
+        }
+        
+        // Tworzymy kod: [liczba 1. miejsc][liczba 2. miejsc][liczba 3. miejsc]...
+        // Każda liczba na 3 cyfrach
+        let tieBreakerCode = '';
+        for (let pos = 1; pos <= 20; pos++) {
+            const count = positionCounts[pos] || 0;
+            tieBreakerCode += String(count).padStart(3, '0');
+        }
+        
+        // Konwertujemy na liczbę (im większa, tym lepszy wynik)
+        return parseInt(tieBreakerCode) || 0;
+    }
+
+    // Tie-breaker dla konstruktorów – bierzemy najlepszą pozycję zespołu w każdym rajdzie
+    _calculateConstructorTieBreaker(teamId, calendar) {
+        const bestPositions = [];
+        for (const rally of calendar) {
+            if (rally.status !== 'completed') continue;
+            const calc = this._l1[`calc_${rally.id}`];
+            if (!calc?.overall) continue;
+            
+            // Znajdź najlepszego kierowcę zespołu w tym rajdzie
+            const teamDrivers = calc.overall.filter(r => 
+                r.teamId === teamId && 
+                r.status !== '—' && 
+                r.status !== 'CANCELLED' && 
+                r.status !== 'DSQ' &&
+                r.position !== null
+            );
+            
+            if (teamDrivers.length === 0) continue;
+            
+            // Weź najlepszą pozycję (najmniejszy numer)
+            const bestPos = Math.min(...teamDrivers.map(r => r.position));
+            bestPositions.push(bestPos);
+        }
+        
+        // Liczymy wystąpienia każdej pozycji
+        const positionCounts = {};
+        for (const pos of bestPositions) {
+            positionCounts[pos] = (positionCounts[pos] || 0) + 1;
+        }
+        
+        // Tworzymy kod
+        let tieBreakerCode = '';
+        for (let pos = 1; pos <= 20; pos++) {
+            const count = positionCounts[pos] || 0;
+            tieBreakerCode += String(count).padStart(3, '0');
+        }
+        
+        return parseInt(tieBreakerCode) || 0;
+    }
+
+    // Tie-breaker dla Power Stage
+    _calculatePowerStageTieBreaker(driverId, calendar) {
+        const psPositions = [];
+        for (const rally of calendar) {
+            if (rally.status !== 'completed') continue;
+            const calc = this._l1[`calc_${rally.id}`];
+            if (!calc?.powerStage) continue;
+            
+            const psResult = calc.powerStage.find(r => r.driverId === driverId);
+            if (!psResult) continue;
+            
+            const pos = psResult.position;
+            if (pos && pos > 0) {
+                psPositions.push(pos);
+            }
+        }
+        
+        // Liczymy wystąpienia każdej pozycji
+        const positionCounts = {};
+        for (const pos of psPositions) {
+            positionCounts[pos] = (positionCounts[pos] || 0) + 1;
+        }
+        
+        // Tworzymy kod
+        let tieBreakerCode = '';
+        for (let pos = 1; pos <= 10; pos++) {
+            const count = positionCounts[pos] || 0;
+            tieBreakerCode += String(count).padStart(3, '0');
+        }
+        
+        return parseInt(tieBreakerCode) || 0;
     }
 
     // ── Obliczenia wyników rajdu ──────────────────────────────────────────────
@@ -324,6 +397,7 @@ class WRCAPI {
         const results = await this.getRallyResults(rallyId);
         const drivers = await this.getDrivers();
         
+        // Jeśli rajd jest anulowany – zwróć puste wyniki
         if (this._isRallyCancelled(rally)) {
             const emptyResults = {
                 overall: drivers.map(d => ({
@@ -351,6 +425,7 @@ class WRCAPI {
 
         if (!rally || !results) return null;
 
+        // Oblicz najgorszy czas na każdym OS (tylko dla statusu OK)
         const worstTimePerStage = {};
         for (const stage of rally.stages) {
             if (stage === rally.powerStage) continue;
@@ -376,6 +451,7 @@ class WRCAPI {
             let hasInvalidTime = false;
             const stageTimes = [];
 
+            // Dla każdego OS (poza Power Stage)
             for (const stage of rally.stages) {
                 const isPowerStage = (stage === rally.powerStage);
                 const stageResult = results.stages[stage]?.find(r => r.driverId === driver.id);
@@ -408,6 +484,7 @@ class WRCAPI {
                     continue;
                 }
 
+                // OS (nie Power Stage)
                 if (!stageResult) {
                     const penaltyTime = worst + 45;
                     totalTimeSeconds += penaltyTime;
@@ -504,6 +581,7 @@ class WRCAPI {
             });
         }
 
+        // ===== SORTOWANIE =====
         overallResults.sort((a, b) => {
             if (a.status === 'DSQ' && b.status !== 'DSQ') return 1;
             if (b.status === 'DSQ' && a.status !== 'DSQ') return -1;
@@ -514,6 +592,7 @@ class WRCAPI {
             return aTime - bTime;
         });
 
+        // Przypisz pozycje
         const pointsSystem = this.data?.settings?.pointsSystem || CONFIG.DEFAULTS.POINTS_SYSTEM;
         let currentPos = 1;
         let leaderTime = null;
@@ -557,6 +636,7 @@ class WRCAPI {
             prevTime = time;
         }
 
+        // Power Stage – osobno
         const powerStageResults = [];
         const powerStage = results.stages[rally.powerStage];
         const psPoints = this.data?.settings?.powerStagePoints || CONFIG.DEFAULTS.POWER_STAGE_POINTS;
@@ -652,7 +732,7 @@ class WRCAPI {
         return this._l1.powerStage;
     }
 
-    // ── Wewnętrzne implementacje ─────────────────────────────────────────────
+    // ── Wewnętrzne implementacje (synchroniczne po przeliczeniu rajdów) ───────
 
     async _computeChampionship(drivers, calendar) {
         const standings = [];
@@ -687,10 +767,33 @@ class WRCAPI {
                 }
                 rallyDetails.push(rb);
             }
-            standings.push({ driverId: driver.id, driverName: driver.name, driverCountry: driver.country, teamId: driver.teamId, carModel: driver.carModel || '', totalPoints, rallyDetails });
+            
+            const tieBreaker = this._calculateDriverTieBreaker(driver.id, calendar);
+            
+            standings.push({ 
+                driverId: driver.id, 
+                driverName: driver.name, 
+                driverCountry: driver.country, 
+                teamId: driver.teamId, 
+                carModel: driver.carModel || '', 
+                totalPoints, 
+                rallyDetails,
+                tieBreaker
+            });
         }
-        standings.sort((a, b) => b.totalPoints - a.totalPoints);
-        standings.forEach((s, i) => { s.position = i + 1; s.diff = i > 0 ? standings[0].totalPoints - s.totalPoints : 0; });
+        
+        // SORTOWANIE: najpierw po punktach (malejąco), potem po tie-breaker (malejąco)
+        standings.sort((a, b) => {
+            if (b.totalPoints !== a.totalPoints) {
+                return b.totalPoints - a.totalPoints;
+            }
+            return (b.tieBreaker || 0) - (a.tieBreaker || 0);
+        });
+        
+        standings.forEach((s, i) => { 
+            s.position = i + 1; 
+            s.diff = i > 0 ? standings[0].totalPoints - s.totalPoints : 0; 
+        });
         return standings;
     }
 
@@ -700,7 +803,8 @@ class WRCAPI {
         for (const team of teams) {
             let totalPoints = 0;
             const rallyDetails = [];
-            const teamDrivers  = drivers.filter(d => d.teamId === team.id);
+            const teamDrivers = drivers.filter(d => d.teamId === team.id);
+            
             for (const rally of calendar) {
                 let rPts = 0;
                 const driverPoints = [];
@@ -713,6 +817,7 @@ class WRCAPI {
                 if (rally.status === 'completed') {
                     const calc = this._l1[`calc_${rally.id}`];
                     if (calc?.overall) {
+                        const teamRallyPoints = [];
                         for (const driver of teamDrivers) {
                             const dr = calc.overall.find(r => r.driverId === driver.id);
                             if (dr && dr.status !== '—' && dr.status !== 'CANCELLED' && dr.status !== 'DSQ') {
@@ -720,21 +825,43 @@ class WRCAPI {
                                 const ps = calc.powerStage?.find(r => r.driverId === driver.id);
                                 if (ps) pts += ps.points;
                                 pts += (dr.totalBonus || 0) + (dr.extraPoints || 0);
-                                if (pts > 0) driverPoints.push({ driverName: driver.name, points: pts });
+                                if (pts > 0) {
+                                    teamRallyPoints.push({ driverName: driver.name, points: pts, position: dr.position });
+                                }
                             }
                         }
+                        teamRallyPoints.sort((a, b) => b.points - a.points);
+                        const top = teamRallyPoints.slice(0, teamPointsCount);
+                        rPts = top.reduce((s, dp) => s + dp.points, 0);
+                        totalPoints += rPts;
+                        rallyDetails.push({ rallyId: rally.id, rallyName: rally.name, points: rPts, driverPoints: top });
+                    } else {
+                        rallyDetails.push({ rallyId: rally.id, rallyName: rally.name, points: 0, driverPoints: [] });
                     }
                 }
-                driverPoints.sort((a, b) => b.points - a.points);
-                const top = driverPoints.slice(0, teamPointsCount);
-                rPts = top.reduce((s, dp) => s + dp.points, 0);
-                totalPoints += rPts;
-                rallyDetails.push({ rallyId: rally.id, rallyName: rally.name, points: rPts, driverPoints: top });
             }
-            standings.push({ teamId: team.id, teamName: team.name, teamLogo: team.logo || 'assets/teams/default.png', totalPoints, rallyDetails });
+            
+            const tieBreaker = this._calculateConstructorTieBreaker(team.id, calendar);
+            
+            standings.push({ 
+                teamId: team.id, 
+                teamName: team.name, 
+                teamLogo: team.logo || 'assets/teams/default.png', 
+                totalPoints, 
+                rallyDetails,
+                tieBreaker
+            });
         }
-        standings.sort((a, b) => b.totalPoints - a.totalPoints);
-        standings.forEach((s, i) => { s.position = i + 1; s.diff = i > 0 ? standings[0].totalPoints - s.totalPoints : 0; });
+        
+        standings.sort((a, b) => {
+            if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
+            return (b.tieBreaker || 0) - (a.tieBreaker || 0);
+        });
+        
+        standings.forEach((s, i) => { 
+            s.position = i + 1; 
+            s.diff = i > 0 ? standings[0].totalPoints - s.totalPoints : 0; 
+        });
         return standings;
     }
 
@@ -743,6 +870,7 @@ class WRCAPI {
         for (const driver of drivers) {
             let totalPoints = 0;
             const rallyPoints = {};
+            
             for (const rally of calendar) {
                 if (rally.status === 'cancelled') {
                     rallyPoints[rally.id] = 0;
@@ -752,14 +880,39 @@ class WRCAPI {
                 if (rally.status === 'completed') {
                     const calc = this._l1[`calc_${rally.id}`];
                     const ps = calc?.powerStage?.find(r => r.driverId === driver.id);
-                    if (ps) { totalPoints += ps.points; rallyPoints[rally.id] = ps.points; }
+                    if (ps) { 
+                        totalPoints += ps.points; 
+                        rallyPoints[rally.id] = ps.points;
+                    } else {
+                        rallyPoints[rally.id] = 0;
+                    }
                 }
                 if (!rallyPoints[rally.id]) rallyPoints[rally.id] = 0;
             }
-            standings.push({ driverId: driver.id, driverName: driver.name, driverCountry: driver.country, teamId: driver.teamId, carModel: driver.carModel || '', totalPoints, rallyPoints });
+            
+            const tieBreaker = this._calculatePowerStageTieBreaker(driver.id, calendar);
+            
+            standings.push({ 
+                driverId: driver.id, 
+                driverName: driver.name, 
+                driverCountry: driver.country, 
+                teamId: driver.teamId, 
+                carModel: driver.carModel || '', 
+                totalPoints, 
+                rallyPoints,
+                tieBreaker
+            });
         }
-        standings.sort((a, b) => b.totalPoints - a.totalPoints);
-        standings.forEach((s, i) => { s.position = i + 1; s.diff = i > 0 ? standings[0].totalPoints - s.totalPoints : 0; });
+        
+        standings.sort((a, b) => {
+            if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
+            return (b.tieBreaker || 0) - (a.tieBreaker || 0);
+        });
+        
+        standings.forEach((s, i) => { 
+            s.position = i + 1; 
+            s.diff = i > 0 ? standings[0].totalPoints - s.totalPoints : 0; 
+        });
         return standings;
     }
 
@@ -829,7 +982,7 @@ class WRCAPI {
 // ── Singleton ─────────────────────────────────────────────────────────────────
 const api = new WRCAPI();
 
-// ── Unieważnienie cache z innych zakładek ─────────────────────────────────
+// ── Unieważnienie cache z innych zakładek (po zapisie admin) ─────────────────
 try {
     const _ch = new BroadcastChannel('wrc-data-invalidate');
     _ch.onmessage = (e) => {
@@ -849,7 +1002,7 @@ document.addEventListener('DOMContentLoaded', () => {
     style.textContent = `
         .rallytv-btn {
             display: inline-flex !important; align-items: center;
-            gap: 6px; padding: 0 14px 0 10px !important; 
+            gap: 6px; padding: 0 14px 0 10px !important;
             transition: background 0.35s, color 0.35s;
         }
         .rallytv-btn::before {
